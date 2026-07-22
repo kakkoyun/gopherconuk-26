@@ -30,3 +30,6 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# Per-talk living plans/trackers (gitignored — local only)
+plans/
