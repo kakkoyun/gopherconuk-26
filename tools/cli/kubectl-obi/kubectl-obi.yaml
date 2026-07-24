@@ -1,0 +1,63 @@
+apiVersion: krew.googlecontainertools.github.com/v1alpha2
+kind: Plugin
+metadata:
+  name: obi
+spec:
+  version: v0.1.0
+  homepage: https://github.com/kakkoyun/gopherconuk-26/tree/main/tools/cli/kubectl-obi
+  shortDescription: Manage OBI (OpenTelemetry eBPF Instrumentation) in your cluster
+  description: |
+    kubectl-obi attaches, manages, and queries OBI (OpenTelemetry eBPF
+    Instrumentation) — zero-touch distributed tracing for Kubernetes workloads.
+
+    OBI uses eBPF to instrument services without any code changes or restarts.
+    It works at the kernel level, supporting Go, Java, .NET, Python, Node.js,
+    and more via a single DaemonSet.
+
+    Requirements:
+      - Linux kernel 5.8+ with BTF (or RHEL 4.18+ with eBPF backports)
+      - Six Linux capabilities (see: kubectl obi attach --help)
+      - OTel Collector reachable from the cluster
+
+    Commands:
+      attach   Deploy OBI DaemonSet or inject sidecar
+      status   Show instrumentation status across the cluster
+      traces   Pull recent spans for a workload
+      detach   Remove OBI instrumentation
+
+  caveats: |
+    OBI is currently in Development status (v0.x). Breaking changes between
+    minor releases are expected. Pin to a specific OBI version for production.
+
+  platforms:
+    # TODO: populate with actual release asset URLs and checksums once a
+    # binary release is cut. See krew docs for the full platform matrix:
+    # https://krew.sigs.k8s.io/docs/developer-guide/plugin-manifest/
+    - selector:
+        matchLabels:
+          os: linux
+          arch: amd64
+      uri: https://github.com/kakkoyun/gopherconuk-26/releases/download/kubectl-obi-v0.1.0/kubectl-obi_linux_amd64.tar.gz
+      sha256: "TODO: fill in after cutting release"
+      bin: kubectl-obi
+    - selector:
+        matchLabels:
+          os: linux
+          arch: arm64
+      uri: https://github.com/kakkoyun/gopherconuk-26/releases/download/kubectl-obi-v0.1.0/kubectl-obi_linux_arm64.tar.gz
+      sha256: "TODO: fill in after cutting release"
+      bin: kubectl-obi
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: amd64
+      uri: https://github.com/kakkoyun/gopherconuk-26/releases/download/kubectl-obi-v0.1.0/kubectl-obi_darwin_amd64.tar.gz
+      sha256: "TODO: fill in after cutting release"
+      bin: kubectl-obi
+    - selector:
+        matchLabels:
+          os: darwin
+          arch: arm64
+      uri: https://github.com/kakkoyun/gopherconuk-26/releases/download/kubectl-obi-v0.1.0/kubectl-obi_darwin_arm64.tar.gz
+      sha256: "TODO: fill in after cutting release"
+      bin: kubectl-obi
