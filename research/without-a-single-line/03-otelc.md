@@ -153,10 +153,13 @@ CI pipeline integration: set `GOTOOLCHAIN` or add the tool to `$PATH` and prefix
 | Tool | Current version | Go min version |
 |------|----------------|----------------|
 | DataDog/orchestrion | v1.11.0 (2026-06-25) | Verify from go.mod |
-| otelc | v1.0.1 (2026-07-14) | Verify from go.mod |
+| otelc | v1.0.1 (2026-07-14) | **Go 1.25+** (confirmed from README badge) |
 
-**TODO:** Check both repos' `go.mod` for minimum Go version. This matters for the talk's "production
-ready" claims — if otelc requires Go 1.23+ it's less broadly applicable.
+**otelc requires Go 1.25+** — confirmed from the README badge `Go-1.25%2B`.
+This is a significant constraint for the talk: services on Go 1.23/1.24 cannot use otelc.
+For those, OBI or Orchestrion (check its go.mod) are the alternatives.
+
+**TODO:** Check DataDog/orchestrion `go.mod` for minimum Go version.
 
 ---
 
