@@ -12,6 +12,7 @@ Reading order matches the talk's three layers.
 | `06-narrative.md` | Framing, story arc, best-practice canon, pacing | TODO |
 | `07-war-stories.md` | First-hand dd-trace-go anecdotes (from ctx sessions) | TODO |
 | `00-sources.md` | Annotated bibliography — every source with URL + access date | TODO |
+| `08-blog-series.md` | Which corpus file became which blog post, and where each one stands | ongoing |
 | `claims-ledger.md` | Every factual claim → primary source → verified? | ongoing |
 
 ## Rule
