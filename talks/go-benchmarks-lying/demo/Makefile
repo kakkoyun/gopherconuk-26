@@ -10,7 +10,7 @@ BENCH_OUTPUT := /tmp/gopherconuk26-bench.txt
 BENCHSTAT    := $(shell go env GOPATH)/bin/benchstat
 BENCHDIFF    := $(shell go env GOPATH)/bin/benchdiff
 
-.PHONY: tools bench bench-dce bench-bloop bench-timer stat clean help
+.PHONY: tools bench bench-dce bench-bloop bench-timer bench-docker cv stat clean help
 
 ## tools: install benchstat and benchdiff
 tools:
@@ -43,6 +43,16 @@ bench-timer: $(BENCHSTAT)
 		-count=$(BENCH_COUNT) -benchtime=$(BENCH_TIME) . \
 		| tee $(BENCH_OUTPUT)
 	$(BENCHSTAT) $(BENCH_OUTPUT)
+
+## bench-docker: CV experiment — idle host vs loaded host vs pinned container
+bench-docker:
+	./cv-experiment.sh
+
+## cv: recompute the CV table from the captured results
+cv:
+	@for f in results/idle.txt results/noisy.txt results/pinned.txt; do \
+		echo "## $$(basename $$f .txt)"; awk -f cv.awk $$f; echo; \
+	done
 
 ## stat: run benchstat on the last captured output
 stat: $(BENCHSTAT)

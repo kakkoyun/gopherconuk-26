@@ -1,0 +1,26 @@
+goos: darwin
+goarch: arm64
+pkg: github.com/kakkoyun/gopherconuk-26/demo
+cpu: Apple M4 Max
+BenchmarkMakeBuffer_Correct-16    	41877204	        39.39 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	28957470	        43.30 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	29975360	        38.82 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	28551685	        40.91 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	28317886	        42.55 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	27342066	        44.01 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	28780026	        42.92 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	30921591	        36.77 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	52521198	        27.54 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	42488716	        27.87 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	40424343	        27.70 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	45772263	        27.72 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	40845964	        29.14 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	41842766	        26.32 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	41914563	        25.32 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	43495659	        29.36 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	48834333	        34.27 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	34967272	        39.33 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	36090993	        38.02 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct-16    	35994194	        38.13 ns/op	      64 B/op	       1 allocs/op
+PASS
+ok  	github.com/kakkoyun/gopherconuk-26/demo	28.485s

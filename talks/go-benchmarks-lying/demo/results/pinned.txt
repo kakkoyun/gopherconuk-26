@@ -1,0 +1,25 @@
+goos: linux
+goarch: arm64
+pkg: github.com/kakkoyun/gopherconuk-26/demo
+BenchmarkMakeBuffer_Correct 	75990199	        15.85 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	81551018	        16.34 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	66276752	        16.32 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	77695323	        16.10 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	80543787	        16.58 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	82399500	        16.13 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	76775872	        16.40 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	79331588	        15.17 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	83398273	        15.91 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	82762946	        15.64 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	82926634	        16.65 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	80828094	        16.24 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	83033168	        15.13 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	68419275	        15.14 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	81878232	        15.94 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	80343962	        15.43 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	77755590	        18.04 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	83214064	        18.02 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	76628992	        17.18 ns/op	      64 B/op	       1 allocs/op
+BenchmarkMakeBuffer_Correct 	73246183	        17.38 ns/op	      64 B/op	       1 allocs/op
+PASS
+ok  	github.com/kakkoyun/gopherconuk-26/demo	25.964s

@@ -71,10 +71,12 @@ After inlining, the compiler sees the inlined body and may eliminate it too. Det
 
 **LIVE DEMO 2** — `make bench-timer`.
 
-Show `BenchmarkProcess_StopOnly_BUG`: ns/op ≈ 0 (timer paused for entire run).
+Show `BenchmarkProcess_TimerOrder_BUG`: the Stop/Start pair brackets the wrong side of the work, so the timer bills the setup and skips the thing under test.
 Show `BenchmarkProcess_PerIterSetup_Correct`: real measurement.
 
-The misuse pattern: StopTimer without StartTimer. The fix: always bracket setup with Stop/Start pair.
+The misuse pattern: Stop/Start in the wrong order around the work. The fix: always bracket the *setup*, never the work.
+
+Worth saying out loud, not demoing: `StopTimer` with no matching `StartTimer` is worse than a wrong number. The testing framework never sees the iteration budget elapse, so the benchmark never terminates. (We tried to demo it. It hung.)
 
 ResetTimer: use after one-time setup before the loop. Matters most with `-benchtime=1x`.
 
@@ -135,14 +137,20 @@ Before CI, before nightly, before a pinned runner — can you trust the number o
 
 ### 4b. The Docker isolation demo (5 min)
 
-**LIVE DEMO 4** — show the same benchmark run:
-- (a) bare on a busy dev laptop: capture CV
-- (b) inside a container with `--cpuset-cpus=0 --cpus=1 --memory=512m`: capture CV
+**LIVE DEMO 4** — `make bench-docker`. Same benchmark, three conditions, CV captured each time.
 
-Watch CV collapse.
+Measured on an Apple M4 Max (darwin/arm64, 16 logical CPUs), `BenchmarkMakeBuffer_Correct`, `-count=20 -benchtime=1s`, container `golang:1.26`:
+
+| Condition | mean ns/op | stddev | CV% |
+|---|---|---|---|
+| idle host | 11.46 | 0.54 | **4.75** |
+| host with 16 background spinners | 34.97 | 6.60 | **18.88** |
+| container pinned to core 0, same 16 spinners | 16.28 | 0.85 | **5.25** |
+
+Read it out loud: the loaded machine's benchmark is three times slower *and* four times noisier. Pinning to a single core hands back the noise floor — 5.25% against an idle-machine 4.75% — while the host is still fully saturated. Raw output committed under `demo/results/`.
 
 **The macOS honesty caveat** (say this explicitly on stage):
-On macOS, Docker Desktop runs containers inside a Linux VM. `--cpuset-cpus` pins vCPUs inside that VM — not physical host cores. You cannot disable host SMT or Turbo Boost from inside. Linux host containers are the real story. If you're on a Mac, containers reduce noise from co-running processes but they're not the full picture. For serious numbers, use a Linux machine or a Linux CI runner.
+That 5.25% is the honest ceiling, not a triumph. A bare-metal Linux runner with SMT off reaches 0.05% — a hundred times tighter. On macOS, Docker Desktop runs containers inside a Linux VM. `--cpuset-cpus` pins vCPUs inside that VM — not physical host cores. You cannot disable host SMT or Turbo Boost from inside. Linux host containers are the real story. If you're on a Mac, containers reduce noise from co-running processes but they're not the full picture. For serious numbers, use a Linux machine or a Linux CI runner.
 
 ### 4c. CPU affinity and core isolation (2 min)
 
