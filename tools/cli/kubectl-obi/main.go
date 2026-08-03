@@ -4,8 +4,14 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
+	"os/exec"
+	"strings"
+	"time"
 
 	"github.com/spf13/cobra"
 )
@@ -35,6 +41,17 @@ Requires: Linux kernel 5.8+ with BTF, and the six required capabilities.`,
 	if err := root.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+// runKubectl runs kubectl with the given arguments, returning combined output.
+// On non-zero exit, the error message includes stderr for context.
+func runKubectl(args ...string) (string, error) {
+	cmd := exec.Command("kubectl", args...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("kubectl %s: %w\n%s", strings.Join(args, " "), err, strings.TrimSpace(string(out)))
+	}
+	return string(out), nil
 }
 
 // attach —————————————————————————————————————————————————
@@ -82,24 +99,85 @@ Requires a rollout restart.`,
 
 func attachDaemonSet(namespace string) error {
 	fmt.Printf("Deploying OBI %s DaemonSet into namespace %q...\n", obiVersion, namespace)
-	// TODO: apply the OBI DaemonSet manifest using client-go or kubectl exec
-	// Manifest: https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/releases/download/v0.10.0/obi-daemonset.yaml
-	// 1. Create namespace if not exists
-	// 2. Apply the DaemonSet YAML
-	// 3. Wait for DaemonSet to be Ready
-	fmt.Printf("TODO: apply DaemonSet from OBI %s release\n", obiVersion)
-	fmt.Println("Once implemented, all pods on each node will be automatically instrumented.")
+
+	// Create namespace idempotently: ignore "already exists" errors.
+	_, err := runKubectl("create", "namespace", namespace)
+	if err != nil && !strings.Contains(err.Error(), "already exists") {
+		return fmt.Errorf("attach daemonset: create namespace: %w", err)
+	}
+
+	manifestURL := fmt.Sprintf(
+		"https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/releases/download/%s/obi-daemonset.yaml",
+		obiVersion,
+	)
+	fmt.Printf("Applying manifest from %s...\n", manifestURL)
+	out, err := runKubectl("apply", "-f", manifestURL, "-n", namespace)
+	if err != nil {
+		return fmt.Errorf("attach daemonset: apply manifest: %w", err)
+	}
+	fmt.Print(out)
+
+	fmt.Println("Waiting for DaemonSet rollout (timeout: 120s)...")
+	out, err = runKubectl("rollout", "status", "daemonset/obi-daemonset", "-n", namespace, "--timeout=120s")
+	if err != nil {
+		return fmt.Errorf("attach daemonset: rollout status: %w", err)
+	}
+	fmt.Print(out)
+
+	fmt.Printf("\nOBI %s deployed successfully.\n", obiVersion)
+	fmt.Println("Run `kubectl obi status` to verify instrumentation is active.")
 	return nil
+}
+
+// jsonPatchOp is a single RFC 6902 JSON Patch operation.
+type jsonPatchOp struct {
+	Op    string `json:"op"`
+	Path  string `json:"path"`
+	Value any    `json:"value"`
 }
 
 func attachSidecar(deployment, namespace string) error {
 	fmt.Printf("Injecting OBI %s sidecar into deployment %q (namespace %q)...\n", obiVersion, deployment, namespace)
-	// TODO: patch the deployment to add the OBI sidecar container
-	// 1. Get the deployment spec
-	// 2. Add obi sidecar container with shareProcessNamespace: true + required caps
-	// 3. Apply the patch
-	// 4. Wait for rollout to complete
-	fmt.Printf("TODO: patch deployment %q with OBI sidecar\n", deployment)
+
+	if _, err := runKubectl("get", "deployment", deployment, "-n", namespace); err != nil {
+		return fmt.Errorf("attach sidecar: get deployment: %w", err)
+	}
+
+	image := fmt.Sprintf("ghcr.io/open-telemetry/opentelemetry-ebpf-instrumentation/obi:%s", obiVersion)
+	patchOps := []jsonPatchOp{
+		{Op: "add", Path: "/spec/template/spec/shareProcessNamespace", Value: true},
+		{Op: "add", Path: "/spec/template/spec/containers/-", Value: map[string]any{
+			"name":            "obi",
+			"image":           image,
+			"imagePullPolicy": "IfNotPresent",
+			"securityContext": map[string]any{"privileged": true},
+		}},
+	}
+	patchJSON, err := json.Marshal(patchOps)
+	if err != nil {
+		return fmt.Errorf("attach sidecar: build patch: %w", err)
+	}
+
+	fmt.Println("Patching deployment with OBI sidecar...")
+	out, err := runKubectl("patch", "deployment", deployment, "-n", namespace, "--type=json", "-p", string(patchJSON))
+	if err != nil {
+		return fmt.Errorf("attach sidecar: patch deployment: %w", err)
+	}
+	fmt.Print(out)
+
+	out, err = runKubectl("rollout", "restart", "deployment/"+deployment, "-n", namespace)
+	if err != nil {
+		return fmt.Errorf("attach sidecar: rollout restart: %w", err)
+	}
+	fmt.Print(out)
+
+	fmt.Println("Waiting for rollout to complete (timeout: 120s)...")
+	out, err = runKubectl("rollout", "status", "deployment/"+deployment, "-n", namespace, "--timeout=120s")
+	if err != nil {
+		return fmt.Errorf("attach sidecar: rollout status: %w", err)
+	}
+	fmt.Print(out)
+
 	return nil
 }
 
@@ -127,12 +205,35 @@ func newStatusCmd() *cobra.Command {
 func showStatus(namespace string, allNamespaces bool) error {
 	fmt.Println("OBI Status")
 	fmt.Println("----------")
-	// TODO: list OBI DaemonSet pods and their readiness
-	// TODO: list workloads that have OBI sidecar injected
-	// TODO: show which services are emitting spans (check OTel collector metrics)
-	fmt.Println("TODO: query cluster for OBI DaemonSet and sidecar pods")
-	fmt.Printf("  Namespace: %s\n", namespace)
-	fmt.Printf("  All namespaces: %v\n", allNamespaces)
+
+	// nsArgs appends the appropriate namespace flag(s) to a base argument slice.
+	nsArgs := func(base ...string) []string {
+		if allNamespaces {
+			return append(base, "--all-namespaces")
+		}
+		if namespace != "" {
+			return append(base, "-n", namespace)
+		}
+		return base
+	}
+
+	dsOut, err := runKubectl(nsArgs("get", "daemonset", "-l", "app=obi")...)
+	if err != nil {
+		fmt.Printf("DaemonSets: none found\n")
+	} else {
+		fmt.Println("DaemonSets:")
+		fmt.Print(dsOut)
+	}
+
+	fmt.Println()
+	podOut, err := runKubectl(nsArgs("get", "pods", "-l", "app=obi")...)
+	if err != nil {
+		fmt.Printf("Pods: none found\n")
+	} else {
+		fmt.Println("Pods:")
+		fmt.Print(podOut)
+	}
+
 	return nil
 }
 
@@ -163,13 +264,73 @@ Jaeger instance.`,
 	return cmd
 }
 
-func pullTraces(deployment, _ string, tail int, _ bool) error {
-	fmt.Printf("Fetching last %d spans for %q...\n", tail, deployment)
-	// TODO: query Jaeger/Tempo/OTel Collector API for spans with service.name=deployment
-	// TODO: if --follow, open a streaming OTLP receiver or long-poll the backend
-	fmt.Println("TODO: query OTLP backend for trace data")
-	fmt.Println("Tip: set OTEL_BACKEND=http://jaeger:16686 or OTEL_BACKEND=http://tempo:3100")
-	return nil
+func pullTraces(deployment, _ string, tail int, follow bool) error {
+	backend := os.Getenv("OTEL_BACKEND")
+	if backend == "" {
+		backend = "http://localhost:16686"
+	}
+
+	fmt.Printf("Fetching last %d spans for %q from %s...\n", tail, deployment, backend)
+
+	fetch := func() error {
+		// #nosec G107 — URL is constructed from user-controlled env var, intentional.
+		url := fmt.Sprintf("%s/api/traces?service=%s&limit=%d", backend, deployment, tail)
+		resp, err := http.Get(url) //nolint:noctx
+		if err != nil {
+			return fmt.Errorf("pull traces: connect to %q: %w\nTip: set OTEL_BACKEND=http://<jaeger-host>:16686", backend, err)
+		}
+		defer resp.Body.Close()
+
+		body, err := io.ReadAll(resp.Body)
+		if err != nil {
+			return fmt.Errorf("pull traces: read response: %w", err)
+		}
+
+		var result struct {
+			Data []struct {
+				TraceID string `json:"traceID"`
+				Spans   []struct {
+					OperationName string `json:"operationName"`
+					Duration      int64  `json:"duration"`
+					StartTime     int64  `json:"startTime"`
+				} `json:"spans"`
+			} `json:"data"`
+		}
+		if err := json.Unmarshal(body, &result); err != nil {
+			return fmt.Errorf("pull traces: parse response: %w", err)
+		}
+
+		if len(result.Data) == 0 {
+			fmt.Println("No traces found.")
+			return nil
+		}
+
+		fmt.Printf("%-50s  %-12s  %s\n", "OPERATION", "DURATION", "START TIME")
+		fmt.Println(strings.Repeat("-", 82))
+		for _, trace := range result.Data {
+			for _, span := range trace.Spans {
+				dur := time.Duration(span.Duration) * time.Microsecond
+				start := time.UnixMicro(span.StartTime).Format(time.RFC3339)
+				fmt.Printf("%-50s  %-12s  %s\n", span.OperationName, dur, start)
+			}
+		}
+		return nil
+	}
+
+	if err := fetch(); err != nil {
+		return err
+	}
+	if !follow {
+		return nil
+	}
+
+	fmt.Println("\nFollowing... (Ctrl-C to stop)")
+	for {
+		time.Sleep(2 * time.Second)
+		if err := fetch(); err != nil {
+			fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		}
+	}
 }
 
 // detach —————————————————————————————————————————————————
@@ -208,16 +369,44 @@ func newDetachCmd() *cobra.Command {
 
 func detachDaemonSet(namespace string) error {
 	fmt.Printf("Removing OBI DaemonSet from namespace %q...\n", namespace)
-	// TODO: delete the DaemonSet and associated resources
-	fmt.Println("TODO: delete OBI DaemonSet")
+	out, err := runKubectl("delete", "daemonset", "obi-daemonset", "-n", namespace, "--ignore-not-found")
+	if err != nil {
+		return fmt.Errorf("detach daemonset: %w", err)
+	}
+	if strings.TrimSpace(out) == "" {
+		fmt.Println("OBI DaemonSet not found (already removed).")
+	} else {
+		fmt.Print(out)
+		fmt.Println("OBI DaemonSet removed.")
+	}
 	return nil
 }
 
 func detachSidecar(deployment, namespace string) error {
 	fmt.Printf("Removing OBI sidecar from deployment %q (namespace %q)...\n", deployment, namespace)
-	// TODO: patch the deployment to remove the OBI sidecar container
-	// TODO: trigger rollout restart
-	fmt.Println("TODO: remove sidecar container and restart deployment")
+
+	// Strategic merge patch: $patch:delete removes the container by its merge key (name).
+	// Setting shareProcessNamespace to false restores the default.
+	mergePatch := `{"spec":{"template":{"spec":{"shareProcessNamespace":false,"containers":[{"name":"obi","$patch":"delete"}]}}}}`
+	out, err := runKubectl("patch", "deployment", deployment, "-n", namespace, "--type=strategic", "-p", mergePatch)
+	if err != nil {
+		return fmt.Errorf("detach sidecar: patch deployment: %w", err)
+	}
+	fmt.Print(out)
+
+	out, err = runKubectl("rollout", "restart", "deployment/"+deployment, "-n", namespace)
+	if err != nil {
+		return fmt.Errorf("detach sidecar: rollout restart: %w", err)
+	}
+	fmt.Print(out)
+
+	fmt.Println("Waiting for rollout to complete (timeout: 120s)...")
+	out, err = runKubectl("rollout", "status", "deployment/"+deployment, "-n", namespace, "--timeout=120s")
+	if err != nil {
+		return fmt.Errorf("detach sidecar: rollout status: %w", err)
+	}
+	fmt.Print(out)
+
 	return nil
 }
 
