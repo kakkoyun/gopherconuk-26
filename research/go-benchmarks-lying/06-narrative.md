@@ -36,9 +36,12 @@ Source: Wikipedia, "OPERA experiment" (fetched 2026-07-22).
   explicitly; 730 km is the standard published baseline but must be attributed to the OPERA
   collaboration's papers rather than the Wikipedia article alone. [PARTIALLY VERIFIED — confirm
   against OPERA paper JHEP 10 (2012) 093 before using on stage]
-- **73 ns timing error:** Wikipedia does not state this figure. It appears in news reports and
-  the OPERA erratum but is [UNVERIFIED from the Wikipedia source]. Confirm against the OPERA
-  collaboration's erratum (arXiv:1109.4897v4) before quoting.
+- **73 ns timing error:** [VERIFIED 2026-08-03 — see claims-ledger #9.] The figure is real but
+  does **not** come from arXiv:1109.4897v4, which reports only the corrected measurement and
+  contains no fault analysis. Cite the CERN press release of 22 Feb 2012 for the cable root
+  cause and Cartlidge, *Science* 335(6072):1027 for the number. Two faults with opposite signs:
+  the connector made neutrinos appear ~73 ns early, an oscillator fault pushed the other way,
+  net anomaly ~58–62 ns. Do not attach a specific figure to the oscillator.
 
 ### Why This Works as a Cold Open
 
@@ -179,7 +182,10 @@ Answer: `-count=10` + `benchstat`. Everything else is compounding on top of that
 - **Source:** Wikipedia, "OPERA experiment," https://en.wikipedia.org/wiki/OPERA_experiment
   (fetched 2026-07-22). For the 73 ns figure, cite OPERA erratum arXiv:1109.4897v4 directly.
 - **730 km distance:** [PARTIALLY VERIFIED] — confirm from OPERA paper before stating on stage.
-- **73 ns timing error:** [UNVERIFIED from Wikipedia] — confirm from OPERA erratum.
+- **73 ns timing error:** [VERIFIED] — approved stage wording: "An improperly seated fibre-optic
+  connector in OPERA's GPS timing chain introduced a ~73 ns bias — enough to explain the apparent
+  superluminal signal once a partially-offsetting oscillator fault is accounted for." Sources:
+  CERN press release 22 Feb 2012; Cartlidge, *Science* 335(6072):1027. Not arXiv:1109.4897v4.
 - **How to use:** Cold open only. One slide, 90 seconds. The cable = your measurement
   environment. Do not over-explain the physics.
 
@@ -209,16 +215,17 @@ Answer: `-count=10` + `benchstat`. Everything else is compounding on top of that
 
 ### 4. Tobi Lütke — "All World-Class Software Is Fast"
 
-- **Claimed quote:** "All world-class software is fast. There's a strong correlation between
-  software quality and speed." Attributed to @tobi on Twitter/X, October 2018, tweet ID
-  1052495816956358657.
-- **Status: [UNVERIFIED]** — Twitter/X requires authentication; the tweet could not be fetched.
-  The quote is widely cited in performance engineering communities but cannot be confirmed as
-  exact wording from primary sources accessed.
-- **How to use:** If you can independently verify the tweet, use it as the opening epigraph.
-  If not, paraphrase as "Tobi Lütke has argued publicly that performance is a proxy for
-  software quality" and cite the tweet ID so audience can verify. Do not quote verbatim without
-  confirmation.
+- **Verified quote** (2026-08-03, claims-ledger #12): "Not all fast software is world-class, but
+  all world-class software is fast. Performance is _the_ killer feature."
+- **Source:** Tobi Lütke (@tobi), X, 5 May 2024 — https://x.com/tobi/status/1787139157078188180.
+  Note this is **not** the October 2018 tweet ID (1052495816956358657) recorded in earlier drafts;
+  that attribution was wrong. The wording above was corroborated across independent excerpts.
+- **Context:** the post argued that "premature optimization is the root of all evil" has been
+  systematically misread — Knuth was warning against hand-written assembler, not endorsing slow
+  software — and linked a SQLite thread on getting 50% faster through hundreds of small changes.
+- **How to use:** safe as a verbatim opening epigraph. Caveat: the X link needs a login to render,
+  so some of the audience will not be able to open it. Don't build an argument that depends on
+  them following the link.
 
 ### 5. Gil Tene — "How NOT to Measure Latency"
 
@@ -335,8 +342,16 @@ Post 1 goes out the week before the conference as a teaser. Posts 2–5 publish 
    https://github.com/dendibakh/perf-book (fetched 2026-07-22). Title, author, CC0 licence
    confirmed.
 
-6. @tobi (Tobi Lütke), tweet ID 1052495816956358657 — https://x.com/tobi/status/1052495816956358657
-   [UNVERIFIED — Twitter/X requires authentication; could not access content].
+6. Tobi Lütke (@tobi), X, 5 May 2024 — https://x.com/tobi/status/1787139157078188180
+   [VERIFIED 2026-08-03 — exact wording corroborated across independent excerpts. Supersedes the
+   October 2018 tweet ID previously cited here, which was the wrong post.]
+
+9. CERN, "OPERA experiment reports anomaly in flight time of neutrinos from CERN to Gran Sasso,"
+   press release, 22 February 2012 — https://home.cern/news/press-release/cern/opera-experiment-reports-anomaly-flight-time-neutrinos-cern-gran-sasso
+   [VERIFIED 2026-08-03 — names both faults and their directions; gives no nanosecond figures.]
+
+10. Edwin Cartlidge, "Loose cable may unravel faster-than-light result," *Science* 335(6072):1027
+    (2012), doi:10.1126/science.335.6072.1027 [VERIFIED 2026-08-03 — source for the ~73 ns figure].
 
 7. Yahoo YUI Blog, Stoyan Stefanov, "Performance Research, Part 2" (2007) —
    http://yuiblog.com/blog/2007/01/04/performance-research-part-2/ [UNVERIFIED — page defunct;

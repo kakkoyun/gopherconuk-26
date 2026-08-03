@@ -146,13 +146,22 @@ Explains how visualisation choice (strip plots over boxplots) affects ability to
 
 **[S25]** Brendan Gregg — Systems Performance: Enterprise and the Cloud (2nd ed.)
 https://www.brendangregg.com/blog/2020-07-15/systems-performance-2nd-edition.html
-The definitive reference on systems performance methodology. Quote: "Not all fast software is world-class, but all world-class software is fast." [UNVERIFIED: exact attribution — check if this is Gregg or Lütke].
+The definitive reference on systems performance methodology.
+
+**[S25b]** Tobi Lütke (@tobi), X, 5 May 2024 — https://x.com/tobi/status/1787139157078188180
+"Not all fast software is world-class, but all world-class software is fast. Performance is _the_ killer feature." [VERIFIED 2026-08-03 — the quote is Lütke's, not Gregg's; an earlier draft of this file attributed it to S25 by mistake. The link needs an X login to render.]
 
 **[S26]** Google latency research — "500ms delay costs 20% traffic"
-[UNVERIFIED: original source unclear — commonly attributed to Marissa Mayer / Urs Hölzle (2006 Google I/O). Verify before using on slide.]
+[VERIFIED for use with a constraint: attribute to "the Google search team". The Marissa Mayer attribution could not be confirmed from primary sources — do not name her. Secondary citation: Jeff Atwood, "Performance is a Feature," https://blog.codinghorror.com/performance-is-a-feature/]
 
 **[S27]** Yahoo latency research — "400ms improvement gave 5-9% more traffic"
-[UNVERIFIED: attributed to Eric Schurman and Jake Loomis (2009 Velocity). Verify before using on slide.]
+[DROPPED — the YUI Blog original is defunct and archive retrieval was blocked. Do not use in slides or posts. Use S26 instead.]
+
+**[S28]** CERN press release, 22 February 2012 — https://home.cern/news/press-release/cern/opera-experiment-reports-anomaly-flight-time-neutrinos-cern-gran-sasso
+[VERIFIED 2026-08-03] Names OPERA's two candidate faults (fibre-optic connector, oscillator) and their opposite directions. No nanosecond figures.
+
+**[S29]** Edwin Cartlidge, "Loose cable may unravel faster-than-light result," *Science* 335(6072):1027 (2012), doi:10.1126/science.335.6072.1027
+[VERIFIED 2026-08-03] Source for the ~73 ns connector bias. Note arXiv:1109.4897v4 is *not* a valid source for this figure — it reports the corrected result only.
 
 ---
 

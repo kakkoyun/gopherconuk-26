@@ -138,9 +138,11 @@ go install github.com/aclements/perflock@latest
 perflock go test -bench=. -count=10 -benchtime=2s ./...
 ```
 
-**How it works**: sets the CPU governor to `performance`, pins max/min frequency to base, and disables Turbo Boost via the `no_turbo` sysfs knob on Intel. AMD uses the `boost` knob.
+**How it works** (verified 2026-08-03 by reading the source, not the README, which is silent on all of this): two separate mechanisms. First, a mutual-exclusion lock, so two benchmark runs never overlap on the same machine. Second, frequency pinning — `SetRange()` writes `scaling_min_freq` and `scaling_max_freq` under `/sys/devices/system/cpu/cpu*/cpufreq/`. It does **not** touch `intel_pstate`'s `max_perf_pct` or the `no_turbo` knob; earlier drafts of this file claimed it did, and that was wrong.
 
-**macOS**: `perflock` installs and runs, but macOS does not expose frequency control via sysfs. Effect on macOS is limited to what the OS will allow. [UNVERIFIED: exact macOS behaviour — check github.com/aclements/perflock README]
+The governor flag defaults to `90` on every invocation (`cmd/perflock/main.go`), and is applied after the lock is acquired unless you pass `-governor=none`.
+
+**macOS** [S14, claims-ledger #16]: `perflock` builds and the lock works — there are no build tags excluding darwin. Frequency pinning does not work. `Domains()` reads `/sys/devices/system/cpu/`, which does not exist on macOS, so the default `-governor 90` errors out. Pass `-governor=none` for lock-only behaviour. On a Mac, perflock buys you serialisation between benchmark runs and nothing else.
 
 **Recommendation**: use `perflock` by default for all Go benchmarking on Linux. Single highest-value local tool after `benchstat`.
 
