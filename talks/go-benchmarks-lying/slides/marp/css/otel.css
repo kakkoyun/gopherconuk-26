@@ -1,0 +1,316 @@
+/* @theme otel */
+/*
+  OpenTelemetry brand theme for Marp
+  Dark theme with proper syntax highlighting for code-heavy presentations.
+  Inspired by the OTel brand palette and the Datadog Marp theme structure.
+*/
+
+@import "default";
+
+:root {
+    --base: #0f1729;
+    --surface: #1a2332;
+    --overlay: #243044;
+    --muted: #6b7b8d;
+    --subtle: #94a3b8;
+    --text: #e8edf3;
+    --love: #f472b6;
+    --gold: #f5a623;
+    --rose: #818cf8;
+    --pine: #34d399;
+    --foam: #67e8f9;
+    --iris: #4f62ad;
+    --highlight-low: #1e293b;
+    --highlight-muted: #334155;
+    --highlight-high: #475569;
+
+    font-family: 'Inter', 'Helvetica Neue', ui-sans-serif, system-ui,
+        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial,
+        sans-serif;
+    font-weight: initial;
+
+    background-color: var(--base);
+}
+
+/* Common style */
+h1 {
+    color: var(--rose);
+    font-size: 1.3em;
+    padding-bottom: 1mm;
+    margin-bottom: 6mm;
+}
+h2 {
+    color: var(--rose);
+}
+h3 {
+    color: var(--foam);
+}
+h4 {
+    color: var(--rose);
+}
+a {
+    color: var(--foam);
+}
+p {
+    font-size: 20pt;
+    font-weight: 500;
+    color: var(--text);
+}
+code {
+    color: var(--text);
+    background-color: var(--highlight-muted);
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', 'Cascadia Code', monospace;
+}
+text {
+    color: var(--text);
+}
+ul {
+    color: var(--subtle);
+}
+li {
+    color: var(--subtle);
+}
+strong {
+    color: var(--text);
+    font-weight: 800;
+}
+blockquote {
+    border-left: 4px solid var(--gold);
+    background: rgba(245, 166, 35, 0.08);
+    padding: 12px 20px;
+    margin: 12px 0;
+    border-radius: 0 6px 6px 0;
+}
+blockquote p {
+    color: var(--text);
+    font-size: 18pt;
+}
+
+/* Tables */
+table {
+    font-size: 0.7em;
+    color: var(--text);
+    background-color: transparent;
+    border-collapse: collapse;
+}
+td {
+    vertical-align: middle;
+    color: var(--subtle);
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--highlight-muted);
+}
+tr:nth-child(even) td {
+    background-color: var(--highlight-low);
+}
+thead th {
+    background-color: var(--overlay);
+    color: var(--text);
+    border-bottom: 2px solid var(--highlight-high);
+}
+
+/* Code block container */
+marp-pre {
+    background-color: var(--overlay);
+    border: 1px solid var(--highlight-high);
+    border-radius: 8px;
+}
+
+section pre {
+    font-size: 0.62em;
+    line-height: 1.5;
+}
+
+section pre code {
+    font-family: 'Menlo', 'Monaco', 'Consolas', 'DejaVu Sans Mono', monospace;
+    color: var(--text);
+    background: transparent;
+    -webkit-font-feature-settings: normal;
+    font-feature-settings: normal;
+    font-variant-ligatures: none;
+}
+
+/* ─── Syntax highlighting (highlight.js classes) ─── */
+
+.hljs-comment {
+    color: var(--muted);
+    font-style: italic;
+}
+.hljs-attr {
+    color: var(--foam);
+}
+.hljs-punctuation {
+    color: var(--subtle);
+}
+.hljs-string {
+    color: var(--gold);
+}
+.hljs-title {
+    color: var(--foam);
+}
+.hljs-keyword {
+    color: var(--pine);
+}
+.hljs-variable {
+    color: var(--text);
+}
+.hljs-literal {
+    color: var(--rose);
+}
+.hljs-type {
+    color: var(--love);
+}
+.hljs-number {
+    color: var(--gold);
+}
+.hljs-built_in {
+    color: var(--love);
+}
+.hljs-params {
+    color: var(--iris);
+}
+.hljs-symbol {
+    color: var(--foam);
+}
+.hljs-meta {
+    color: var(--subtle);
+}
+.hljs-function {
+    color: var(--foam);
+}
+.hljs-selector-class {
+    color: var(--pine);
+}
+.hljs-selector-id {
+    color: var(--foam);
+}
+.hljs-tag {
+    color: var(--love);
+}
+.hljs-name {
+    color: var(--love);
+}
+.hljs-section {
+    color: var(--rose);
+}
+.hljs-bullet {
+    color: var(--gold);
+}
+
+/* Header - small, top-left */
+header {
+    font-size: 0.4em;
+    color: var(--muted);
+    text-align: left;
+    width: auto;
+}
+
+/* Hide footer by default */
+footer {
+    display: none;
+}
+
+/* Page number */
+section::after {
+    font-size: 0.45em;
+    color: var(--muted);
+}
+
+/* ─── Lead class (section dividers) ─── */
+
+section.lead {
+    background: linear-gradient(135deg, #162B4D 0%, var(--iris) 100%);
+    color: var(--text);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    text-align: center;
+}
+
+section.lead h1 {
+    color: #ffffff;
+    border-bottom: 3px solid var(--gold);
+    font-size: 2.2em;
+    display: inline-block;
+    margin: 0 auto 0.5em;
+    padding-bottom: 0.2em;
+}
+
+section.lead h2 {
+    color: rgba(255, 255, 255, 0.8);
+    font-weight: 400;
+    font-size: 1.1em;
+}
+
+section.lead p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9em;
+}
+
+section.lead a {
+    color: var(--gold);
+}
+
+section.lead footer {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+section.lead::after {
+    color: rgba(255, 255, 255, 0.3);
+}
+
+/* ─── Invert class (light slides for contrast) ─── */
+
+section.invert {
+    --base: #f8fafc;
+    --surface: #ffffff;
+    --overlay: #f1f5f9;
+    --muted: #94a3b8;
+    --subtle: #475569;
+    --text: #1e293b;
+    --love: #be185d;
+    --gold: #b45309;
+    --rose: #4338ca;
+    --pine: #047857;
+    --foam: #0e7490;
+    --iris: #4f62ad;
+    --highlight-low: #f1f5f9;
+    --highlight-muted: #e2e8f0;
+    --highlight-high: #cbd5e1;
+
+    background-color: var(--base);
+}
+
+section.invert marp-pre {
+    background-color: #1e293b;
+    border-color: #334155;
+}
+
+section.invert pre code {
+    color: #e2e8f0;
+}
+
+/* Re-apply dark syntax highlighting inside invert code blocks */
+section.invert .hljs-comment { color: #6b7b8d; }
+section.invert .hljs-attr { color: #67e8f9; }
+section.invert .hljs-string { color: #f5a623; }
+section.invert .hljs-title { color: #67e8f9; }
+section.invert .hljs-keyword { color: #34d399; }
+section.invert .hljs-type { color: #f472b6; }
+section.invert .hljs-number { color: #f5a623; }
+section.invert .hljs-built_in { color: #f472b6; }
+section.invert .hljs-literal { color: #818cf8; }
+section.invert .hljs-variable { color: #e2e8f0; }
+section.invert .hljs-punctuation { color: #94a3b8; }
+
+section.invert code {
+    background-color: var(--highlight-muted);
+    color: var(--text);
+}
+
+section.invert footer {
+    color: var(--muted);
+}
+
+section.invert::after {
+    color: var(--muted);
+}

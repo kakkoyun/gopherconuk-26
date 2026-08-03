@@ -58,16 +58,28 @@ var sinkStr string
 // b.duration to stay at 0 forever, so the testing framework keeps doubling
 // b.N and the benchmark never exits. Don't run that live.
 
-// BenchmarkProcess_TimerOrder_BUG: work runs while timer is stopped.
-// StartTimer called AFTER processString — timer measures fixture, not work.
-// Expected: ns/op ≈ cost of buildFixture (not processString).
+// BenchmarkProcess_TimerOrder_BUG: the Stop/Start pair brackets the work
+// instead of the setup — the exact inversion of what was intended.
+//
+// The fixture is built with the timer RUNNING, and processString runs with the
+// timer STOPPED. So ns/op reports the cost of buildFixture, and the function
+// actually under test contributes nothing to the measurement.
+//
+// Expected: ns/op ≈ cost of buildFixture, and _Correct is the cheaper-looking
+// of the two even though it measures strictly more work.
+//
+// Note on ordering: the pair must leave the timer running across some part of
+// each iteration. A variant that stops the timer first and starts it last
+// (StopTimer, fixture, work, StartTimer) leaves b.duration at ~0 forever, so
+// the framework keeps doubling b.N and the benchmark never exits — the same
+// failure as omitting StartTimer entirely. Don't run that live.
 func BenchmarkProcess_TimerOrder_BUG(b *testing.B) {
 	var s string
 	for range b.N {
+		input := buildFixture(fixtureSize) // BUG: fixture is timed
 		b.StopTimer()
-		input := buildFixture(fixtureSize) // fixture: timer stopped ✓
-		s = processString(input)           // BUG: work runs while timer is off
-		b.StartTimer()                     // timer restarts AFTER work — measures nothing useful
+		s = processString(input) // BUG: the work under test is not timed
+		b.StartTimer()
 	}
 	sinkStr = s
 }

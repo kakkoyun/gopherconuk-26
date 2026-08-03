@@ -1,0 +1,4 @@
+# Build output — regenerate with `make pdf` / `make html`
+presentation.pdf
+presentation.html
+node_modules/
