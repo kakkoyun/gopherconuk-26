@@ -1,0 +1,72 @@
+{
+  "mcpServers": {
+    "meme": {
+      "type": "http",
+      "url": "https://memebo.at/mcp"
+    },
+    "giphy": {
+      "command": "op",
+      "args": [
+        "--account",
+        "my.1password.com",
+        "run",
+        "--",
+        "npx",
+        "-y",
+        "mcp-server-giphy@1.0.3"
+      ],
+      "env": {
+        "GIPHY_API_KEY": "op://Private/Giphy API Key/credential"
+      }
+    },
+    "readwise": {
+      "type": "http",
+      "url": "https://mcp2.readwise.io/mcp"
+    },
+    "fal": {
+      "command": "op",
+      "args": [
+        "--account",
+        "my.1password.com",
+        "run",
+        "--",
+        "sh",
+        "-c",
+        "exec npx -y mcp-remote@0.1.38 https://mcp.fal.ai/mcp --header \"Authorization: Bearer $FAL_KEY\""
+      ],
+      "env": {
+        "FAL_KEY": "op://Private/Fal API Key/credential"
+      }
+    },
+    "pexels": {
+      "command": "op",
+      "args": [
+        "--account",
+        "my.1password.com",
+        "run",
+        "--",
+        "npx",
+        "-y",
+        "mcp-pexels@1.0.2"
+      ],
+      "env": {
+        "PEXELS_API_KEY": "op://Private/Pexels API Key/credential"
+      }
+    },
+    "pixabay": {
+      "command": "op",
+      "args": [
+        "--account",
+        "my.1password.com",
+        "run",
+        "--",
+        "npx",
+        "-y",
+        "pixabay-mcp@0.3.0"
+      ],
+      "env": {
+        "PIXABAY_API_KEY": "op://Private/Pixabay API Key/credential"
+      }
+    }
+  }
+}
