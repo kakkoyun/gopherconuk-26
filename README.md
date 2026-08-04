@@ -30,6 +30,3 @@ on remote URLs. Keep the provider attribution with the asset. Animated GIFs work
 in HTML decks, but PDF exports capture a static frame.
 
 fal model execution can incur charges. Check pricing before running a model.
-
-Pi is a separate terminal coding agent. It does not load `.mcp.json`; use an
-equivalent CLI or extension integration instead.
