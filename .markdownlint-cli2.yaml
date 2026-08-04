@@ -1,0 +1,16 @@
+config:
+  # Marp directives intentionally use HTML and non-document heading levels.
+  MD001: false
+  MD004: false
+  MD010: false
+  MD013: false
+  MD022: false
+  MD024: false
+  MD026: false
+  MD028: false
+  MD033: false
+  MD036: false
+  MD040: false
+  MD041: false
+  MD045: false
+  MD060: false

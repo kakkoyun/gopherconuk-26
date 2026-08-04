@@ -1,41 +1,41 @@
 ---
 marp: true
-theme: datadog
+theme: gophercon-datadog
 math: mathjax
 html: true
 paginate: true
-header: "**Why Your Go Benchmarks Are Lying** · GopherCon UK 2026"
+header: "Why Your Go Benchmarks Are Lying · GopherCon UK 2026"
+footer: "Kemal Akkoyun · Datadog"
 style: |
-  /* Two-column layout */
   .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-  /* Font-size helpers */
   .big    { font-size: 1.4em; }
   .medium { font-size: 1.0em; }
   .small  { font-size: 0.8em; }
   .tiny   { font-size: 0.6em; }
-  /* Table override — Marp injects white backgrounds by default */
-  table, td, tr, th { background-color: transparent !important; }
-  table { font-size: 0.7em; }
 ---
 
-<!-- _class: lead -->
+<!-- _class: title gopher-sage -->
 <!-- _paginate: false -->
 <!-- _header: "" -->
 
+##### GopherCon UK · 2026
+
 # Why Your Go Benchmarks Are Lying
 
-## (And How to Stop Them)
+### Kemal Akkoyun · Datadog
 
-**Kemal Akkoyun** · Datadog
-
-GopherCon UK 2026
+And How to Stop Them
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
+###### 01
+
 # A Loose Cable
+
+A systematic measurement error can hide in plain sight.
 
 ---
 
@@ -65,8 +65,6 @@ CERN press release, 22 Feb 2012 · Cartlidge, *Science* 335(6072):1027
 
 ---
 
-<!-- _class: vcenter -->
-
 ## The point is not physics
 
 A systematic measurement error can hide in plain sight,
@@ -89,8 +87,6 @@ You have `testing.B`, a laptop, and background Chrome tabs.
 
 ---
 
-<!-- _class: vcenter -->
-
 ## Three questions
 
 <div class="big">
@@ -103,12 +99,11 @@ You have `testing.B`, a laptop, and background Chrome tabs.
 
 ---
 
-<!-- _class: vcenter -->
-
-# Local first.
+# Local first
 
 ## Trust the number on your laptop
-## before you push to CI.
+
+## before you push to CI
 
 <br>
 
@@ -116,11 +111,14 @@ If you can't trust it locally, CI will industrialise the lie.
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Layer 1
-## Making the Compiler Honest
+###### 02
+
+# Making the Compiler Honest
+
+Layer 1
 
 ---
 
@@ -158,8 +156,8 @@ func BenchmarkMakeBuffer_DCE(b *testing.B) {
 ## DEMO: `make bench-dce`
 
 ```text
-BenchmarkMakeBuffer_DCE-16          0.2532 ns/op       0 B/op    0 allocs/op
-BenchmarkMakeBuffer_Correct-16     11.14   ns/op      64 B/op    1 allocs/op
+DCE       0.2532 ns/op   0 B/op   0 allocs/op
+correct  11.14 ns/op  64 B/op   1 allocs/op
 ```
 
 <br>
@@ -170,11 +168,9 @@ Yet: **0 allocs/op**.
 
 ---
 
-<!-- _class: vcenter -->
+## `ns/op` can lie
 
-## `ns/op` can lie.
-
-## `allocs/op` cannot.
+## `allocs/op` cannot
 
 <br>
 
@@ -311,8 +307,8 @@ Get the order wrong and you time the fixture, not the function.
 ## DEMO: `make bench-timer`
 
 ```text
-BenchmarkProcess_TimerOrder_BUG-16          415.8 ns/op   128 B/op   1 allocs/op
-BenchmarkProcess_PerIterSetup_Correct-16    550.6 ns/op   144 B/op   1 allocs/op
+buggy    415.8 ns/op  128 B/op  1 allocs/op
+correct  550.6 ns/op  144 B/op  1 allocs/op
 ```
 
 <br>
@@ -330,8 +326,6 @@ A benchmark that measures the wrong thing does not look broken. It looks like go
 </div>
 
 ---
-
-<!-- _class: vcenter -->
 
 ## The one that hangs
 
@@ -380,7 +374,7 @@ Proposal #61515, Austin Clements
 ## What `B.Loop` removes
 
 | Behaviour | `for range b.N` | `for b.Loop()` |
-|---|---|---|
+| --- | --- | --- |
 | Automatic ResetTimer at loop start | No | **Yes** |
 | Automatic StopTimer at loop end | No | **Yes** |
 | Benchmark fn called per ramp-up | Multiple times | **Once per `-count`** |
@@ -390,8 +384,6 @@ Proposal #61515, Austin Clements
 The DCE prevention needs the condition written **literally** as `b.Loop()`.
 
 ---
-
-<!-- _class: vcenter -->
 
 ## Question 1 answered
 
@@ -403,11 +395,14 @@ Sink pattern. `-benchmem`. Check `allocs/op`. Prefer `b.Loop`.
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Layer 2
-## Statistical Interpretation
+###### 03
+
+# Statistical Interpretation
+
+Layer 2
 
 ---
 
@@ -434,11 +429,14 @@ go test -bench=. -benchmem -count=20 -benchtime=1s . | tee new.txt
 benchstat old.txt new.txt
 ```
 
-```text
-                      │ results/idle.txt │           results/noisy.txt           │
-                      │      sec/op      │    sec/op     vs base                 │
-MakeBuffer_Correct-16        11.32n ± 5%   37.40n ± 25%  +230.34% (p=0.000 n=20)
-```
+| Environment | sec/op | Difference |
+| --- | --- | --- |
+| idle | `11.32n ± 5%` | — |
+| noisy | `37.40n ± 25%` | `+230.34% (p=0.000 n=20)` |
+
+---
+
+## Read the output
 
 - `11.32n` — the **median**, not the mean
 - `± 5%` — spread of the distribution
@@ -467,15 +465,13 @@ characterising the environment producing them. Separate pass, ~20 lines of awk.
 ## Rules of thumb
 
 | Question | Answer |
-|---|---|
+| --- | --- |
 | How many runs? | `-count=10` is the floor. 20 is better. |
 | Time or iterations? | `-benchtime=100x` for the most reproducible per-commit numbers |
 | When is CV too high? | **Above ~5%, fix the environment before comparing anything** |
 | Significant but tiny? | Effect size and significance are different questions |
 
 ---
-
-<!-- _class: vcenter -->
 
 ## The p-hacking trap
 
@@ -493,8 +489,6 @@ With enough draws, any noise pattern looks like signal.
 
 ---
 
-<!-- _class: vcenter -->
-
 ## Question 2 answered
 
 **Is my sample stable enough?**
@@ -505,11 +499,14 @@ With enough draws, any noise pattern looks like signal.
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Layer 3a
-## Local Reproduction
+###### 04
+
+# Local Reproduction
+
+Layer 3A
 
 ---
 
@@ -530,7 +527,7 @@ So we measured it.
 Same benchmark. `-count=20 -benchtime=1s`. Apple M4 Max, 16 logical CPUs.
 
 | Condition | mean ns/op | stddev | **CV%** |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | idle host | 11.46 | 0.54 | **4.75** |
 | host with 16 background spinners | 34.97 | 6.60 | **18.88** |
 | container pinned to core 0, same load | 16.28 | 0.85 | **5.25** |
@@ -542,11 +539,9 @@ while the host is still fully saturated.
 
 ---
 
-<!-- _class: vcenter -->
+## 5.25% is not a triumph
 
-## 5.25% is not a triumph.
-
-## It is a ceiling.
+## It is a ceiling
 
 <br>
 
@@ -572,7 +567,7 @@ Docker Desktop on macOS runs containers **inside a Linux VM**.
 ## The Linux toolbox
 
 | Control | Command | What it buys |
-|---|---|---|
+| --- | --- | --- |
 | CPU affinity | `taskset -c 0` | No scheduler migration, warm cache |
 | Core isolation | `isolcpus`, `cset shield` | Exclusive cores; needs reboot or root |
 | Priority | `nice -n -5`, `chrt -f` | Helps under load; `chrt` can starve your display |
@@ -616,11 +611,14 @@ steady state. Free variance reduction, zero setup.
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Layer 3b
-## Escalating to CI
+###### 05
+
+# Escalating to CI
+
+Layer 3B
 
 ---
 
@@ -643,7 +641,7 @@ This is an **environment** problem, not a statistics problem.
 ## The numbers — AWS m5.metal
 
 | Configuration | Runtime | **CV** |
-|---|---|---|
+| --- | --- | --- |
 | SMT enabled, CPU-bound | — | **~23%** |
 | SMT disabled, task 1 | 737.37 ± 0.32 ms | **0.044%** |
 | SMT disabled, task 2 | 737.93 ± 1.74 ms | **0.235%** |
@@ -694,7 +692,7 @@ CI is for **detecting** regressions. It is not your primary measurement.
 ## Don't build this yourself
 
 | Tool | Verdict |
-|---|---|
+| --- | --- |
 | **bencher.dev** | Hosted, Go-native, PR comments — the default recommendation |
 | **github-action-benchmark** | Self-hosted, simple, good for a first gate |
 | **Apache Otava** | Change-point detection over a rolling window |
@@ -706,11 +704,14 @@ Full survey and wire-up in the talk repo.
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
+###### 06
+
 # The CI Regression
-## That Was a Speedup
+
+That Was a Speedup
 
 ---
 
@@ -742,7 +743,7 @@ Locally: **<0.1% run-to-run variance.** The 6–9% was specific to CI.
 ## Same machine, both branches
 
 | Build | 1 span | 10 spans |
-|---|---|---|
+| --- | --- | --- |
 | `main` | 883.3 ns/op | 7115 ns/op |
 | `#4891` | **840.7 ns/op** | **6775 ns/op** |
 
@@ -775,8 +776,6 @@ lock CPU frequency.
 
 ---
 
-<!-- _class: vcenter -->
-
 ## The lesson
 
 A number from a noisy environment is not merely **imprecise**.
@@ -796,11 +795,14 @@ and waves bad ones through.
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
+###### 07
+
 # Wire It Up
-## This Afternoon
+
+This Afternoon
 
 ---
 
@@ -829,9 +831,9 @@ so an agent can run the same discipline.
 ```text
 benchenv: benchmarking environment diagnosis (darwin/arm64, 16 CPUs)
 
-  [unavailable]  SMT control — macOS does not expose SMT control via sysfs
-  [unavailable]  CPU frequency governor — not exposed on macOS
-  [unavailable]  Turbo Boost — not controllable from user space
+  [unavailable]  SMT control — no sysfs controls on macOS
+  [unavailable]  CPU frequency — not exposed on macOS
+  [unavailable]  Turbo Boost — no user-space control
   [ok]           load average — 1-min load 6.15 ≤ 8.0
   [warn]         perflock not installed
   [ok]           benchstat installed
@@ -840,9 +842,12 @@ benchenv: benchmarking environment diagnosis (darwin/arm64, 16 CPUs)
 Summary: 3 ok, 2 warn, 4 unavailable.
 ```
 
-<br>
+---
 
-Four `unavailable` lines on a Mac. That is the honest answer, printed rather than assumed.
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
+# Four *unavailable* lines are the honest answer
 
 ---
 
@@ -863,11 +868,7 @@ Under an hour. The benchmarks you write after today will tell the truth.
 
 ---
 
-<!-- _class: vcenter -->
-
 # Three questions
-
-<div class="big">
 
 1. Is the compiler measuring **real work**?
    <div class="small">sink pattern · <code>-benchmem</code> · <code>allocs/op</code> · <code>b.Loop</code></div>
@@ -878,19 +879,13 @@ Under an hour. The benchmarks you write after today will tell the truth.
 3. Is the difference **large relative to the noise**?
    <div class="small">read the interval · control the environment first</div>
 
-</div>
-
 ---
 
-<!-- _class: lead -->
+<!-- _class: end gopher-rocket -->
 <!-- _paginate: false -->
 
 # Thank you
 
-**github.com/kakkoyun/gopherconuk-26**
-
-Demo module · three CLIs · the full research corpus
-
-<br>
-
-Kemal Akkoyun · Datadog
+- [github.com/kakkoyun/gopherconuk-26](https://github.com/kakkoyun/gopherconuk-26)
+- Demo modules, three CLIs, and the full research corpus
+- Kemal Akkoyun · Datadog

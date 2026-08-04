@@ -1,9 +1,11 @@
 ---
 marp: true
-theme: otel
+theme: gophercon-datadog
 math: mathjax
 html: true
 paginate: true
+header: "Zero-Touch Go Instrumentation · GopherCon UK 2026"
+footer: "Kemal Akkoyun · Datadog"
 style: |
   .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
   .columns3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
@@ -16,22 +18,25 @@ style: |
   .prod   { background: #1e6845; color: #c3e8d4; }
   .dev    { background: #1a3a6e; color: #c3d4f0; }
   .always { background: #5a1e6e; color: #e4c3f0; }
-  table, td, tr, th { background-color: transparent !important; }
 ---
 
-<!-- _class: lead -->
+<!-- _class: title gopher-network -->
 <!-- _paginate: false -->
+<!-- _header: "" -->
 
-# How to Instrument Go Without Changing a Single Line of Code
+##### GopherCon UK · 2026
 
-**Kemal Akkoyun** · Datadog
-GopherCon UK 2026 · Keynote
+# Zero-Touch
+
+### Go Instrumentation
+
+### Kemal Akkoyun · Datadog
+
+How to Instrument Go Without Changing a Single Line of Code
 
 ---
 
 <!-- _paginate: false -->
-<!-- _class: vcenter -->
-
 ## Quick question
 
 <br>
@@ -45,24 +50,25 @@ GopherCon UK 2026 · Keynote
 ---
 
 <!-- _paginate: false -->
-<!-- _class: vcenter -->
-
 ## What if you didn't have to?
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Part 1
-## Why Go Resists Instrumentation
+###### 01
+
+# Why Go Resists Instrumentation
+
+Part 1
 
 ---
 
 ## The easy routes — closed for Go
 
 | Language | Zero-touch mechanism |
-|----------|---------------------|
+| ---------- | --------------------- |
 | **JVM** | `-javaagent` JVMTI hook, bytecode rewriting |
 | **Python** | `importlib` hooks, `sys.settrace` |
 | **Ruby** | `TracePoint`, dynamic method wrapping |
@@ -87,7 +93,7 @@ The only "hook" is reluctant accommodation of abuse.
 
 ---
 
-## LD_PRELOAD? Blocked.
+## LD_PRELOAD? Blocked
 
 ```bash
 # Works on dynamic binaries:
@@ -97,11 +103,17 @@ LD_PRELOAD=./tracer.so ./python-app    ✅
 LD_PRELOAD=./tracer.so ./go-app        ❌ (silently ignored)
 
 # Requires forcing external linking:
-go build -ldflags="-linkmode=external" ⚠️  (non-default, not always possible)
+go build -ldflags="-linkmode=external" ⚠️
+# Non-default; unavailable for some builds.
 ```
 
-Static cgo binaries: **rejected by injection vendors outright.**
-`CGO_ENABLED=0 + -buildmode=pie`: no libc dependency → no injection.
+---
+
+## Injection limits
+
+Static cgo binaries are **rejected by injection vendors outright.**
+
+`CGO_ENABLED=0 + -buildmode=pie` has no libc dependency to inject into.
 
 ---
 
@@ -112,6 +124,7 @@ Static cgo binaries: **rejected by injection vendors outright.**
 <div>
 
 ### eBPF
+
 Probe from the **kernel**
 
 No rebuild, no restart
@@ -123,6 +136,7 @@ Requires Linux 5.8+ + BTF
 <div>
 
 ### Compile-time
+
 Rewrite **before** the compiler
 
 Rebuild required
@@ -134,6 +148,7 @@ Works on any OS
 <div>
 
 ### Runtime injection
+
 Patch **running** binary
 
 Needs external linker
@@ -150,13 +165,14 @@ Today: three open-source projects, one for each signal.
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Part 2
-## OBI — eBPF from the Outside
-<br>
-<span class="tag prod">production · zero rebuild</span>
+###### 02
+
+# OBI — eBPF from the Outside
+
+Part 2 · production · zero rebuild
 
 ---
 
@@ -189,7 +205,11 @@ Your Go service (running)
   OpenTelemetry Collector → Jaeger / Prometheus / ...
 ```
 
-**Zero source changes. Zero restarts. Zero recompilation.**
+---
+
+<!-- _class: punchline dark -->
+
+# Zero source changes. Zero *restarts*. Zero recompilation
 
 ---
 
@@ -198,16 +218,20 @@ Your Go service (running)
 13 Go libraries via dedicated uprobes:
 
 | Library | Min version |
-|---------|------------|
+| --------- | ------------ |
 | `net/http` | Go 1.17+ |
 | `google.golang.org/grpc` | ≥ 1.40 |
 | `github.com/gin-gonic/gin` | ≥ v1.6.0 |
 | `gorilla/mux` | ≥ v1.5.0 |
 | `go-redis/redis` v8/v9 | (added v0.7.1) |
-| `database/sql` | (fixed v0.7.0) |
-| + 7 more | see SUPPORT_MATRIX.md |
 
-Plus: Java, .NET, Node.js, Python, Ruby, C, C++, Rust at network level.
+---
+
+## Beyond the first five
+
+- `database/sql` — fixed in v0.7.0
+- Seven more Go libraries — see `SUPPORT_MATRIX.md`
+- Java, .NET, Node.js, Python, Ruby, C, C++, and Rust at network level
 
 ---
 
@@ -233,10 +257,11 @@ kubectl obi status
 ## Requirements
 
 | Requirement | Detail |
-|-------------|--------|
+| ------------- | -------- |
 | **Kernel** | Linux 5.8+ with BTF (BTF default since 5.14+) |
 | **RHEL exception** | 4.18+ with eBPF backports |
-| **Capabilities** | `CAP_BPF`, `CAP_SYS_PTRACE`, `CAP_NET_RAW`, `CAP_CHECKPOINT_RESTORE`, `CAP_DAC_READ_SEARCH`, `CAP_PERFMON` |
+| **Capabilities** | `CAP_BPF`, `CAP_SYS_PTRACE`, `CAP_NET_RAW` |
+| | `CAP_CHECKPOINT_RESTORE`, `CAP_DAC_READ_SEARCH`, `CAP_PERFMON` |
 | **macOS dev** | Linux VM or remote cluster required |
 
 ---
@@ -244,20 +269,23 @@ kubectl obi status
 ## The honest scope
 
 ✅ **Zero code changes** for:
+
 - HTTP/gRPC RED metrics (rate, errors, duration)
 - Library-level spans (13 Go libs)
 
 ❌ **Still needs code changes** for:
+
 - Custom spans with business-logic attributes
 - SQL query details / parameters
 - In-process context propagation beyond library boundaries
 
 ---
 
-<!-- _class: vcenter center -->
+<!-- _class: terminal -->
 
-## 🔴 Live Demo
-### Attach OBI to a running HTTP service
+# Live demo
+
+Attach OBI to a running HTTP service.
 
 ```bash
 kubectl obi attach --mode=daemonset
@@ -266,13 +294,14 @@ kubectl obi attach --mode=daemonset
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Part 3
-## otelc — Compile-Time, From the Inside
-<br>
-<span class="tag dev">local dev · granular spans</span>
+###### 03
+
+# otelc — Compile-Time, From the Inside
+
+Part 3 · local dev · granular spans
 
 ---
 
@@ -283,9 +312,11 @@ kubectl obi attach --mode=daemonset
 <div>
 
 ### `orchestrion` (Datadog)
+
 ```bash
 orchestrion go build .
 ```
+
 GA v1.11.0 · defaults to dd-trace-go/v2
 Vendor-agnostic · battle-tested
 
@@ -294,9 +325,11 @@ Vendor-agnostic · battle-tested
 <div>
 
 ### `otelc` (OTel SIG)
+
 ```bash
 otelc go build ./...
 ```
+
 Stable v1.0.1 (2026-07-14) · OTel SDK
 Datadog + Alibaba co-founded SIG
 
@@ -311,20 +344,13 @@ Same core mechanism. Both use Go's `-toolexec` flag.
 ## How `-toolexec` works
 
 ```
-go build ./...
-    │
-    │  -toolexec otelc
-    ▼
-otelc intercepts EVERY call to go tool compile
-    │
-    │  Parse .go files → Decorated Syntax Tree (dst)
-    │  Apply instrumentation aspects
-    │  Write rewritten files
-    ▼
-go tool compile (sees modified source)
+go build ./...  ── -toolexec otelc
     │
     ▼
-Binary with spans baked in
+otelc rewrites .go files
+    │  parses → instruments → writes
+    ▼
+go tool compile → binary with spans
 ```
 
 Orchestrion calls this "compile-time-woven Aspect-Oriented Programming."
@@ -338,7 +364,7 @@ Go has no goroutine-local storage. The workaround:
 **Step 1** — Orchestrion's aspect patches `runtime.g`:
 
 ```yaml
-# internal/orchestrion/gls.orchestrion.yml (in dd-trace-go, commit b97e7cbb4)
+# dd-trace-go/internal/orchestrion/gls.orchestrion.yml
 join-point:
   struct-definition: runtime.g
 advice:
@@ -368,9 +394,6 @@ var __dd_orchestrion_gls_get = func() any {
 getg().__dd_gls_v2 = nil   // prevent memory leaks
 ```
 
-The Go team's own comment calls `go:linkname` abusers a **"hall of shame."**
-This is how deep you have to go.
-
 ---
 
 ## go:linkname for variables: fragile
@@ -394,7 +417,7 @@ This **broke between Go 1.22 and 1.23.**
 ## Requirements & limits
 
 | | |
-|--|--|
+| -- | -- |
 | **Go version** | **1.25+** (otelc); check go.mod for orchestrion |
 | **Platform** | Any OS (no eBPF required) |
 | **What it gives you** | Granular spans, stdlib instrumentation, custom span injection |
@@ -403,10 +426,11 @@ This **broke between Go 1.22 and 1.23.**
 
 ---
 
-<!-- _class: vcenter center -->
+<!-- _class: terminal -->
 
-## 🔴 Live Demo
-### Build with otelc, see granular spans
+# Live demo
+
+Build with otelc and see granular spans.
 
 ```bash
 otelc go build -o ./myapp ./...
@@ -416,13 +440,14 @@ OTEL_SERVICE_NAME=demo ./myapp
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Part 4
-## opentelemetry-ebpf-profiler — The Third Signal
-<br>
-<span class="tag always">always-on · whole-system profiles</span>
+###### 04
+
+# The Third Signal
+
+Part 4 · opentelemetry-ebpf-profiler · always-on profiles
 
 ---
 
@@ -464,8 +489,13 @@ opentelemetry-ebpf-profiler
 Named function stacks → OTLP profiles
 ```
 
-From `doc/gopclntab.md`:
+---
+
+## Stripping does not erase `.gopclntab`
+
 > *"The information remains present even for fully static and stripped executables."*
+>
+> — `doc/gopclntab.md`
 
 ---
 
@@ -489,6 +519,7 @@ That's the agent's requirement, not each application's.
 <div class="center">
 
 ### OBI
+
 <span class="tag prod">Traces + Metrics</span>
 <br><br>
 HTTP/gRPC spans
@@ -500,6 +531,7 @@ Library-level
 <div class="center">
 
 ### otelc
+
 <span class="tag dev">Granular Spans</span>
 <br><br>
 Function-level
@@ -511,6 +543,7 @@ In-process context
 <div class="center">
 
 ### ebpf-profiler
+
 <span class="tag always">Profiles</span>
 <br><br>
 CPU flame graphs
@@ -523,11 +556,14 @@ Whole-system
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Part 5
-## Benchmark Shootout
+###### 05
+
+# Benchmark Shootout
+
+Part 5
 
 ---
 
@@ -545,7 +581,7 @@ Hardware/versions pinned — see `talks/without-a-single-line/demo/bench/README.
 ## Overhead (placeholder — run demo/)
 
 | Approach | p99 latency vs baseline | CPU overhead | Binary size delta |
-|----------|------------------------|--------------|------------------|
+| ---------- | ------------------------ | -------------- | ------------------ |
 | **Baseline** | — | — | — |
 | **OBI** | TODO | TODO | n/a (no recompile) |
 | **otelc** | TODO | TODO | TODO |
@@ -556,11 +592,14 @@ not application latency. Benchmark design matters.
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Part 6
-## Decision Framework
+###### 06
+
+# Decision Framework
+
+Part 6
 
 ---
 
@@ -570,7 +609,8 @@ not application latency. Benchmark design matters.
 
 <div>
 
-### Use OBI when:
+### Use OBI when
+
 <br>
 
 <span class="tag prod">production</span>
@@ -587,7 +627,8 @@ Attach in seconds, zero rollout.
 
 <div>
 
-### Use otelc when:
+### Use otelc when
+
 <br>
 
 <span class="tag dev">local dev</span>
@@ -608,19 +649,26 @@ business-logic visibility.
 
 ---
 
-<!-- _class: vcenter center -->
+<!-- _class: terminal -->
 
-## 🔴 Agent Demo
+# Agent demo: production
 
-```
+```text
 User: "my-service is slow in production, help me debug it"
 
-→ Skill detects "production" context
+→ Detects production context
 → Routes to OBI
 → Runs: obi-integration.sh net/http
-→ Fetches only the net/http section of SUPPORT_MATRIX.md
 → Provides: kubectl obi attach command
+```
 
+---
+
+<!-- _class: terminal -->
+
+# Agent demo: local
+
+```text
 User: "now I want granular spans locally"
 
 → Routes to otelc
@@ -630,11 +678,14 @@ User: "now I want granular spans locally"
 
 ---
 
-<!-- _class: lead -->
+<!-- _class: section -->
 <!-- _paginate: false -->
 
-# Part 7
-## Runtime Futures
+###### 07
+
+# Runtime Futures
+
+Part 7
 
 ---
 
@@ -655,7 +706,11 @@ fr.WriteTo(&buf)
 // → buf contains the last 2s of execution trace
 ```
 
-JFR-style circular buffer. On-demand snapshot. No continuous I/O overhead.
+---
+
+<!-- _class: punchline dark -->
+
+# A circular buffer, not continuous *I/O*
 
 ---
 
@@ -691,14 +746,12 @@ If flight recording is Go 1.25 — USDT could be a future Go 1.2X.
 
 ---
 
-<!-- _class: vcenter -->
-
 ## The mental model
 
 <br>
 
 | When | Tool | Signal |
-|------|------|--------|
+| ------ | ------ | -------- |
 | **Always, in prod** | OBI (eBPF) | Traces + metrics |
 | **Debugging locally** | otelc | Granular spans |
 | **Always, CPU** | ebpf-profiler | Profiles |
@@ -708,10 +761,9 @@ If flight recording is Go 1.25 — USDT could be a future Go 1.2X.
 
 ---
 
-<!-- _class: lead -->
-<!-- _paginate: false -->
+<!-- _class: dark -->
 
-## Thank you
+# Thank you
 
 <br>
 
@@ -721,17 +773,19 @@ Datadog · Go & Observability
 <br>
 
 **Resources:**
+
 - OBI: `github.com/open-telemetry/opentelemetry-ebpf-instrumentation`
 - otelc: `github.com/open-telemetry/opentelemetry-go-compile-instrumentation`
 - ebpf-profiler: `github.com/open-telemetry/opentelemetry-ebpf-profiler`
 - This talk: `github.com/kakkoyun/gopherconuk-26/tree/main/talks/without-a-single-line`
-- Agent skill: `tools/skills/collect-go-telemetry/`
 
 ---
 
 <!-- _paginate: false -->
-<!-- _class: vcenter center -->
+<!-- _class: end gopher-balloon -->
 
-## Questions?
+# Questions?
 
-`@kakkoyun` · GitHub · Mastodon · LinkedIn
+- `@kakkoyun`
+- GitHub · Mastodon · LinkedIn
+- Skill → `tools/skills/collect-go-telemetry/`

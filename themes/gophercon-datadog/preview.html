@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Blueprint — gophercon-datadog theme preview</title>
+<link rel="stylesheet" href="gophercon-datadog.css">
+<style>
+  body { margin: 0; background: #E7E5E0; font-family: 'Space Grotesk', system-ui, sans-serif; }
+  .head { padding: 34px 40px 8px; }
+  .head h1 { margin: 0 0 6px; font: 700 22px/1.2 'Space Grotesk', system-ui, sans-serif; color: #0B0F14; letter-spacing: -.02em; }
+  .head p { margin: 0; font: 400 13px/1.5 ui-monospace, monospace; color: rgba(11,15,20,.55); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, 640px); gap: 30px; padding: 26px 40px 60px; justify-content: start; }
+  .slot { width: 640px; }
+  .slot .cap { margin: 0 0 7px; font: 400 11px/1.2 ui-monospace, monospace; color: rgba(11,15,20,.5); }
+  .frame { width: 640px; height: 360px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,.12); background: #fff; }
+  .frame > section { transform: scale(.5); transform-origin: top left; }
+</style>
+</head>
+<body>
+<div class="head">
+  <h1>Blueprint — <code>gophercon-datadog.css</code></h1>
+  <p>Real theme file, real fonts, real assets. Every slide below is the markup Marp emits from deck.md.</p>
+</div>
+<div class="grid">
+
+<div class="slot"><p class="cap">_class: title gopher-hero</p><div class="frame">
+<section class="title gopher-hero">
+<h5>GopherCon UK · 12 Aug 2026</h5>
+<h1>Profiling Go in production</h1>
+<h3>Speaker Name</h3>
+<p>Staff Engineer · Datadog</p>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: section</p><div class="frame">
+<section class="section" data-marpit-pagination="2" data-marpit-pagination-total="14">
+<h6>01</h6>
+<h1>Runtime internals</h1>
+<p>Where the scheduler spends its time, and how to see it.</p>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">default + code panel (h6 before the fence)</p><div class="frame">
+<section data-marpit-pagination="3" data-marpit-pagination-total="14">
+<h1>Collect without allocating</h1>
+<h6>profiler/collect.go</h6>
+<pre><code class="language-go hljs"><span class="hljs-comment">// Collect runs one CPU profile window.</span>
+<span class="hljs-keyword">func</span> (p *Profiler) <span class="hljs-title function_">Collect</span>(ctx context.Context) <span class="hljs-type">error</span> {
+    buf := p.pool.Get()
+    <span class="hljs-keyword">defer</span> p.pool.Put(buf)
+
+    <span class="hljs-keyword">if</span> err := pprof.StartCPUProfile(buf); err != <span class="hljs-literal">nil</span> {
+        <span class="hljs-keyword">return</span> fmt.Errorf(<span class="hljs-string">"start profile: %w"</span>, err)
+    }
+}</code></pre>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: emoji</p><div class="frame">
+<section class="emoji" data-marpit-pagination="4" data-marpit-pagination-total="14">
+<h1>Four things we tried first</h1>
+<ul>
+<li>🔥 Flamegraphs, read wrong — depth is not cost</li>
+<li>🧊 Cold paths that still bill you every request</li>
+<li>📉 Averages, which hid the only number that mattered</li>
+<li>🤖 Automating the diff instead of the reading</li>
+</ul>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: chart</p><div class="frame">
+<section class="chart" data-marpit-pagination="5" data-marpit-pagination-total="14">
+<h1>p99 latency, by endpoint</h1>
+<h5>milliseconds · 24h window</h5>
+<div class="bars">
+  <div class="row"><span class="label">/checkout</span><span class="track"><span class="fill" style="width:92%"></span></span><span class="value">412</span></div>
+  <div class="row"><span class="label">/search</span><span class="track"><span class="fill" style="width:60%"></span></span><span class="value">268</span></div>
+  <div class="row"><span class="label">/inventory</span><span class="track"><span class="fill" style="width:43%"></span></span><span class="value">191</span></div>
+  <div class="row mark"><span class="label">/checkout*</span><span class="track"><span class="fill" style="width:20%"></span></span><span class="value">88</span></div>
+</div>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: stat</p><div class="frame">
+<section class="stat" data-marpit-pagination="6" data-marpit-pagination-total="14">
+<h1>79%</h1>
+<p>of the CPU time was in code <strong>nobody had read</strong> for two years.</p>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: compare</p><div class="frame">
+<section class="compare" data-marpit-pagination="7" data-marpit-pagination-total="14">
+<h1>One line, measured</h1>
+<h6>−79%</h6>
+<blockquote>
+<p><strong>Before</strong>
+<code>buf := new(bytes.Buffer)</code></p>
+<h2>412 <small>ms</small></h2>
+<p>18 MB / minute</p>
+</blockquote>
+<blockquote>
+<p><strong>After</strong>
+<code>buf := p.pool.Get()</code></p>
+<h2>88 <small>ms</small></h2>
+<p>0.4 MB / minute</p>
+</blockquote>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: terminal</p><div class="frame">
+<section class="terminal" data-marpit-pagination="8" data-marpit-pagination-total="14">
+<h1>Live demo</h1>
+<pre><code class="language-console hljs"><span class="hljs-meta">$</span> go tool pprof -http=:6060 cpu.pprof
+<span class="hljs-comment">Fetching profile over HTTP from localhost:6060</span>
+<span class="hljs-comment">Saved profile in ~/pprof/pprof.samples.cpu.001.pb.gz</span>
+Serving web UI on http://localhost:6060
+
+<span class="hljs-meta">$</span> go test -bench=Collect -benchmem
+BenchmarkCollect-10   14322   <span class="hljs-number">81.4 ns/op</span>   0 B/op</code></pre>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: meme + ![bg contain]</p><div class="frame">
+<section class="meme" style="background-image:url('assets/placeholder-meme.png');background-size:contain;background-repeat:no-repeat;background-position:center" data-marpit-pagination="9" data-marpit-pagination-total="14">
+<p>when the profiler blames the GC</p>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">default — table</p><div class="frame">
+<section data-marpit-pagination="10" data-marpit-pagination-total="14">
+<h1>What the numbers said</h1>
+<table>
+<thead><tr><th>Change</th><th>Allocations</th><th>p99</th><th>Verdict</th></tr></thead>
+<tbody>
+<tr><td>Buffer pool</td><td>−99%</td><td>−79%</td><td>Ship it</td></tr>
+<tr><td>Tighter sampling</td><td>−4%</td><td>−2%</td><td>Noise</td></tr>
+<tr><td>GC tuning</td><td>0%</td><td>+1%</td><td>Revert</td></tr>
+</tbody>
+</table>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: dark + .cols</p><div class="frame">
+<section class="dark" data-marpit-pagination="11" data-marpit-pagination-total="14">
+<h1>Two columns, any content</h1>
+<div class="cols">
+<div class="card"><h3>Read the flame</h3><p>Wide bars are cost, not depth. Compare two windows before you tune anything.</p></div>
+<div class="card measure"><h3>Then measure</h3><p>Every frame is a decision someone made. Find the decision, not the frame.</p></div>
+</div>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">default — blockquote callout</p><div class="frame">
+<section data-marpit-pagination="12" data-marpit-pagination-total="14">
+<blockquote><p>A profile is a hypothesis, not a verdict.</p></blockquote>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: section (02)</p><div class="frame">
+<section class="section" data-marpit-pagination="13" data-marpit-pagination-total="14">
+<h6>02</h6>
+<h1>Shipping it</h1>
+<p>What survived contact with production.</p>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+
+<div class="slot"><p class="cap">_class: agenda</p><div class="frame">
+<section class="agenda" data-marpit-pagination="15" data-marpit-pagination-total="19">
+<h1>Where we're going</h1>
+<ol>
+<li>Runtime internals</li>
+<li><strong>Reading a profile without lying to yourself</strong></li>
+<li>Shipping it</li>
+<li>What I'd do differently</li>
+</ol>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: photo + duotone filter chain</p><div class="frame">
+<section class="photo" style="background-image:url('assets/placeholder-photo.png');background-size:cover;background-position:center;filter:none" data-marpit-pagination="16" data-marpit-pagination-total="19">
+<h5>The Brewery, 2025</h5>
+<h1>Three hundred people, one flamegraph</h1>
+<p>Nobody in the room agreed on what it meant.</p>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">fragments — ghosted until revealed</p><div class="frame">
+<section class="emoji" data-marpit-pagination="17" data-marpit-pagination-total="19">
+<h1>Reveal these one at a time</h1>
+<ul>
+<li data-marpit-fragment="1">🔥 First you notice the wide bar</li>
+<li data-marpit-fragment="2">🧊 Then you notice it's been there for a year</li>
+<li data-marpit-fragment="3" data-bespoke-marp-fragment="inactive">📉 Then you notice nobody owns it</li>
+<li data-marpit-fragment="4" data-bespoke-marp-fragment="inactive">🤖 Then you write the tool you should have written first</li>
+</ul>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: punchline dark</p><div class="frame">
+<section class="punchline dark" data-marpit-pagination="18" data-marpit-pagination-total="19">
+<h1>It was a <em>for loop</em>.</h1>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: speaker</p><div class="frame">
+<section class="speaker" data-marpit-pagination="19" data-marpit-pagination-total="19">
+<p><img src="assets/placeholder-headshot.png" alt=""></p>
+<h1>Speaker Name</h1>
+<h3>Staff Engineer · Datadog</h3>
+<ul>
+<li>bluesky <strong>@handle</strong></li>
+<li>github <strong>@handle</strong></li>
+<li>slides <strong>example.dev/gcuk</strong></li>
+</ul>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+<div class="slot"><p class="cap">_class: end gopher-rocket</p><div class="frame">
+<section class="end gopher-rocket">
+<h1>Thank you</h1>
+<div class="qr"><img src="assets/placeholder-qr.png" alt="slides"></div>
+<ul>
+<li>slides → example.dev/gcuk</li>
+<li>bluesky → @handle</li>
+<li>code → github.com/handle/talk</li>
+</ul>
+<footer>@handle · #gopherconuk</footer>
+</section>
+</div></div>
+
+</div>
+</body>
+</html>

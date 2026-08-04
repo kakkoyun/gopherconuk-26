@@ -1,0 +1,1238 @@
+/* @theme gophercon-datadog */
+
+/*!
+ * Blueprint — a Marp theme for GopherCon UK talks, with a quiet Datadog signature.
+ *
+ * Colour rule:  Go blue is the frame.  Datadog purple is the measurement.
+ *               Blue draws structure (rails, ticks, section blocks, keywords).
+ *               Purple only ever marks a reading — a chart series, an improved
+ *               number, a delta, a shell prompt, a live-demo marker.
+ *
+ * Fonts    Space Grotesk + JetBrains Mono, both SIL OFL, self-hosted in ./fonts.
+ * Gophers  CC0, from github.com/egonelbre/gophers, in ./assets/gophers.
+ * Licence  Do what you like with the CSS.
+ */
+
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("fonts/JetBrainsMono-400-latin-ext.woff2") format("woff2");
+	unicode-range:
+		U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("fonts/JetBrainsMono-400-latin.woff2") format("woff2");
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url("fonts/JetBrainsMono-500-latin-ext.woff2") format("woff2");
+	unicode-range:
+		U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url("fonts/JetBrainsMono-500-latin.woff2") format("woff2");
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url("fonts/JetBrainsMono-700-latin-ext.woff2") format("woff2");
+	unicode-range:
+		U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: "JetBrains Mono";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url("fonts/JetBrainsMono-700-latin.woff2") format("woff2");
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("fonts/SpaceGrotesk-400-latin-ext.woff2") format("woff2");
+	unicode-range:
+		U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url("fonts/SpaceGrotesk-400-latin.woff2") format("woff2");
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url("fonts/SpaceGrotesk-500-latin-ext.woff2") format("woff2");
+	unicode-range:
+		U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url("fonts/SpaceGrotesk-500-latin.woff2") format("woff2");
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url("fonts/SpaceGrotesk-700-latin-ext.woff2") format("woff2");
+	unicode-range:
+		U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+	font-family: "Space Grotesk";
+	font-style: normal;
+	font-weight: 700;
+	font-display: swap;
+	src: url("fonts/SpaceGrotesk-700-latin.woff2") format("woff2");
+	unicode-range:
+		U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+/* ────────────────────────────────────────────────────────── tokens ── */
+
+:root {
+	--blue: #00add8; /* Go gopher blue — structure */
+	--blue-deep: #007d9c;
+	--blue-lift: #8bd5ea; /* blue that survives a dark background */
+	--purple: #632ca6; /* Datadog — measurement */
+	--purple-lift: #a78be8; /* purple that survives a dark background */
+	--purple-deep: #2a1c43;
+	--ink: #0b0f14;
+	--paper: #f6f7f8;
+	--night: #0b1116;
+	--panel: #0e1419;
+	--panel-tab: #0a0f13;
+
+	--fg: var(--ink);
+	--bg: var(--paper);
+	--rule: rgba(11, 15, 20, 0.25);
+	--mute: rgba(11, 15, 20, 0.45);
+	--card: #ffffff;
+
+	--edge: 88px; /* left / right margin */
+	--strip: 30px; /* measurement strip height */
+	--sans: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+	--mono: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+
+	--gopher: none;
+}
+
+/* ──────────────────────────────────────────────────────────── slide ── */
+
+section {
+	width: 1280px;
+	height: 720px;
+	position: relative;
+	overflow: hidden;
+	box-sizing: border-box;
+	padding: 74px var(--edge) 92px;
+	background: var(--bg);
+	color: var(--fg);
+	font-family: var(--sans);
+	font-size: 28px;
+	line-height: 1.42;
+	letter-spacing: -0.005em;
+	text-wrap: pretty;
+	-webkit-font-smoothing: antialiased;
+}
+
+/* Measurement strip + progress bar. Chromium 133+ reads Marpit's
+   pagination attributes and calculates the filled length in CSS. */
+section {
+	--p: attr(data-marpit-pagination type(<number>), 0);
+	--pt: attr(data-marpit-pagination-total type(<number>), 1);
+	--progress: calc(100% * var(--p) / var(--pt));
+}
+
+section::before {
+	content: "";
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 0;
+	height: calc(var(--strip) + 8px);
+	pointer-events: none;
+	background:
+		linear-gradient(var(--blue), var(--blue)) 0 var(--strip) / var(--progress)
+		8px no-repeat,
+		repeating-linear-gradient(90deg, var(--rule) 0 1px, transparent 1px 24px) 0
+		0 / 100% var(--strip) no-repeat;
+}
+
+/* pagination — bottom right */
+section::after {
+	position: absolute;
+	right: var(--edge);
+	bottom: 34px;
+	padding: 0;
+	font: 500 16px / 1 var(--mono);
+	letter-spacing: 0.04em;
+	color: var(--mute);
+	content: attr(data-marpit-pagination) " / " attr(data-marpit-pagination-total);
+}
+
+/* footer — bottom left, carrying the Datadog mark */
+footer {
+	position: absolute;
+	left: var(--edge);
+	bottom: 30px;
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	margin: 0;
+	padding: 0;
+	font: 500 16px / 1 var(--mono);
+	letter-spacing: 0.04em;
+	color: var(--mute);
+}
+footer::before {
+	content: "";
+	width: 24px;
+	height: 26px;
+	flex: none;
+	opacity: 0.85;
+	background:
+		url("data:image/svg+xml,%3Csvg height%3D%222500%22 viewBox%3D%22.27 .27 800.01 858.98%22 width%3D%222328%22 xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath clip-rule%3D%22evenodd%22 d%3D%22m670.38 608.27-71.24-46.99-59.43 99.27-69.12-20.21-60.86 92.89 3.12 29.24 330.9-60.97-19.22-206.75zm-308.59-89.14 53.09-7.3c8.59 3.86 14.57 5.33 24.87 7.95 16.04 4.18 34.61 8.19 62.11-5.67 6.4-3.17 19.73-15.36 25.12-22.31l217.52-39.46 22.19 268.56-372.65 67.16zm404.06-96.77-21.47 4.09-41.25-426.18-702.86 81.5 86.59 702.68 82.27-11.94c-6.57-9.38-16.8-20.73-34.27-35.26-24.23-20.13-15.66-54.32-1.37-75.91 18.91-36.48 116.34-82.84 110.82-141.15-1.98-21.2-5.35-48.8-25.03-67.71-.74 7.85.59 15.41.59 15.41s-8.08-10.31-12.11-24.37c-4-5.39-7.14-7.11-11.39-14.31-3.03 8.33-2.63 17.99-2.63 17.99s-6.61-15.62-7.68-28.8c-3.92 5.9-4.91 17.11-4.91 17.11s-8.59-24.62-6.63-37.88c-3.92-11.54-15.54-34.44-12.25-86.49 21.45 15.03 68.67 11.46 87.07-15.66 6.11-8.98 10.29-33.5-3.05-81.81-8.57-30.98-29.79-77.11-38.06-94.61l-.99.71c4.36 14.1 13.35 43.66 16.8 57.99 10.44 43.47 13.24 58.6 8.34 78.64-4.17 17.42-14.17 28.82-39.52 41.56-25.35 12.78-58.99-18.32-61.12-20.04-24.63-19.62-43.68-51.63-45.81-67.18-2.21-17.02 9.81-27.24 15.87-41.16-8.67 2.48-18.34 6.88-18.34 6.88s11.54-11.94 25.77-22.27c5.89-3.9 9.35-6.38 15.56-11.54-8.99-.15-16.29.11-16.29.11s14.99-8.1 30.53-14c-11.37-.5-22.25-.08-22.25-.08s33.45-14.96 59.87-25.94c18.17-7.45 35.92-5.25 45.89 9.17 13.09 18.89 26.84 29.15 55.98 35.51 17.89-7.93 23.33-12.01 45.81-18.13 19.79-21.76 35.33-24.58 35.33-24.58s-7.71 7.07-9.77 18.18c11.22-8.84 23.52-16.22 23.52-16.22s-4.76 5.88-9.2 15.22l1.03 1.53c13.09-7.85 28.48-14.04 28.48-14.04s-4.4 5.56-9.56 12.76c9.87-.08 29.89.42 37.66 1.3 45.87 1.01 55.39-48.99 72.99-55.26 22.04-7.87 31.89-12.63 69.45 24.26 32.23 31.67 57.41 88.36 44.91 101.06-10.48 10.54-31.16-4.11-54.08-32.68-12.11-15.13-21.27-33.01-25.56-55.74-3.62-19.18-17.71-30.31-17.71-30.31s8.18 18.18 8.18 34.24c0 8.77 1.1 41.56 15.16 59.96-1.39 2.69-2.04 13.31-3.58 15.34-16.36-19.77-51.49-33.92-57.22-38.09 19.39 15.89 63.96 52.39 81.08 87.37 16.19 33.08 6.65 63.4 14.84 71.25 2.33 2.25 34.82 42.73 41.07 63.07 10.9 35.45.65 72.7-13.62 95.81l-39.85 6.21c-5.83-1.62-9.76-2.43-14.99-5.46 2.88-5.1 8.61-17.82 8.67-20.44l-2.25-3.95c-12.4 17.57-33.18 34.63-50.44 44.43-22.59 12.8-48.63 10.83-65.58 5.58-48.11-14.84-93.6-47.35-104.57-55.89 0 0-.34 6.82 1.73 8.35 12.13 13.68 39.92 38.43 66.78 55.68l-57.26 6.3 27.07 210.78c-12 1.72-13.87 2.56-27.01 4.43-11.58-40.91-33.73-67.62-57.94-83.18-21.35-13.72-50.8-16.81-78.99-11.23l-1.81 2.1c19.6-2.04 42.74.8 66.51 15.85 23.33 14.75 42.13 52.85 49.05 75.79 8.86 29.32 14.99 60.68-8.86 93.92-16.97 23.63-66.51 36.69-106.53 8.44 10.69 17.19 25.14 31.25 44.59 33.9 28.88 3.92 56.29-1.09 75.16-20.46 16.11-16.56 24.65-51.19 22.4-87.66l25.49-3.7 9.2 65.46 421.98-50.81zm-256.73-177.77c-1.18 2.69-3.03 4.45-.25 13.2l.17.5.44 1.13 1.16 2.62c5.01 10.24 10.51 19.9 19.7 24.83 2.38-.4 4.84-.67 7.39-.8 8.63-.38 14.08.99 17.54 2.85.31-1.72.38-4.24.19-7.95-.67-12.97 2.57-35.03-22.36-46.64-9.41-4.37-22.61-3.02-27.01 2.43.8.1 1.52.27 2.08.46 6.65 2.33 2.14 4.62.95 7.37m69.87 121.02c-3.27-1.8-18.55-1.09-29.29.19-20.46 2.41-42.55 9.51-47.39 13.29-8.8 6.8-4.8 18.66 1.7 23.53 18.23 13.62 34.21 22.75 51.08 20.53 10.36-1.36 19.49-17.76 25.96-32.64 4.43-10.25 4.43-21.31-2.06-24.9m-181.14-104.96c5.77-5.48-28.74-12.68-55.52 5.58-19.75 13.47-20.38 42.35-1.47 58.72 1.89 1.62 3.45 2.77 4.91 3.71 5.52-2.6 11.81-5.23 19.05-7.58 12.23-3.97 22.4-6.02 30.76-7.11 4-4.47 8.65-12.34 7.49-26.59-1.58-19.33-16.23-16.26-5.22-26.73%22 fill%3D%22%23632ca6%22 fill-rule%3D%22evenodd%22%3E%3C%2Fpath%3E%3C%2Fsvg%3E")
+		no-repeat center / contain;
+}
+
+header {
+	position: absolute;
+	left: var(--edge);
+	top: 56px;
+	margin: 0;
+	padding: 0;
+	font: 500 16px / 1 var(--mono);
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--mute);
+}
+
+/* ───────────────────────────────────────────────────────── headings ── */
+
+h1 {
+	margin: 0 0 26px;
+	font-weight: 700;
+	font-size: 54px;
+	line-height: 1.05;
+	letter-spacing: -0.035em;
+}
+h2 {
+	margin: 0 0 20px;
+	font-weight: 700;
+	font-size: 40px;
+	line-height: 1.1;
+	letter-spacing: -0.03em;
+}
+h3 {
+	margin: 0 0 16px;
+	font-weight: 500;
+	font-size: 32px;
+	line-height: 1.2;
+	letter-spacing: -0.02em;
+}
+h4 {
+	margin: 0 0 14px;
+	font-weight: 500;
+	font-size: 26px;
+}
+h5 {
+	margin: 0 0 12px;
+	font: 500 18px / 1 var(--mono);
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: var(--blue-deep);
+}
+
+/* h6 is the utility slot: filename tab, section number, delta chip */
+h6 {
+	margin: 0;
+	font: 500 19px / 1 var(--mono);
+	font-weight: 500;
+}
+
+/* ─────────────────────────────────────────────────────────── blocks ── */
+
+p {
+	margin: 0 0 22px;
+}
+strong {
+	font-weight: 700;
+}
+em {
+	font-style: italic;
+}
+
+a {
+	color: var(--blue-deep);
+	text-decoration: underline;
+	text-underline-offset: 4px;
+	text-decoration-thickness: 2px;
+}
+a:hover {
+	color: var(--purple);
+}
+
+ul,
+ol {
+	margin: 0 0 22px;
+	padding: 0 0 0 0;
+}
+li {
+	margin: 0 0 18px;
+	padding-left: 1.9em;
+	text-indent: -1.9em;
+	list-style: none;
+}
+li::marker {
+	content: none;
+}
+/* plain bullets get a blue square; a leading emoji simply replaces it */
+ul > li::before {
+	content: "";
+	display: inline-block;
+	width: 0.38em;
+	height: 0.38em;
+	margin-right: 1.05em;
+	margin-bottom: 0.22em;
+	vertical-align: middle;
+	background: var(--blue);
+	text-indent: 0;
+}
+ul.emoji > li::before,
+li.emoji::before,
+section.emoji ul > li::before {
+	content: none;
+	margin: 0;
+}
+ol {
+	counter-reset: li;
+}
+ol > li {
+	counter-increment: li;
+}
+ol > li::before {
+	content: counter(li, decimal-leading-zero);
+	display: inline-block;
+	width: 1.5em;
+	margin-right: 0.4em;
+	font: 700 0.62em / 1 var(--mono);
+	color: var(--blue-deep);
+	text-indent: 0;
+}
+
+blockquote {
+	margin: 0 0 24px;
+	padding: 4px 0 4px 30px;
+	border-left: 8px solid var(--blue);
+	font-size: 32px;
+}
+blockquote p:last-child {
+	margin-bottom: 0;
+}
+
+hr {
+	height: 2px;
+	margin: 34px 0;
+	border: 0;
+	background: var(--rule);
+}
+
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 24px;
+}
+th {
+	padding: 14px 16px;
+	border-bottom: 2px solid var(--ink);
+	font: 500 17px / 1 var(--mono);
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	text-align: left;
+	color: var(--mute);
+}
+td {
+	padding: 15px 16px;
+	border-bottom: 1px solid rgba(11, 15, 20, 0.12);
+}
+tr td:last-child,
+tr th:last-child {
+	text-align: right;
+	font-family: var(--mono);
+}
+
+img {
+	display: block;
+	max-width: 100%;
+}
+
+/* ───────────────────────────────────────────────────────────── code ── */
+
+code {
+	font-family: var(--mono);
+	font-size: 0.86em;
+	padding: 0.1em 0.34em;
+	border-radius: 3px;
+	background: rgba(0, 173, 216, 0.14);
+	color: var(--blue-deep);
+}
+
+pre {
+	margin: 0 0 24px;
+	padding: 28px 30px;
+	overflow: hidden;
+	background: var(--panel);
+	color: #e6edf3;
+	box-shadow: 0 18px 40px rgba(11, 15, 20, 0.18);
+}
+pre code {
+	display: block;
+	padding: 0;
+	background: none;
+	color: inherit;
+	font-size: 23px;
+	line-height: 1.62;
+}
+
+/* h6 immediately before a fence becomes the editor tab */
+h6 + pre {
+	margin-top: 0;
+}
+h6:has(+ pre) {
+	display: block;
+	padding: 15px 26px;
+	background: var(--panel-tab);
+	color: var(--blue-lift);
+	border-top: 3px solid var(--blue);
+	box-shadow: 0 18px 40px rgba(11, 15, 20, 0.18);
+}
+h6:has(+ pre) + pre {
+	box-shadow: 0 18px 40px rgba(11, 15, 20, 0.18);
+}
+
+/* highlight.js */
+.hljs-comment,
+.hljs-quote {
+	color: #6b7c8a;
+	font-style: italic;
+}
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-built_in,
+.hljs-type,
+.hljs-literal {
+	color: var(--blue);
+}
+.hljs-string,
+.hljs-attr,
+.hljs-regexp {
+	color: #f3b562;
+}
+.hljs-number {
+	color: var(--purple-lift);
+}
+.hljs-title,
+.hljs-title.function_,
+.hljs-section {
+	color: #e6edf3;
+	font-weight: 500;
+}
+.hljs-meta,
+.hljs-meta .hljs-prompt {
+	color: var(--purple-lift);
+}
+.hljs-variable,
+.hljs-params {
+	color: #c9d6e0;
+}
+.hljs-deletion {
+	color: #f08c7a;
+}
+.hljs-addition {
+	color: var(--purple-lift);
+}
+
+/* ───────────────────────────────────────────────── dark, per slide ── */
+
+section.dark,
+section.section,
+section.stat,
+section.meme,
+section.end.dark {
+	--fg: #f2f6f8;
+	--bg: var(--night);
+	--rule: rgba(242, 246, 248, 0.3);
+	--mute: rgba(242, 246, 248, 0.45);
+	--card: #131a20;
+}
+section.dark h5,
+section.section h5,
+section.stat h5 {
+	color: var(--blue-lift);
+}
+section.dark a,
+section.section a,
+section.stat a,
+section.meme a {
+	color: var(--blue-lift);
+}
+section.dark a:hover {
+	color: var(--purple-lift);
+}
+section.dark code,
+section.section code,
+section.stat code,
+section.meme code {
+	background: rgba(0, 173, 216, 0.18);
+	color: var(--blue-lift);
+}
+section.dark footer::before,
+section.section footer::before,
+section.stat footer::before,
+section.meme footer::before,
+section.title footer::before,
+section.end footer::before {
+	filter: brightness(0) invert(1);
+	opacity: 0.75;
+}
+section.dark td {
+	border-bottom-color: rgba(242, 246, 248, 0.16);
+}
+section.dark th {
+	border-bottom-color: #f2f6f8;
+}
+
+/* ───────────────────────────────────────────────────────── gophers ── */
+
+.gopher-hero {
+	--gopher: url("assets/gophers/gopher-hero.svg");
+}
+.gopher-rocket {
+	--gopher: url("assets/gophers/gopher-rocket.svg");
+}
+.gopher-network {
+	--gopher: url("assets/gophers/gopher-network.svg");
+}
+.gopher-sage {
+	--gopher: url("assets/gophers/gopher-sage.svg");
+}
+.gopher-hiking {
+	--gopher: url("assets/gophers/gopher-hiking.svg");
+}
+.gopher-balloon {
+	--gopher: url("assets/gophers/gopher-balloon.svg");
+}
+.gopher-none {
+	--gopher: none;
+}
+
+/* ─────────────────────────────────────────────────── class: title ── */
+
+section.title {
+	--fg: #08131a;
+	--bg: var(--blue);
+	--rule: rgba(8, 19, 26, 0.35);
+	--mute: rgba(8, 19, 26, 0.6);
+	--gopher: url("assets/gophers/gopher-hero.svg");
+	padding-top: 126px;
+	padding-right: 520px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+section.title::before {
+	height: 100%;
+	background:
+		var(--gopher) no-repeat right 48px bottom 40px / 460px 420px,
+		repeating-linear-gradient(90deg, var(--rule) 0 1px, transparent 1px 24px) 0
+		0 / 100% var(--strip) no-repeat;
+}
+section.title h5 {
+	color: #08131a;
+	letter-spacing: 0.3em;
+	font-weight: 700;
+	font-size: 20px;
+	margin-bottom: 34px;
+}
+section.title h1 {
+	font-size: 104px;
+	line-height: 0.96;
+	letter-spacing: -0.04em;
+	margin-bottom: 46px;
+}
+section.title h1::after {
+	content: "";
+	display: block;
+	width: 110px;
+	height: 7px;
+	margin-top: 46px;
+	background: #08131a;
+}
+section.title h3 {
+	font-size: 30px;
+	font-weight: 500;
+	margin-bottom: 6px;
+}
+section.title p {
+	font: 400 21px / 1.5 var(--mono);
+	color: rgba(8, 19, 26, 0.7);
+	margin: 0;
+}
+section.title footer {
+	color: rgba(8, 19, 26, 0.7);
+}
+section.title footer::before {
+	filter: brightness(0);
+	opacity: 0.7;
+}
+
+/* ───────────────────────────────────────────────── class: section ── */
+
+section.section {
+	display: grid;
+	grid-template-columns: 230px 1fr;
+	grid-template-rows: 1fr;
+	align-content: center;
+	align-items: start;
+	column-gap: 54px;
+	padding-top: 210px;
+	padding-bottom: 200px;
+}
+section.section h6 {
+	grid-row: 1 / span 4;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 230px;
+	height: 230px;
+	background: var(--blue);
+	color: #08131a;
+	font: 700 128px / 1 var(--sans);
+	letter-spacing: -0.06em;
+}
+section.section h1 {
+	grid-column: 2;
+	font-size: 78px;
+	line-height: 1;
+	margin: 6px 0 22px;
+}
+section.section p {
+	grid-column: 2;
+	font-size: 27px;
+	color: rgba(242, 246, 248, 0.6);
+	max-width: 640px;
+}
+
+/* ──────────────────────────────────────────────────── class: stat ── */
+
+section.stat {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	padding-top: 120px;
+}
+section.stat h1 {
+	font-size: 268px;
+	line-height: 0.82;
+	letter-spacing: -0.06em;
+	color: var(--purple-lift);
+	margin: 0 0 42px;
+}
+section.stat h1::after {
+	content: "";
+	display: block;
+	width: 660px;
+	height: 6px;
+	margin-top: 42px;
+	background: var(--purple-lift);
+}
+section.stat p {
+	font-size: 36px;
+	line-height: 1.32;
+	max-width: 900px;
+	color: rgba(242, 246, 248, 0.85);
+}
+section.stat strong {
+	color: var(--purple-lift);
+	font-weight: 700;
+}
+
+/* ──────────────────────────────────────────────────── class: meme ── */
+
+section.meme {
+	padding: 0;
+}
+section.meme p:last-of-type {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	height: 104px;
+	margin: 0;
+	padding: 0 430px 0 var(--edge);
+	display: flex;
+	align-items: center;
+	background: var(--blue);
+	color: #08131a;
+	font: 700 38px / 1 var(--sans);
+	letter-spacing: -0.02em;
+}
+section.meme::after {
+	color: rgba(8, 19, 26, 0.6);
+	bottom: 44px;
+}
+section.meme footer {
+	left: auto;
+	right: 180px;
+	bottom: 39px;
+	color: rgba(8, 19, 26, 0.6);
+}
+section.meme footer::before {
+	filter: brightness(0);
+	opacity: 0.7;
+}
+
+/* ───────────────────────────────────────────────── class: compare ── */
+
+section.compare {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: auto 1fr;
+	column-gap: 80px;
+	align-content: start;
+}
+section.compare h1 {
+	grid-column: 1 / -1;
+}
+section.compare blockquote {
+	margin: 0;
+	padding: 30px;
+	border: 0;
+	font-size: 28px;
+	background: var(--panel);
+	color: #e6edf3;
+}
+section.compare blockquote:nth-of-type(2) {
+	background: var(--purple-deep);
+	color: #f3eefa;
+}
+section.compare blockquote strong {
+	display: block;
+	margin-bottom: 26px;
+	font: 500 19px / 1 var(--mono);
+	letter-spacing: 0.16em;
+	text-transform: uppercase;
+	color: rgba(230, 237, 243, 0.45);
+}
+section.compare blockquote:nth-of-type(2) strong {
+	color: #c0a6ee;
+}
+section.compare blockquote h2 {
+	margin: 40px 0 12px;
+	font-size: 68px;
+	letter-spacing: -0.04em;
+}
+section.compare blockquote:nth-of-type(2) h2 {
+	color: #c0a6ee;
+}
+section.compare blockquote h2 small {
+	font-size: 26px;
+	font-weight: 400;
+	opacity: 0.5;
+}
+section.compare blockquote p:last-child {
+	font: 400 21px / 1 var(--mono);
+	opacity: 0.5;
+	margin: 0;
+}
+section.compare blockquote code {
+	background: none;
+	color: inherit;
+	padding: 0;
+	font-size: 22px;
+}
+section.compare h6 {
+	position: absolute;
+	left: 50%;
+	top: 392px;
+	transform: translateX(-50%);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 120px;
+	height: 48px;
+	background: var(--purple);
+	color: #fff;
+	font: 700 24px / 1 var(--mono);
+	z-index: 2;
+}
+
+/* ──────────────────────────────────────────────── class: terminal ── */
+
+section.terminal h1 {
+	display: flex;
+	align-items: center;
+	gap: 20px;
+}
+section.terminal h1::before {
+	content: "";
+	width: 20px;
+	height: 20px;
+	flex: none;
+	background: var(--purple);
+}
+section.terminal pre {
+	padding: 34px 32px;
+}
+section.terminal pre code {
+	font-size: 25px;
+	line-height: 1.75;
+}
+
+/* ─────────────────────────────────────────────────── class: chart ── */
+
+section.chart h5 {
+	margin-bottom: 30px;
+}
+.bars {
+	display: flex;
+	flex-direction: column;
+	gap: 26px;
+}
+.bars .row {
+	display: flex;
+	align-items: center;
+	gap: 26px;
+}
+.bars .label {
+	width: 236px;
+	text-align: right;
+	font: 400 25px / 1 var(--mono);
+	color: rgba(11, 15, 20, 0.7);
+}
+.bars .track {
+	flex: 1;
+	height: 38px;
+	background: rgba(11, 15, 20, 0.06);
+}
+.bars .fill {
+	display: block;
+	height: 100%;
+	background: var(--blue);
+}
+.bars .value {
+	width: 104px;
+	font: 500 25px / 1 var(--mono);
+}
+.bars .mark .label,
+.bars .mark .value {
+	color: var(--purple);
+	font-weight: 500;
+}
+.bars .mark .fill {
+	background: var(--purple);
+}
+
+.cols {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	gap: 60px;
+	align-items: start;
+}
+.cols.wide-left {
+	grid-template-columns: 1.6fr 1fr;
+}
+.cols.wide-right {
+	grid-template-columns: 1fr 1.6fr;
+}
+
+.card {
+	background: var(--card);
+	padding: 28px 30px;
+	border-left: 8px solid var(--blue);
+}
+.card.measure {
+	border-left-color: var(--purple);
+}
+
+.qr {
+	width: 200px;
+	height: 200px;
+	background: #08131a;
+	padding: 13px;
+	box-sizing: border-box;
+}
+.qr img {
+	width: 100%;
+	height: 100%;
+}
+
+/* ───────────────────────────────────────────────────── class: end ── */
+
+section.end {
+	--fg: #08131a;
+	--bg: var(--blue);
+	--rule: rgba(8, 19, 26, 0.35);
+	--mute: rgba(8, 19, 26, 0.6);
+	--gopher: url("assets/gophers/gopher-rocket.svg");
+	padding-top: 140px;
+	padding-right: 460px;
+}
+section.end::after {
+	content: none;
+}
+section.end h1 {
+	font-size: 96px;
+	line-height: 0.98;
+	letter-spacing: -0.04em;
+	margin-bottom: 52px;
+}
+section.end ul,
+section.end p {
+	font: 500 26px / 1.75 var(--mono);
+}
+section.end li {
+	padding: 0;
+	text-indent: 0;
+	margin: 0;
+}
+section.end li::before {
+	content: none;
+}
+section.end a {
+	color: #08131a;
+	text-decoration-color: rgba(8, 19, 26, 0.4);
+}
+section.end footer {
+	color: rgba(8, 19, 26, 0.7);
+}
+section.end footer::before {
+	filter: brightness(0);
+	opacity: 0.7;
+}
+section.end .qr {
+	position: absolute;
+	right: 330px;
+	bottom: 130px;
+}
+section.end::before {
+	height: 100%;
+	background:
+		var(--gopher) no-repeat right 86px bottom 0 / 240px 470px,
+		repeating-linear-gradient(90deg, var(--rule) 0 1px, transparent 1px 24px) 0
+		0 / 100% var(--strip) no-repeat;
+}
+
+/* Title and end layouts set a default gopher with higher specificity than
+   the generic modifier classes above, so repeat the modifiers here. */
+section.title.gopher-hero,
+section.end.gopher-hero {
+	--gopher: url("assets/gophers/gopher-hero.svg");
+}
+section.title.gopher-rocket,
+section.end.gopher-rocket {
+	--gopher: url("assets/gophers/gopher-rocket.svg");
+}
+section.title.gopher-network,
+section.end.gopher-network {
+	--gopher: url("assets/gophers/gopher-network.svg");
+}
+section.title.gopher-sage,
+section.end.gopher-sage {
+	--gopher: url("assets/gophers/gopher-sage.svg");
+}
+section.title.gopher-hiking,
+section.end.gopher-hiking {
+	--gopher: url("assets/gophers/gopher-hiking.svg");
+}
+section.title.gopher-balloon,
+section.end.gopher-balloon {
+	--gopher: url("assets/gophers/gopher-balloon.svg");
+}
+section.title.gopher-none,
+section.end.gopher-none {
+	--gopher: none;
+}
+
+/* ─────────────────────────────────────────── incremental reveal ── */
+/* Marp's bespoke output fragments `*` lists. Unrevealed items ghost
+   rather than vanish, so the audience keeps the shape of the list.
+   Static HTML and PDF show everything, which is what you want. */
+
+[data-marpit-fragment] {
+	transition:
+		opacity 0.22s ease,
+		filter 0.22s ease;
+}
+[data-bespoke-marp-fragment="inactive"] {
+	opacity: 0.18;
+	filter: saturate(0.1);
+}
+
+/* ────────────────────────────────────────────────── class: agenda ── */
+
+section.agenda {
+	padding-top: 96px;
+}
+section.agenda h1 {
+	font-size: 44px;
+	margin-bottom: 34px;
+}
+section.agenda ol,
+section.agenda ul {
+	counter-reset: li;
+}
+section.agenda li {
+	display: grid;
+	grid-template-columns: 92px 1fr;
+	align-items: baseline;
+	gap: 22px;
+	margin: 0;
+	padding: 20px 0 20px 22px;
+	text-indent: 0;
+	border-left: 6px solid transparent;
+	border-bottom: 1px solid rgba(11, 15, 20, 0.1);
+	font-size: 38px;
+	line-height: 1.25;
+	opacity: 0.44;
+	counter-increment: li;
+}
+section.agenda li::before {
+	content: counter(li, decimal-leading-zero);
+	display: block;
+	width: auto;
+	height: auto;
+	margin: 0;
+	background: none;
+	font: 700 26px / 1 var(--mono);
+	color: var(--mute);
+	text-indent: 0;
+}
+section.agenda li:has(strong) {
+	opacity: 1;
+	border-left-color: var(--purple);
+}
+section.agenda li:has(strong)::before {
+	color: var(--purple);
+}
+section.agenda strong {
+	font-weight: 700;
+	color: var(--fg);
+}
+section.dark.agenda li {
+	border-bottom-color: rgba(242, 246, 248, 0.14);
+}
+section.dark.agenda li:has(strong) {
+	border-left-color: var(--purple-lift);
+}
+section.dark.agenda li:has(strong)::before {
+	color: var(--purple-lift);
+}
+
+/* ───────────────────────────────────────────────── class: speaker ── */
+
+section.speaker {
+	display: grid;
+	grid-template-columns: 360px 1fr;
+	column-gap: 72px;
+	align-content: center;
+	padding-top: 110px;
+}
+section.speaker p:has(img) {
+	grid-row: 1 / span 5;
+	align-self: center;
+	margin: 0;
+}
+section.speaker img {
+	width: 360px;
+	height: 360px;
+	object-fit: cover;
+	border-radius: 50%;
+}
+section.speaker h1 {
+	grid-column: 2;
+	font-size: 64px;
+	margin: 0 0 10px;
+}
+section.speaker h3 {
+	grid-column: 2;
+	font-weight: 500;
+	font-size: 30px;
+	color: var(--mute);
+	margin: 0 0 32px;
+}
+section.speaker ul {
+	grid-column: 2;
+	margin: 0;
+}
+section.speaker li {
+	padding: 0;
+	text-indent: 0;
+	margin: 0;
+	font: 500 25px / 1.95 var(--mono);
+}
+section.speaker li::before {
+	content: none;
+}
+section.speaker li strong {
+	color: var(--purple);
+	font-weight: 500;
+}
+section.speaker.dark li strong {
+	color: var(--purple-lift);
+}
+
+/* ─────────────────────────────────────────────────── class: photo ── */
+/* Pair with a Marpit filter chain for the duotone — see the README. */
+
+section.photo {
+	--fg: #f2f6f8;
+	--rule: rgba(242, 246, 248, 0.3);
+	--mute: rgba(242, 246, 248, 0.55);
+	color: var(--fg);
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-end;
+	padding-bottom: 116px;
+}
+section.photo::before {
+	height: 100%;
+	z-index: 0;
+	background:
+		linear-gradient(var(--blue), var(--blue)) 0 var(--strip) / var(--progress)
+		8px no-repeat,
+		repeating-linear-gradient(90deg, var(--rule) 0 1px, transparent 1px 24px) 0
+		0 / 100% var(--strip) no-repeat,
+		linear-gradient(
+			to top,
+			rgba(8, 14, 19, 0.94) 0%,
+			rgba(8, 14, 19, 0.55) 42%,
+			rgba(8, 14, 19, 0) 78%
+		);
+}
+section.photo > *:not(footer):not(header) {
+	position: relative;
+	z-index: 1;
+}
+section.photo footer,
+section.photo header {
+	z-index: 2;
+}
+section.photo h1 {
+	font-size: 72px;
+	max-width: 940px;
+	margin-bottom: 20px;
+}
+section.photo h5 {
+	color: var(--blue-lift);
+}
+section.photo p {
+	font-size: 28px;
+	max-width: 780px;
+	color: rgba(242, 246, 248, 0.78);
+	margin: 0;
+}
+section.photo footer::before {
+	filter: brightness(0) invert(1);
+	opacity: 0.75;
+}
+
+/* ─────────────────────────────────────────────── class: punchline ── */
+
+section.punchline {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+	padding: 110px 120px;
+}
+section.punchline::after {
+	content: none;
+}
+section.punchline footer {
+	display: none;
+}
+section.punchline h1 {
+	margin: 0;
+	max-width: 1000px;
+	font-size: 108px;
+	line-height: 1;
+	letter-spacing: -0.045em;
+}
+section.punchline em {
+	font-style: normal;
+	color: var(--purple);
+}
+section.punchline.dark em,
+section.punchline.photo em {
+	color: var(--purple-lift);
+}
+
+/* ────────────────────────────────────────────────────── utilities ── */
+
+.mono {
+	font-family: var(--mono);
+}
+.mute {
+	color: var(--mute);
+}
+.measure {
+	color: var(--purple);
+}
+section.dark .measure,
+section.section .measure,
+section.stat .measure {
+	color: var(--purple-lift);
+}
+.big {
+	font-size: 1.4em;
+}
+.tight {
+	margin-bottom: 8px;
+}
+.center {
+	text-align: center;
+}
+
+/* print / PDF: Marp handles page geometry; just keep the paint */
+@media print {
+	section {
+		print-color-adjust: exact;
+		-webkit-print-color-adjust: exact;
+	}
+}
