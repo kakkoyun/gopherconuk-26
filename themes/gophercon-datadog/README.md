@@ -192,7 +192,7 @@ looking, just not informative. Everything else is plain CSS.
 the back of a room the size of The Brewery. Code is 23px, terminal 25px. If you
 find yourself shrinking code to fit, cut the code instead.
 
-**PDF export needs `print-color-adjust`,** which the theme sets. If a backgrounds
+**PDF export needs `print-color-adjust`,** which the theme sets. If backgrounds
 come out white, it's the browser's "background graphics" print setting, not the
 theme.
 

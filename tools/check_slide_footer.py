@@ -11,10 +11,8 @@ import subprocess
 import sys
 from pathlib import Path
 
-PAGE_RE = re.compile(r'<page width="[^"]+" height="([0-9.]+)">')
-WORD_RE = re.compile(
-    r'<word xMin="[^"]+" yMin="([0-9.]+)" xMax="[^"]+" yMax="[^"]+">(.*?)</word>'
-)
+PAGE_RE = re.compile(r'<page\b[^>]*\bheight="([0-9.]+)"')
+WORD_RE = re.compile(r'<word\b[^>]*\byMin="([0-9.]+)"[^>]*>(.*?)</word>')
 
 
 def coordinate(value: str) -> float | None:
