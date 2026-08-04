@@ -41,8 +41,9 @@ html: true
 ---
 ```
 
-The theme resolves `fonts/` and `assets/` **relative to the CSS file**, so keep the
-folder together. Move the CSS, move the folder.
+Marp puts theme CSS into exported HTML but retains these relative URLs. If you
+write HTML outside this directory, put `fonts/` and `assets/` beside it. This
+repository's Makefile stages them before each build; those directories are ignored.
 
 ## The colour rule
 

@@ -35,9 +35,13 @@ go.work.sum
 # Per-talk living plans/trackers (gitignored — local only)
 plans/
 
-# Slide build artifacts
+# Slide build artifacts and staged theme resources
 talks/**/slides/presentation.html
 talks/**/slides/presentation.pdf
+talks/go-benchmarks-lying/slides/assets/
+talks/go-benchmarks-lying/slides/fonts/
+talks/without-a-single-line/slides/assets/
+talks/without-a-single-line/slides/fonts/
 themes/gophercon-datadog/.theme-check.pdf
 
 # Agent runtime artifacts

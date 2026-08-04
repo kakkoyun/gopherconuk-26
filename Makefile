@@ -13,7 +13,7 @@ MARP := npx marp
 .DEFAULT_GOAL := help
 
 .PHONY: all build/html build/pdf build/html/% build/pdf/% watch/% serve/% clean clean/% \
-	check check/fast check/slides check/css check/theme check/theme-copies check/footer check/go \
+	check check/fast check/slides check/css check/theme check/footer check/go \
 	lint/md lint/md/% fix/md/% format/md format/md/% check/typos check/typos/% fix/typos/% \
 	pre-commit sync/theme hooks install help
 
@@ -21,16 +21,16 @@ all: check
 
 build/html: build/html/go-benchmarks-lying build/html/without-a-single-line
 
-build/html/%:
-	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set talks/$*/slides/gophercon-datadog.css -o talks/$*/slides/presentation.html
+build/html/%: sync/theme
+	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_CSS)" -o talks/$*/slides/presentation.html
 
 build/pdf: build/pdf/go-benchmarks-lying build/pdf/without-a-single-line
 
-build/pdf/%:
-	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set talks/$*/slides/gophercon-datadog.css --pdf -o talks/$*/slides/presentation.pdf
+build/pdf/%: sync/theme
+	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_CSS)" --pdf -o talks/$*/slides/presentation.pdf
 
-watch/%:
-	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set talks/$*/slides/gophercon-datadog.css --watch --preview
+watch/%: sync/theme
+	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_CSS)" --watch --preview
 
 serve/%: build/html/%
 	python3 -m http.server --directory talks/$*/slides 8000
@@ -38,15 +38,15 @@ serve/%: build/html/%
 clean: clean/go-benchmarks-lying clean/without-a-single-line
 
 clean/%:
-	rm -f talks/$*/slides/presentation.html talks/$*/slides/presentation.pdf
+	rm -rf talks/$*/slides/presentation.html talks/$*/slides/presentation.pdf talks/$*/slides/assets talks/$*/slides/fonts
 
 check: check/slides check/go
 
-check/fast: check/theme-copies lint/md check/typos
+check/fast: check/theme lint/md check/typos
 
 check/slides: check/css lint/md check/typos build/html check/footer
 
-check/css: check/theme-copies check/theme
+check/css: check/theme
 
 check/footer: build/pdf
 	python3 tools/check_slide_footer.py $(SLIDE_PDFS)
@@ -57,14 +57,6 @@ check/theme:
 	trap 'rm -f "$$output"' EXIT; \
 	$(MARP) "$(THEME_DIR)/deck.md" --allow-local-files --theme-set "$(THEME_CSS)" --pdf -o "$$output"; \
 	test -s "$$output"
-
-check/theme-copies:
-	@cmp -s "$(THEME_CSS)" talks/go-benchmarks-lying/slides/gophercon-datadog.css || { printf '%s\n' 'Theme CSS is out of sync for go-benchmarks-lying.' >&2; exit 1; }
-	@diff -qr "$(THEME_DIR)/fonts" talks/go-benchmarks-lying/slides/fonts
-	@diff -qr "$(THEME_DIR)/assets" talks/go-benchmarks-lying/slides/assets
-	@cmp -s "$(THEME_CSS)" talks/without-a-single-line/slides/gophercon-datadog.css || { printf '%s\n' 'Theme CSS is out of sync for without-a-single-line.' >&2; exit 1; }
-	@diff -qr "$(THEME_DIR)/fonts" talks/without-a-single-line/slides/fonts
-	@diff -qr "$(THEME_DIR)/assets" talks/without-a-single-line/slides/assets
 
 check/go:
 	command -v goimports >/dev/null || { printf '%s\n' 'Install goimports: go install golang.org/x/tools/cmd/goimports@v0.45.0' >&2; exit 1; }
@@ -116,10 +108,8 @@ fix/typos/%:
 pre-commit: check/fast
 
 sync/theme:
-	@cp "$(THEME_CSS)" talks/go-benchmarks-lying/slides/gophercon-datadog.css
 	@rsync -a --delete "$(THEME_DIR)/fonts/" talks/go-benchmarks-lying/slides/fonts/
 	@rsync -a --delete "$(THEME_DIR)/assets/" talks/go-benchmarks-lying/slides/assets/
-	@cp "$(THEME_CSS)" talks/without-a-single-line/slides/gophercon-datadog.css
 	@rsync -a --delete "$(THEME_DIR)/fonts/" talks/without-a-single-line/slides/fonts/
 	@rsync -a --delete "$(THEME_DIR)/assets/" talks/without-a-single-line/slides/assets/
 
@@ -137,9 +127,9 @@ help:
 	@printf '%s\n' '  make watch/<talk>        Open a live preview for one talk'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Verify:'
-	@printf '%s\n' '  make check/fast          Theme-copy, Markdown, and typo checks'
+	@printf '%s\n' '  make check/fast          Theme, Markdown, and typo checks'
 	@printf '%s\n' '  make check               Full slides, footer, CSS/theme, and Go checks'
-	@printf '%s\n' '  make sync/theme          Copy canonical theme assets into both decks'
+	@printf '%s\n' '  make sync/theme          Stage output-local theme resources'
 	@printf '%s\n' ''
 	@printf '%s\n' 'Hooks:'
 	@printf '%s\n' '  make hooks               Enable the repository pre-commit hook'
