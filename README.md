@@ -9,12 +9,12 @@ writing and designing talks.
 
 | Server | Use |
 | --- | --- |
-| Memeboat | Search meme templates and create captioned images |
-| GIPHY | Search rated GIFs and stickers |
-| Readwise | Search highlights and Reader documents |
-| fal | Find generative-media models and run them when requested |
-| Pexels | Search stock photos and videos |
-| Pixabay | Search stock photos, illustrations, vectors, and videos |
+| `meme` | Search meme templates and create captioned images |
+| `giphy` | Search rated GIFs and stickers |
+| `readwise` | Search highlights and Reader documents |
+| `fal` | Find generative-media models and run them when requested |
+| `pexels` | Search stock photos and videos |
+| `pixabay` | Search stock photos, illustrations, vectors, and videos |
 
 The credential-backed servers require Node.js 20 or newer and the 1Password
 CLI. Their API keys remain as `op://` references and are resolved only when each
@@ -31,4 +31,5 @@ in HTML decks, but PDF exports capture a static frame.
 
 fal model execution can incur charges. Check pricing before running a model.
 
-Pi does not load `.mcp.json`; it needs an equivalent CLI or extension integration.
+Pi is a separate terminal coding agent. It does not load `.mcp.json`; use an
+equivalent CLI or extension integration instead.
