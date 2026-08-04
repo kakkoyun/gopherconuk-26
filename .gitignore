@@ -33,3 +33,11 @@ go.work.sum
 
 # Per-talk living plans/trackers (gitignored — local only)
 plans/
+
+# Slide build artifacts
+talks/**/slides/presentation.html
+talks/**/slides/presentation.pdf
+
+# Compiled CLI binaries
+tools/cli/*/kubectl-obi
+tools/cli/*/kubectl-obi.exe
