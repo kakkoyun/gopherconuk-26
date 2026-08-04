@@ -19,6 +19,7 @@ profile.cov
 
 # Dependency directories (remove the comment below to include it)
 # vendor/
+node_modules/
 
 # Go workspace file
 go.work
@@ -37,6 +38,11 @@ plans/
 # Slide build artifacts
 talks/**/slides/presentation.html
 talks/**/slides/presentation.pdf
+themes/gophercon-datadog/.theme-check.pdf
+
+# Agent runtime artifacts
+.pi-subagents/
+__pycache__/
 
 # Compiled CLI binaries
 tools/cli/*/kubectl-obi
