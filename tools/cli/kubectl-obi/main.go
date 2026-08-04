@@ -250,7 +250,7 @@ func newTracesCmd() *cobra.Command {
 		Long: `Query the OTel Collector or backend for recent traces from a deployment.
 Requires OTEL_EXPORTER_OTLP_ENDPOINT to point to a reachable collector or
 Jaeger instance.`,
-		Args:    cobra.ExactArgs(1),
+		Args: cobra.ExactArgs(1),
 		Example: `  kubectl obi traces my-service --tail=50
   kubectl obi traces my-service --follow`,
 		RunE: func(cmd *cobra.Command, args []string) error {
