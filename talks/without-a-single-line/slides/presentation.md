@@ -5,7 +5,7 @@ math: mathjax
 html: true
 paginate: true
 header: "Zero-Touch Go Instrumentation · GopherCon UK 2026"
-footer: "Kemal Akkoyun · Datadog"
+footer: " "
 style: |
   .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem; }
   .columns3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }

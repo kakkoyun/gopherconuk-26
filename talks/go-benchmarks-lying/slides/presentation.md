@@ -5,7 +5,7 @@ math: mathjax
 html: true
 paginate: true
 header: "Why Your Go Benchmarks Are Lying · GopherCon UK 2026"
-footer: "Kemal Akkoyun · Datadog"
+footer: " "
 style: |
   .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   .big    { font-size: 1.4em; }
