@@ -131,7 +131,14 @@ func attachDaemonSet(namespace string) error {
 	fmt.Print(out)
 
 	fmt.Println("Waiting for DaemonSet rollout (timeout: 120s)...")
-	out, err = runKubectl("rollout", "status", "daemonset/obi", "-n", namespace, "--timeout=120s")
+	dsName, err := runKubectl("get", "daemonset",
+		"-l", "app.kubernetes.io/instance=obi",
+		"-n", namespace,
+		"-o", "jsonpath={.items[0].metadata.name}")
+	if err != nil {
+		return fmt.Errorf("attach daemonset: find daemonset: %w", err)
+	}
+	out, err = runKubectl("rollout", "status", "daemonset/"+strings.TrimSpace(dsName), "-n", namespace, "--timeout=120s")
 	if err != nil {
 		return fmt.Errorf("attach daemonset: rollout status: %w", err)
 	}
@@ -230,7 +237,7 @@ func showStatus(namespace string, allNamespaces bool) error {
 		return base
 	}
 
-	dsOut, err := runKubectl(nsArgs("get", "daemonset", "-l", "app=obi")...)
+	dsOut, err := runKubectl(nsArgs("get", "daemonset", "-l", "app.kubernetes.io/instance=obi")...)
 	if err != nil {
 		fmt.Printf("DaemonSets: none found\n")
 	} else {
@@ -239,7 +246,7 @@ func showStatus(namespace string, allNamespaces bool) error {
 	}
 
 	fmt.Println()
-	podOut, err := runKubectl(nsArgs("get", "pods", "-l", "app=obi")...)
+	podOut, err := runKubectl(nsArgs("get", "pods", "-l", "app.kubernetes.io/instance=obi")...)
 	if err != nil {
 		fmt.Printf("Pods: none found\n")
 	} else {
