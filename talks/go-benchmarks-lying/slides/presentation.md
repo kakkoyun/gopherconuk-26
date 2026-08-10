@@ -194,8 +194,8 @@ Measure in production before writing a single benchmark.
 
 - **Always-on, pprof-based** — Datadog Continuous Profiler (low-overhead sampling, all signal types)
 - **eBPF-based** — no code changes, whole-system view
-  - [opentelemetry-ebpf-profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler) · [Parca](https://parca.dev) (OSS)
-  - Currently CPU only — memory profiling is in progress; this is a new OTel profiling signal
+  - [opentelemetry-ebpf-profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler) · [Parca](https://parca.dev) (open source)
+  - Currently CPU only — memory profiling is in progress; this is a new OpenTelemetry (OTel) profiling signal
 - **Real metrics** — p50 / p95 / p99 latency from your observability stack
 
 *If nothing shows as hot, there may be nothing worth optimizing.*
@@ -306,7 +306,7 @@ Your loop still runs `b.N` times. It just runs empty.
 
 ---
 
-## Dead-code elimination
+## Dead-code elimination (DCE)
 
 ```go
 func makeBuffer(n int) []byte {
@@ -623,6 +623,8 @@ It does not answer: *is this machine a trustworthy place to ask?*
 
 <br>
 
+Coefficient of Variation (CV):
+
 $$ CV = \frac{\sigma}{\mu} $$
 
 <br>
@@ -715,7 +717,7 @@ while the host is still fully saturated.
 
 <br>
 
-Bare-metal Linux, SMT off: **~0.05%**. A hundred times tighter.
+Bare-metal Linux, Simultaneous Multi-Threading (SMT) off: **~0.05%**. A hundred times tighter.
 
 ---
 
@@ -815,7 +817,7 @@ This is an **environment** problem, not a statistics problem.
 | SMT enabled, CPU-bound | — | **~23%** |
 | SMT disabled, task 1 | 737.37 ± 0.32 ms | **0.044%** |
 | SMT disabled, task 2 | 737.93 ± 1.74 ms | **0.235%** |
-| DFS on, 1 task | 533.97 ± 2.046 ms | **0.383%** |
+| Dynamic Frequency Scaling (DFS) on, 1 task | 533.97 ± 2.046 ms | **0.383%** |
 | DFS off, 1 task | 738.18 ± 0.306 ms | **0.041%** |
 
 <br>
@@ -1005,7 +1007,7 @@ Stdlib-only Go modules — also wrapped as Claude Code skills.
 
 ## `honestbench` — static analysis for benchmarks
 
-Go/AST analysis. No benchmark needs to run. Finds problems before you measure.
+Go Abstract Syntax Tree (AST) analysis. No benchmark needs to run. Finds problems before you measure.
 
 ```text
 dce_bench_test.go:46:3: high: discarded-result:
