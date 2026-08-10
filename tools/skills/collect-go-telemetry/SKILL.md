@@ -23,19 +23,25 @@ Collect telemetry from a Go service for troubleshooting or optimization — no s
 
 Ask the user (or infer from context) which scenario applies:
 
-**→ OBI** when any of these are true:
+**→ OBI** (v0, active dev) when any of these are true:
 - Service is already deployed (production, staging, k8s, docker-compose)
 - Rebuild/redeploy is not acceptable
-- Service is not Go-only (polyglot, multiple languages)
-- Goal is HTTP/gRPC RED metrics (rate, errors, duration) or library-level spans
+- Mixed-language fleet (Go, Java, Python, .NET, etc.)
+- Goal is HTTP/gRPC RED metrics or boundary-level library spans
 - User says: "production", "k8s", "pod", "cluster", "running", "no rebuild", "runtime"
+- Note: emitted telemetry fields may change between minor releases (v0 stability guarantee)
 
-**→ otelc** when any of these are true:
+**→ otelc** (v1 stable, Go 1.25+) when any of these are true:
 - Working locally or in a dev environment
-- Need granular spans (custom functions, specific code paths, business logic)
+- Need deep in-process spans (custom functions, business logic, third-party module internals)
 - Willing to rebuild with `otelc go build`
 - Debugging a specific slow path with exact trace data
+- Runtime is restricted (no root, no eBPF capabilities, serverless)
 - User says: "local", "dev", "debug", "granular", "custom span", "trace specific function"
+
+**→ Both together** when the service is Go and runs in a mixed-language environment:
+- otelc for the Go service internals (per-function spans, business logic)
+- OBI for infrastructure-level coverage + non-Go neighbours
 
 If context is ambiguous, ask: *"Is this for a running production service (OBI) or local development where you can rebuild (otelc)?"*
 
@@ -66,14 +72,21 @@ This fetches only the relevant section from OBI's SUPPORT_MATRIX.md — not the 
 ### Attach: Kubernetes (DaemonSet)
 
 ```bash
-# 1. Add OBI DaemonSet to the cluster (one-time, instruments all pods on the node)
-kubectl apply -f https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/releases/download/v0.10.0/obi-daemonset.yaml
+# 1. Deploy OBI via Helm (one-time, instruments all pods on the node)
+#    Using kubectl-obi plugin (repo: tools/cli/kubectl-obi):
+kubectl obi attach
+
+#    Or directly with Helm:
+helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+helm upgrade --install obi open-telemetry/opentelemetry-ebpf-instrumentation \
+  --namespace obi-system --create-namespace
 
 # 2. Verify OBI is running
-kubectl get pods -n obi-system
+kubectl obi status
+# or: kubectl get pods -n obi-system -l app.kubernetes.io/instance=obi
 
 # 3. Check that spans are flowing (assumes OTel Collector configured)
-kubectl logs -n obi-system -l app=obi --tail=50
+kubectl logs -n obi-system -l app.kubernetes.io/instance=obi --tail=50
 ```
 
 ### Attach: Docker Compose
@@ -119,7 +132,7 @@ docker compose logs obi -f
 - Granular OTel spans for all supported Go frameworks, injected at compile time
 - Instruments your code, its dependencies, and parts of the standard library
 - No runtime overhead beyond the OTel SDK
-- **Requires:** rebuild with `otelc go build`; Linux/macOS dev machine; Go version ≥ (check go.mod)
+- **Requires:** rebuild with `otelc go build`; Linux/macOS dev machine; **Go 1.25+** (hard requirement)
 
 ### Fetch integration details (token-thrift)
 
@@ -183,12 +196,13 @@ open http://localhost:16686
 
 ## Decision summary
 
-| Need | Use |
-|------|-----|
-| Production service, no rebuild | **OBI** |
-| Any language in the fleet | **OBI** |
-| HTTP/gRPC RED metrics only | **OBI** |
-| Local dev, granular spans | **otelc** |
-| Custom business-logic traces | **otelc** |
-| Specific slow function traced exactly | **otelc** |
-| Always-on CPU profiling (no code changes) | `opentelemetry-ebpf-profiler` (separate skill) |
+| Need | Use | Maturity |
+|------|-----|----------|
+| Production service, no rebuild | **OBI** | v0 — expect breaking changes in minors |
+| Mixed-language fleet | **OBI** | v0 |
+| HTTP/gRPC RED metrics, boundary spans | **OBI** | v0 |
+| Local dev, deep in-process traces | **otelc** | v1 stable |
+| Custom business-logic spans | **otelc** | v1 stable |
+| Restricted runtime (no root/eBPF) | **otelc** | v1 stable |
+| Go service in mixed fleet | **Both** | see above |
+| Always-on CPU profiling | `ebpf-profiler` | Development |
