@@ -100,7 +100,7 @@ The only "hook" is reluctant accommodation of abuse.
 LD_PRELOAD=./tracer.so ./python-app    ✅
 
 # Go uses its internal linker by default:
-LD_PRELOAD=./tracer.so ./go-app        ❌ (silently ignored)
+LD_PRELOAD=./tracer.so ./go-app        ❌ (Go's runtime bypasses libc — no effect)
 
 # Requires forcing external linking:
 go build -ldflags="-linkmode=external" ⚠️
@@ -305,7 +305,7 @@ Part 3 · local dev · granular spans
 
 ---
 
-## Two tools, one idea
+## One story converging
 
 <div class="columns">
 
@@ -317,8 +317,8 @@ Part 3 · local dev · granular spans
 orchestrion go build .
 ```
 
-GA v1.11.0 · defaults to dd-trace-go/v2
-Vendor-agnostic · battle-tested
+GA v1.11.0 · battle-tested · active standalone
+The mature input — still maintained by Datadog
 
 </div>
 
@@ -330,14 +330,14 @@ Vendor-agnostic · battle-tested
 otelc go build ./...
 ```
 
-Stable v1.0.1 (2026-07-14) · OTel SDK
-Datadog + Alibaba co-founded SIG
+v1.0.1 stable · OTel SDK
+Merges Orchestrion + Alibaba approaches into one vendor-neutral tool
 
 </div>
 
 </div>
 
-Same core mechanism. Both use Go's `-toolexec` flag.
+Same `-toolexec` mechanism. `otelc` is where the ecosystem converges.
 
 ---
 
@@ -467,7 +467,7 @@ But what about **profiles**?
 Donated by **Elastic** (formerly Elastic Universal Profiling) to OTel in June 2024.
 
 - Repo: `github.com/open-telemetry/opentelemetry-ebpf-profiler`
-- Version: `v0.0.202627` (calendar-week tags — no formal releases yet)
+- Version: `v0.0.202632` (calendar-week tags — no formal releases yet)
 - Ships as the **`otelcol-ebpf-profiler`** OTel Collector distribution
 - OTLP profiles signal: **Alpha** (OTel spec) / **Development** (OTLP 1.11.0)
 
@@ -693,7 +693,7 @@ Part 7
 
 USDT probes give out-of-process tools a **stable, named hook point** — not a fragile uprobe on a symbol address that changes with every build.
 
-Go ships **no built-in USDT probes** today (golang/go#57175, initial inquiry). The proof of concept is there:
+Go ships **no built-in USDT probes** today. The proof of concept is there:
 
 ```bash
 # github.com/kakkoyun/go/tree/poc_usdt
