@@ -33,6 +33,66 @@ And How to Stop Them
 
 ###### 01
 
+# Why Benchmark?
+
+Performance is a feature.
+
+---
+
+## Latency and throughput
+
+<div class="columns">
+<div>
+
+### Latency
+Time for a single operation to complete.
+
+Low latency = fast response.
+
+*Users feel this directly.*
+
+</div>
+<div>
+
+### Throughput
+Operations completed per unit of time.
+
+High throughput = more capacity.
+
+*Your system's ceiling.*
+
+</div>
+</div>
+
+---
+
+## The cost of slowness
+
+| Response time | User perception |
+|---|---|
+| 100–200ms | Minimally noticeable |
+| 300–500ms | Quick but slightly slow |
+| 1–3s | Amount of work noticeable |
+| 5–10s+ | User switches away |
+
+<br>
+
+A 500ms delay cost Google 20% of search traffic.
+
+---
+
+<!-- _class: vcenter -->
+
+> "Not all fast software is world-class,
+> but all world-class software is fast."
+
+Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 02
+
 # A Loose Cable
 
 A systematic measurement error can hide in plain sight.
@@ -114,7 +174,117 @@ If you can't trust it locally, CI will industrialise the lie.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 02
+###### 03
+
+# Before You Optimize
+
+Measure symptoms. Set targets.
+
+---
+
+## Is it actually slow?
+
+Measure in production before writing a single benchmark.
+
+- **pprof** — CPU, memory, goroutine, block; the standard Go profiler
+
+  ```bash
+  go tool pprof http://localhost:6060/debug/pprof/profile
+  ```
+
+- **Always-on, pprof-based** — Datadog Continuous Profiler (low-overhead sampling, all signal types)
+- **eBPF-based** — no code changes, whole-system view
+  - [opentelemetry-ebpf-profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler) · [Parca](https://parca.dev) (OSS)
+  - Currently CPU only — memory profiling is in progress; this is a new OTel profiling signal
+- **Real metrics** — p50 / p95 / p99 latency from your observability stack
+
+*If nothing shows as hot, there may be nothing worth optimizing.*
+
+---
+
+## Is it worth optimizing?
+
+Define a target before you start. Without one, you never finish.
+
+- **SLOs** — "p99 < 200 ms" is an objective, not a wish
+- **Error budgets** — within budget, optimization is optional
+- **Amdahl's Law** — only the hottest path produces meaningful wins
+
+*Benchmark what your profiler tells you is hot, not what looks interesting.*
+
+---
+
+## Further reading: finding what to optimize
+
+[**Optimizing Go Code Without a Blindfold**](https://www.youtube.com/watch?v=oE_vm7KeV_E)
+Daniel Martí · GopherCon 2019
+
+pprof, benchmarks, and data-driven optimization in Go.
+Martí covers *how to find what to optimize*;
+this talk covers *how to trust the measurement once you have a target*.
+
+---
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 04
+
+# The Art of Benchmarking
+
+Two kinds. Know which one you need.
+
+---
+
+## Microbenchmarks vs macrobenchmarks
+
+<div class="columns">
+<div>
+
+### Microbenchmarks
+
+- Isolated functions or operations
+- Nanosecond-level precision
+- Prone to compiler tricks
+- Risk: **not representative**
+
+`testing.B` — the focus of this talk
+
+</div>
+<div>
+
+### Macrobenchmarks
+
+- End-to-end workflows
+- Realistic production workloads
+- Higher variance, harder to isolate
+- Risk: **slow feedback loop**
+
+Load testing tools
+
+</div>
+</div>
+
+---
+
+## When to use which
+
+| Use case | Benchmark type |
+|---|---|
+| Comparing algorithms | Micro |
+| Validating a specific optimization | Micro |
+| Regression detection | Both |
+| Capacity planning | Macro |
+| User-facing latency targets | Macro |
+
+<br>
+
+*This talk focuses entirely on microbenchmarks with Go's `testing.B`.*
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 05
 
 # Making the Compiler Honest
 
@@ -398,7 +568,7 @@ Sink pattern. `-benchmem`. Check `allocs/op`. Prefer `b.Loop`.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 03
+###### 06
 
 # Statistical Interpretation
 
@@ -426,7 +596,7 @@ BenchmarkMakeBuffer_Correct-16    52521198    27.54 ns/op
 
 ```bash
 go test -bench=. -benchmem -count=20 -benchtime=1s . | tee new.txt
-benchstat old.txt new.txt
+benchstat old.txt new.txt  # golang.org/x/perf/cmd/benchstat
 ```
 
 | Environment | sec/op | Difference |
@@ -502,7 +672,7 @@ With enough draws, any noise pattern looks like signal.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 04
+###### 07
 
 # Local Reproduction
 
@@ -595,7 +765,7 @@ and you get serialisation between runs. Nothing more.
 ## The inner loop
 
 ```bash
-benchdiff --base=main ./...
+benchdiff --base-ref=main ./...
 ```
 
 Stash, run on the base ref, restore, run again, pipe both to `benchstat`.
@@ -614,7 +784,7 @@ steady state. Free variance reduction, zero setup.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 05
+###### 08
 
 # Escalating to CI
 
@@ -707,7 +877,7 @@ Full survey and wire-up in the talk repo.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 06
+###### 09
 
 # The CI Regression
 
@@ -717,7 +887,7 @@ That Was a Speedup
 
 ## dd-trace-go #4891
 
-A restructure of `context.go` in `ddtrace/tracer`. June 2026.
+A change to tracer and orchestrion internals across `ddtrace/tracer`. June 2026.
 
 The benchmark bot comments: **`BenchmarkOTLPProtoSize` 6–9% slower than main.**
 
@@ -776,6 +946,21 @@ lock CPU frequency.
 
 ---
 
+## This is a known phenomenon
+
+[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A) — Emery Berger · Strange Loop 2019
+
+Code layout — which symbol lands at which address — can swing
+performance by ±10% or more. Berger demonstrated this by randomising
+object placement and measuring the effect.
+
+The dd-trace-go case is a live instance: the diff touched zero
+performance-critical code, yet the linker placed one function differently,
+and the benchmark flipped sign.
+
+**Implication:** micro-benchmark deltas smaller than ~10% need statistical
+confidence to be trusted at all. This is precisely what benchstat gives you.
+
 ## The lesson
 
 A number from a noisy environment is not merely **imprecise**.
@@ -798,7 +983,7 @@ and waves bad ones through.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 07
+###### 10
 
 # Wire It Up
 
@@ -809,20 +994,71 @@ This Afternoon
 ## Three tools
 
 ```bash
-honestbench ./...     # static analysis: missing sink, DCE risk,
-                      # StopTimer misorder, B.Loop migration hints
-
-benchgate -pkg=./... -count=10 -cv-threshold=5
-                      # runs N times, fails if CV exceeds the threshold
-
-benchenv              # diagnoses SMT, governor, Turbo, load,
-                      # and which tools you're missing
+honestbench ./...                                    # static analysis
+benchgate   -pkg=./... -count=10 -cv-threshold=5    # CV gate
+benchenv                                             # env diagnosis
 ```
 
-<br>
+Stdlib-only Go modules — also wrapped as Claude Code skills.
 
-Stdlib-only Go modules. Each also wrapped as a Claude Code skill —
-so an agent can run the same discipline.
+---
+
+## `honestbench` — static analysis for benchmarks
+
+Go/AST analysis. No benchmark needs to run. Finds problems before you measure.
+
+```text
+dce_bench_test.go:46:3: high: discarded-result:
+    call to makeBuffer() result is discarded;
+    compiler may eliminate this call via DCE
+
+timer_bench_test.go:80:3: high: stoptimer-without-starttimer:
+    b.StartTimer() called after the work under test;
+    measured code runs while the timer is stopped
+
+17 findings (2 high, 4 medium, 11 info) across 12 functions
+```
+
+Exit 1 on any `high` finding — usable as a CI gate.
+
+---
+
+## `benchgate` — CV gate
+
+Runs the benchmark N times and fails if variance is too high to trust.
+
+```text
+# threshold 5%          → FAIL
+benchgate: BenchmarkMakeBuffer_Correct  mean=11.8 ns/op  cv=5.2%  ✗
+VERDICT: FAIL — 1/1 benchmarks exceed CV threshold 5.0%
+
+# threshold 8%          → PASS
+benchgate: BenchmarkMakeBuffer_Correct  mean=11.1 ns/op  cv=2.2%  ✓
+VERDICT: PASS — all 1 benchmarks within CV threshold 8.0%
+```
+
+Catches the case where your environment is too noisy before the numbers go into a PR comment.
+
+---
+
+## `benchenv` — diagnose your environment
+
+No flags needed. Run it once before any serious benchmarking session.
+
+```text
+benchenv: benchmarking environment diagnosis (darwin/arm64, 16 CPUs)
+
+  [unavailable]  SMT control — use a Linux machine for publication-quality numbers
+  [unavailable]  CPU frequency governor — not exposed on macOS
+  [unavailable]  Turbo Boost — no user-space control
+  [warn]         load average — close background applications first
+  [warn]         perflock not installed
+  [ok]           benchstat installed
+  [warn]         benchdiff not installed
+  [ok]           GOMAXPROCS / NumCPU — NumCPU=16 GOMAXPROCS=16
+
+Summary: 2 ok, 3 warn, 4 unavailable.
+```
 
 ---
 
