@@ -1,22 +1,30 @@
 # Talk Outline: Why Your Go Benchmarks Are Lying (And How to Stop Them)
-## GopherCon UK 2026 — 60-min session, advanced audience
+## GopherCon UK 2026 — 60 min TOTAL INCLUDING Q&A · advanced audience
+
+Last updated: 2026-08-10 · Deck: 72 slides, 10 sections
 
 ---
 
 ## Beat sheet
 
-| # | Section | Duration | Type |
-|---|---------|----------|------|
-| 0 | Cold open | 3 min | Story |
-| 1 | The thesis | 2 min | Setup |
-| 2 | Layer 1 — Compiler honesty | 15 min | Demo |
-| 3 | Layer 2 — Statistical interpretation | 13 min | Demo |
-| 4 | Layer 3a — Local reproduction (main) | 14 min | Demo |
-| 5 | Layer 3b — CI escalation | 7 min | Slides |
-| 6 | War story | 3 min | Story |
-| 7 | Agent tooling (close) | 2 min | Demo |
-| 8 | Three questions / Q&A setup | 1 min | Close |
-| — | Buffer | 60 min total | |
+| § | Section | Duration | Type | Slides |
+|---|---------|----------|------|--------|
+| 01 | Why Benchmark? | 3 min | Stakes | 1–5 |
+| 02 | A Loose Cable (OPERA) + thesis | 4 min | Story | 6–13 |
+| 03 | Before You Optimize | 4 min | Advice | 14–17 |
+| 04 | The Art of Benchmarking | 3 min | Concepts | 18–20 |
+| 05 | Layer 1 — Compiler honesty | 14 min | Demo | 21–37 |
+| 06 | Layer 2 — Statistical interpretation | 11 min | Demo | 38–47 |
+| 07 | Layer 3a — Local reproduction | 12 min | Demo | 48–57 |
+| 08 | Layer 3b — CI escalation | 5 min | Slides | 58–63 |
+| 09 | War story | 4 min | Story | 64–67 |
+| 10 | Wire It Up + close | 3 min | Demo | 68–72 |
+| — | Q&A buffer | 2 min | — | — |
+| — | **Full delivery total** | **~65 min** | ⚠️ over budget by ~5 min | |
+
+> **⚠️ TIMING WARNING**: Full delivery runs ~65 min against a 60 min hard limit.
+> Apply the cut list in speaker-notes.md — cutting §03 + asm-dce demo + effect-size
+> slide recovers ~5–6 min. §01 Why Benchmark? can compress to 2 min if needed.
 
 ---
 

@@ -1,31 +1,50 @@
 # Speaker Notes — Why Your Go Benchmarks Are Lying
 
-GopherCon UK 2026 · 60 minutes · advanced audience
-Deck: `slides/presentation.md` (54 slides) · Demo: `demo/`
+GopherCon UK 2026 · 60 minutes TOTAL INCLUDING Q&A · advanced audience
+Deck: `slides/presentation.md` (72 slides, 10 sections) · Demo: `demo/`
+
+Last updated: 2026-08-10
 
 ---
 
 ## Timing plan
 
+> ⚠️ Full delivery runs ~65 min. You must apply cuts to fit 60 min. See cut order below.
+
 | Block | Slides | Target | Running total |
 |---|---|---|---|
-| Cold open (OPERA) | 2–7 | 4 min | 0:04 |
-| Thesis / local-first | 8 | 1 min | 0:05 |
-| Layer 1 — compiler honesty | 9–23 | 15 min | 0:20 |
-| Layer 2 — statistics | 24–31 | 12 min | 0:32 |
-| Layer 3a — local reproduction | 32–41 | 13 min | 0:45 |
-| Layer 3b — CI | 42–47 | 6 min | 0:51 |
-| War story | 48–52 | 4 min | 0:55 |
-| Tools + close | 53–54 | 3 min | 0:58 |
-| Q&A buffer | — | 2 min | 1:00 |
+| §01 Why Benchmark? | 1–5 | 3 min | 0:03 |
+| §02 A Loose Cable (OPERA) + thesis | 6–13 | 4 min | 0:07 |
+| §03 Before You Optimize | 14–17 | 4 min | 0:11 |
+| §04 The Art of Benchmarking | 18–20 | 3 min | 0:14 |
+| §05 Compiler honesty | 21–37 | 14 min | 0:28 |
+| §06 Statistical interpretation | 38–47 | 11 min | 0:39 |
+| §07 Local reproduction | 48–57 | 12 min | 0:51 |
+| §08 CI escalation | 58–63 | 5 min | 0:56 |
+| §09 War story | 64–67 | 4 min | 1:00 |
+| §10 Wire It Up + close | 68–72 | 3 min | 1:03 |
+| Q&A buffer | — | 2 min | 1:05 |
 
-**Checkpoints.** If you are not at Layer 2 by **0:20**, you are behind — the compiler section is
-the easiest place to lose five minutes. If you are not at the war story by **0:51**, cut straight
-to it; the war story and the three questions are the two things people remember.
+**Checkpoints.** §05 Compiler open by **0:14**. §06 Stats open by **0:28**. War story by **1:00**.
+
+If behind at §05: cut §03 Before You Optimize entirely (saves 4 min) and compress §01 to 2 min (saves 1 min). That recovers 5 min and puts you back on budget.
 
 ---
 
-## Cold open (slides 2–7)
+## §01 Why Benchmark? (slides 1–5)
+
+Move through this at conversational pace — 3 minutes is plenty. The audience of experienced Go
+engineers does not need a lecture on why latency matters. The goal is to plant two specific
+frames: (1) latency and throughput are the two levers, and (2) measurement is a prerequisite for
+optimization, not a follow-on. The Lütke quote lands the stakes without overstating them.
+
+**If behind schedule:** compress to 2 min by skipping the user perception table and going straight
+from the latency/throughput definitions to the Lütke quote. The table is useful context, not the
+argument.
+
+---
+
+## §02 A Loose Cable — cold open (slides 6–13)
 
 Ninety seconds on OPERA. Resist the physics. The audience does not need the baseline distance or
 the detector mass, and every detail invites a question you do not want in the Q&A.
@@ -47,7 +66,42 @@ Then the pivot — quick and a little flat, no drum roll:
 
 ---
 
-## Layer 1 — compiler honesty (slides 9–23)
+## §03 Before You Optimize (slides 14–17)
+
+Most likely to be cut under time pressure — useful but not load-bearing for the argument.
+
+**pprof slide:** resist explaining pprof deeply. One line: "attach it to a running service, find
+the hot path, then write a benchmark for *that* — not for something that looks interesting." The
+eBPF tier (Parca, OTel ebpf-profiler) is for the "what about continuous profiling" question —
+say it once and move on.
+
+**SLOs slide:** the key message is "without a target you never finish." Do not over-explain
+Amdahl's Law; the audience knows it.
+
+**Martí slide:** one sentence. "Daniel Martí's GopherCon 2019 talk covers how to find what to
+optimize; this talk covers how to trust the measurement once you have a target. Both are
+required."
+
+**If cutting:** skip this section entirely after §02, go straight to §04. Saves 4 min.
+
+---
+
+## §04 The Art of Benchmarking (slides 18–20)
+
+Three slides. Orientation, not content — keep the pace up.
+
+The micro/macro slide answers "should I benchmark or load test?" Point at the bold risk labels
+("not representative" vs "hard to isolate"). Do not read the bullets.
+
+The "when to use which" table: one sentence. "Comparing two implementations? Micro. Validating
+10k RPS? Macro. Regression detection? Both."
+
+Close with the scope declaration: "For the rest of this talk, we are doing microbenchmarks with
+Go's `testing.B`. Everything I show runs in under 30 seconds on a laptop."
+
+---
+
+## §05 Making the Compiler Honest (slides 21–37)
 
 ### DEMO 1 — `make bench-dce`
 
@@ -92,7 +146,7 @@ transformation. This audience appreciates that kind of detail.
 
 ---
 
-## Layer 2 — statistics (slides 24–31)
+## §06 Statistical interpretation (slides 38–47)
 
 The 43% swing is real captured data from `results/noisy.txt`, two runs of the same binary eight
 apart. If someone asks whether the machine was deliberately loaded — yes, sixteen spinners. Say so.
@@ -110,7 +164,7 @@ To save time here, drop the effect-size row from the rules-of-thumb table and mo
 
 ---
 
-## Layer 3a — local reproduction (slides 32–41)
+## §07 Local reproduction (slides 48–57)
 
 ### DEMO 3 — `make bench-docker`
 
@@ -147,7 +201,7 @@ This matters because "just use perflock" is standard Go advice and most of the r
 
 ---
 
-## Layer 3b — CI (slides 42–47)
+## §08 CI escalation (slides 58–63)
 
 Fast section. The SMT/DFS table is the argument; everything else is scaffolding.
 
@@ -159,7 +213,7 @@ wastes the audience's time.
 
 ---
 
-## War story (slides 48–52)
+## §09 War story (slides 64–67)
 
 Tell it as a detective story, in order. Do not reveal the ending early.
 
@@ -181,7 +235,7 @@ themselves.
 
 ---
 
-## Close (slides 53–54)
+## §10 Wire It Up + close (slides 68–72)
 
 The three questions are the takeaway. Say them, then stop. Do not summarise the summary.
 
