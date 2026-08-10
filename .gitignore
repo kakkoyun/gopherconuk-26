@@ -51,3 +51,5 @@ __pycache__/
 # Compiled CLI binaries
 tools/cli/*/kubectl-obi
 tools/cli/*/kubectl-obi.exe
+tools/cli/*/kubectl-profiler
+tools/cli/*/kubectl-profiler.exe
