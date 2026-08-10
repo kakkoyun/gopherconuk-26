@@ -36,6 +36,48 @@ How to Instrument Go Without Changing a Single Line of Code
 
 ---
 
+<!-- _class: vcenter -->
+
+## Why listen to me
+
+<div class="columns">
+<div>
+
+**Prometheus Steering Committee**
+<div class="small">elected 2026 · one of seven</div>
+
+**Maintainer**
+`client_golang` · `promu` ·
+OTel `go-compile-instrumentation`
+
+**Emeritus**
+Thanos · Parca
+
+</div>
+<div>
+
+Writing Go since 2017 —
+in the open since 2018
+
+**963** merged PRs in Go repos
+**3,150** PRs reviewed for others
+
+The Zen of Prometheus: my talk,
+now the project's own docs
+
+GopherCon UK 2025 → back again
+
+</div>
+</div>
+
+<div class="tiny">
+
+Every number here: `github.com/kakkoyun/gopherconuk-26/blob/main/research/about-speaker.md`
+
+</div>
+
+---
+
 <!-- _paginate: false -->
 ## Quick question
 

@@ -9,7 +9,8 @@ Last updated: 2026-08-10 · Deck: 72 slides, 10 sections
 
 | § | Section | Duration | Type | Slides |
 |---|---------|----------|------|--------|
-| 01 | Why Benchmark? | 3 min | Stakes | 1–5 |
+| 00 | Why listen to me | < 1 min | Ethos | 2 |
+| 01 | Why Benchmark? | 3 min | Stakes | 3–7 |
 | 02 | A Loose Cable (OPERA) + thesis | 4 min | Story | 6–13 |
 | 03 | Before You Optimize | 4 min | Advice | 14–17 |
 | 04 | The Art of Benchmarking | 3 min | Concepts | 18–20 |

@@ -1,5 +1,15 @@
 # Speaker Notes: Without a Single Line
 
+## 0. Ethos slide (< 1 min)
+
+Twenty seconds. Do not read the slide aloud. Land one sentence: "I'm on the Prometheus
+Steering Committee — which is to say, someone other than me decided I know something about
+Go observability." Then move directly to the show-of-hands question.
+
+Credibility must land before the audience ask, or the ask falls flat.
+
+---
+
 ## 1. Hook (2 min)
 
 Ask the question out loud, then wait — raise your own hand first, and hold the silence for two or three full seconds while the room settles. Let them feel the weight of it: every raised hand is a person who has spent real hours wrapping HTTP clients and DB calls in boilerplate they didn't want to write. Then drop the turn: "What if you didn't have to?" — and move on without explaining it yet.

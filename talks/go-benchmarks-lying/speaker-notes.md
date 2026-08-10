@@ -31,7 +31,18 @@ If behind at §05: cut §03 Before You Optimize entirely (saves 4 min) and compr
 
 ---
 
-## §01 Why Benchmark? (slides 1–5)
+## Ethos slide (slide 2)
+
+Twenty seconds. Do not read the slide aloud — the audience reads faster than you speak.
+Land one sentence: "I'm on the Prometheus Steering Committee, which means someone besides me
+thinks I know what I'm doing about Go observability." Then move on without lingering.
+
+The steering-committee line is the only one worth saying. Everything else on the slide is
+warrant for later claims; let them absorb it visually while you transition.
+
+---
+
+## §01 Why Benchmark? (slides 2–6)
 
 Move through this at conversational pace — 3 minutes is plenty. The audience of experienced Go
 engineers does not need a lecture on why latency matters. The goal is to plant two specific

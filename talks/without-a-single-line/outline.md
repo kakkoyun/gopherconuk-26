@@ -7,6 +7,7 @@
 
 | # | Section | Time | Key point |
 |---|---------|------|-----------|
+| 0 | Why listen to me | < 1 min | Ethos slide — 20 seconds, do not read aloud; land the steering-committee line. |
 | 1 | Hook | 2 min | "Go can't be monkey-patched — or can it?" Live question to audience. |
 | 2 | The problem | 3 min | No runtime hook point. Static binary. The three workaround families. |
 | 3 | OBI | 7 min | eBPF from the outside. Production-safe. Live demo: attach to a running service. |
