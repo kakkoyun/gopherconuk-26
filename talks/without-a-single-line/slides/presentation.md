@@ -683,57 +683,17 @@ User: "now I want granular spans locally"
 
 ###### 07
 
-# Runtime Futures
+# The Horizon
 
 Part 7
 
 ---
 
-## Flight recording — **shipped** in Go 1.25
+## USDT: the right path forward
 
-This is no longer a future. It's available today.
+USDT probes give out-of-process tools a **stable, named hook point** — not a fragile uprobe on a symbol address that changes with every build.
 
-```go
-fr := trace.NewFlightRecorder(trace.FlightRecorderConfig{
-    MinAge:   2 * time.Second,  // ~2x your event window
-    MaxBytes: 64 << 20,
-})
-fr.Start()
-
-// On latency spike:
-var buf bytes.Buffer
-fr.WriteTo(&buf)
-// → buf contains the last 2s of execution trace
-```
-
----
-
-<!-- _class: punchline dark -->
-
-# A circular buffer, not continuous *I/O*
-
----
-
-## Still missing (active proposals)
-
-**golang/go#75654** — `httptrace.ClientTrace.GotResponseEnd`
-
-> OTel Go currently uses `PutIdleConn` as a workaround.
-> `PutIdleConn` is **never called for HTTP/2** — so client spans never close.
-> Filed: 2025-09-29. Open.
-
-**golang/go#69887** — `-toolexec` build graph improvements
-Orchestrion maintainer (Datadog) filed. Makes otelc/orchestrion less fragile.
-
----
-
-## USDT: what could be
-
-USDT probes = NOP sled → `INT3` patch at attach time. Near-zero unattached overhead.
-
-Go runtime ships **no built-in USDT probes** (as of Go 1.25, #57175 at initial-inquiry stage).
-
-But a proof-of-concept fork adds them to `net/http`, `database/sql`, `crypto/tls`:
+Go ships **no built-in USDT probes** today (golang/go#57175, initial inquiry). The proof of concept is there:
 
 ```bash
 # github.com/kakkoyun/go/tree/poc_usdt
@@ -742,7 +702,39 @@ go tool usdt list ./...
 # → probe: database/sql.(*DB).QueryContext enter
 ```
 
-If flight recording is Go 1.25 — USDT could be a future Go 1.2X.
+When Go ships USDT probes, **every** out-of-process tool — OBI, ebpf-profiler, debuggers, injectors — gets a stable contract to attach to.
+
+---
+
+## Live Debugger — eBPF, applied to debugging
+
+<div class="columns">
+<div>
+
+**Datadog Live Debugger** adds log lines + variable snapshots to running Go services.
+
+No code change. No restart. No redeploy.
+
+Uses eBPF via Datadog's `system-probe`.
+Requires Linux **5.17+** (Go-specific).
+
+Logpoints auto-expire. Production-safe.
+
+</div>
+<div>
+
+**Bits Live Debugger** *(Preview)*
+
+Describe the bug in natural language.
+
+AI places logpoints on the live service.
+
+Reads real production snapshots.
+
+Forms hypotheses. Suggests fixes.
+
+</div>
+</div>
 
 ---
 
@@ -755,7 +747,6 @@ If flight recording is Go 1.25 — USDT could be a future Go 1.2X.
 | **Always, in prod** | OBI (eBPF) | Traces + metrics |
 | **Debugging locally** | otelc | Granular spans |
 | **Always, CPU** | ebpf-profiler | Profiles |
-| **On-demand in prod** | Flight recorder (Go 1.25) | Execution trace |
 
 **One service. Three zero-touch signals. No source changes.**
 
