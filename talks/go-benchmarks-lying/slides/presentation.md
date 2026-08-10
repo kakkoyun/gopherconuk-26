@@ -88,6 +88,8 @@ A 500ms delay cost Google 20% of search traffic.
 
 Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
 
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
@@ -280,6 +282,8 @@ Load testing tools
 <br>
 
 *This talk focuses entirely on microbenchmarks with Go's `testing.B`.*
+
+---
 
 <!-- _class: section -->
 <!-- _paginate: false -->
