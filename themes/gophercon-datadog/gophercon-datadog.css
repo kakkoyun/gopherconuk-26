@@ -461,7 +461,6 @@ h6:has(+ pre) {
 	background: var(--panel-tab);
 	color: var(--blue-lift);
 	border-top: 3px solid var(--blue);
-	box-shadow: 0 2px 8px rgba(11, 15, 20, 0.28);
 }
 h6:has(+ pre) + pre {
 	box-shadow: 0 2px 8px rgba(11, 15, 20, 0.28);
