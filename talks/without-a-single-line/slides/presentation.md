@@ -609,43 +609,69 @@ Part 6
 
 <div>
 
-### Use OBI when
+### OBI <span class="tag prod">v0 — active dev</span>
 
-<br>
+**Choose when:**
 
-<span class="tag prod">production</span>
-<span class="tag prod">k8s / deployed</span>
-<span class="tag prod">no rebuild</span>
-<span class="tag prod">polyglot fleet</span>
+- Mixed-language fleet (Go, Java, Python, .NET…)
+- No build pipeline access or pre-compiled binaries
+- Boundary observability: RED metrics, service-to-service calls
+- Kubernetes-native — DaemonSet, zero rollout
 
-<br><br>
-
-HTTP/gRPC RED metrics + library spans.
-Attach in seconds, zero rollout.
+**Network-level spans. Attach in seconds.**
 
 </div>
 
 <div>
 
-### Use otelc when
+### otelc <span class="tag dev">v1 — stable</span>
 
-<br>
+**Choose when:**
 
-<span class="tag dev">local dev</span>
-<span class="tag dev">debugging</span>
-<span class="tag dev">granular spans</span>
-<span class="tag dev">Go 1.25+</span>
+- You own the Go build pipeline (Go 1.25+)
+- Deep in-process fidelity: business logic, third-party internals
+- Custom span attributes on internal functions
+- Restricted runtime (no root, no eBPF capabilities)
 
-<br><br>
-
-Per-function traces, custom attributes,
-business-logic visibility.
+**Per-function traces. Baked into the binary.**
 
 </div>
 
 </div>
 
-**Always:** `ebpf-profiler` for CPU profiling — it's orthogonal to both.
+**Always alongside:** `ebpf-profiler` for CPU profiles — orthogonal to both.
+
+---
+
+## They work at different layers
+
+OBI and otelc are **complementary, not competing**.
+
+<div class="columns">
+
+<div>
+
+**OBI** sees what crosses the boundary:
+
+- HTTP/gRPC calls entering and leaving
+- Database queries at the network level
+- Every language running on the node
+
+</div>
+
+<div>
+
+**otelc** sees what happens inside:
+
+- Internal function call chains
+- Business logic and custom spans
+- Third-party Go module internals
+
+</div>
+
+</div>
+
+Use both: otelc for your Go service internals, OBI for infrastructure + non-Go neighbours.
 
 ---
 
