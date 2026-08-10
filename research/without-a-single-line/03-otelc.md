@@ -6,18 +6,28 @@
 
 ---
 
-## ⚠️ CRITICAL CORRECTION — Read First
+## ⚠️ UPDATED — Convergence Story (supersedes prior "NOT donated" correction)
 
-**Orchestrion was NOT donated to OpenTelemetry.** Prior research assumed a donation; this is wrong.
+**The correct framing (verified 2026-08-10, otelc research agent):**
 
-There are **two distinct but related tools**:
+DataDog and Alibaba both proposed donations to OpenTelemetry in early 2025. Neither was
+accepted as-is. Instead, both orgs joined forces to **bootstrap a new OTel SIG** and build
+`otelc` from scratch — a unified, vendor-neutral codebase picking the best of both approaches.
+
+> Source: https://opentelemetry.io/blog/2025/go-compile-time-instrumentation/
+
+Orchestrion **remains actively maintained** as a standalone Datadog project. Its README makes
+no mention of donation or deprecation. otelc is the OTel SIG output (v1.0.1, first stable).
+
+**For the talk:** say "One story converging" — otelc is where the ecosystem lands. Orchestrion
+is the more mature input and remains the Datadog-specific option.
 
 | | DataDog/orchestrion | open-telemetry/opentelemetry-go-compile-instrumentation |
 |---|---|---|
 | **CLI binary** | `orchestrion` | `otelc` |
 | **Repo** | github.com/DataDog/orchestrion | github.com/open-telemetry/opentelemetry-go-compile-instrumentation |
-| **Owner** | Datadog (proprietary vendor tool) | OTel SIG (Datadog + Alibaba co-founded) |
-| **Status** | GA v1.11.0 (2026-06-25) | Stable v1.0.1 (2026-07-14) 🔥 **NEW** |
+| **Owner** | Datadog (active standalone) | OTel SIG (Datadog + Alibaba joint) |
+| **Status** | GA v1.11.0 (2026-06-25) | Stable v1.0.1 (2026-07-14) |
 | **Default tracer** | dd-trace-go/v2 (but vendor-agnostic) | OpenTelemetry SDK |
 | **Relationship** | Inspiration + SIG co-founder | New tool built from scratch |
 
