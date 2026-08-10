@@ -54,6 +54,16 @@ func runKubectl(args ...string) (string, error) {
 	return string(out), nil
 }
 
+// runHelm runs helm with the given arguments, returning combined output.
+func runHelm(args ...string) (string, error) {
+	cmd := exec.Command("helm", args...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "", fmt.Errorf("helm %s: %w\n%s", strings.Join(args, " "), err, strings.TrimSpace(string(out)))
+	}
+	return string(out), nil
+}
+
 // attach —————————————————————————————————————————————————
 
 func newAttachCmd() *cobra.Command {
@@ -98,27 +108,30 @@ Requires a rollout restart.`,
 }
 
 func attachDaemonSet(namespace string) error {
-	fmt.Printf("Deploying OBI %s DaemonSet into namespace %q...\n", obiVersion, namespace)
+	fmt.Printf("Deploying OBI %s into namespace %q via Helm...\n", obiVersion, namespace)
 
-	// Create namespace idempotently: ignore "already exists" errors.
-	_, err := runKubectl("create", "namespace", namespace)
-	if err != nil && !strings.Contains(err.Error(), "already exists") {
-		return fmt.Errorf("attach daemonset: create namespace: %w", err)
+	fmt.Println("Adding OTel Helm repository...")
+	if _, err := runHelm("repo", "add", "open-telemetry",
+		"https://open-telemetry.github.io/opentelemetry-helm-charts"); err != nil &&
+		!strings.Contains(err.Error(), "already exists") {
+		return fmt.Errorf("attach daemonset: helm repo add: %w", err)
+	}
+	if _, err := runHelm("repo", "update", "open-telemetry"); err != nil {
+		return fmt.Errorf("attach daemonset: helm repo update: %w", err)
 	}
 
-	manifestURL := fmt.Sprintf(
-		"https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/releases/download/%s/obi-daemonset.yaml",
-		obiVersion,
+	fmt.Println("Installing OBI Helm chart...")
+	out, err := runHelm("upgrade", "--install", "obi",
+		"open-telemetry/opentelemetry-ebpf-instrumentation",
+		"--namespace", namespace, "--create-namespace",
 	)
-	fmt.Printf("Applying manifest from %s...\n", manifestURL)
-	out, err := runKubectl("apply", "-f", manifestURL, "-n", namespace)
 	if err != nil {
-		return fmt.Errorf("attach daemonset: apply manifest: %w", err)
+		return fmt.Errorf("attach daemonset: helm install: %w", err)
 	}
 	fmt.Print(out)
 
 	fmt.Println("Waiting for DaemonSet rollout (timeout: 120s)...")
-	out, err = runKubectl("rollout", "status", "daemonset/obi-daemonset", "-n", namespace, "--timeout=120s")
+	out, err = runKubectl("rollout", "status", "daemonset/obi", "-n", namespace, "--timeout=120s")
 	if err != nil {
 		return fmt.Errorf("attach daemonset: rollout status: %w", err)
 	}
@@ -368,16 +381,16 @@ func newDetachCmd() *cobra.Command {
 }
 
 func detachDaemonSet(namespace string) error {
-	fmt.Printf("Removing OBI DaemonSet from namespace %q...\n", namespace)
-	out, err := runKubectl("delete", "daemonset", "obi-daemonset", "-n", namespace, "--ignore-not-found")
+	fmt.Printf("Removing OBI Helm release from namespace %q...\n", namespace)
+	out, err := runHelm("uninstall", "obi", "--namespace", namespace, "--ignore-not-found")
 	if err != nil {
-		return fmt.Errorf("detach daemonset: %w", err)
+		return fmt.Errorf("detach daemonset: helm uninstall: %w", err)
 	}
 	if strings.TrimSpace(out) == "" {
-		fmt.Println("OBI DaemonSet not found (already removed).")
+		fmt.Println("OBI release not found (already removed).")
 	} else {
 		fmt.Print(out)
-		fmt.Println("OBI DaemonSet removed.")
+		fmt.Println("OBI removed.")
 	}
 	return nil
 }
