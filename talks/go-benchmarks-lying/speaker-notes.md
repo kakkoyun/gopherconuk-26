@@ -9,7 +9,7 @@ Deck: `slides/presentation.md` (76 slides)
 This is the additive review version. The scripted estimate is about 66 minutes before Q&A, so it does not yet fit the slot. Kemal will choose the pruning pass after reviewing and rehearsing the complete deck.
 
 | Block | Slides | Expanded target | Running total |
-|---|---:|---:|---:|
+| --- | ---: | ---: | ---: |
 | Loose-cable story and thesis | 2-8 | 4:00 | 4:00 |
 | Personal and Datadog context | 9-10 | 1:30 | 5:30 |
 | Why benchmark | 11-14 | 3:30 | 9:00 |
@@ -170,7 +170,7 @@ Close Layer 2: enough samples, benchstat, and CV before comparison.
 The Docker results are committed captured output, not a live run:
 
 | Condition | Mean ns/op | CV |
-|---|---:|---:|
+| --- | ---: | ---: |
 | Idle host | 11.46 | 4.75% |
 | Host with 16 spinners | 34.97 | 18.88% |
 | Container pinned to vCPU 0 | 16.28 | 5.25% |
@@ -281,8 +281,6 @@ Make the structure explicit:
 
 Point at the QR on the CTA. Name what is there: the deck, captured experiments, three CLIs, and the benchmark skills. Mention the prior FOSDEM recording for anyone who wants the earlier version.
 
-Point at the QR on the CTA. Name what is there: the deck, captured experiments, three CLIs, and the benchmark skills. Mention the prior FOSDEM recording for anyone who wants the earlier version.
-
 End with: "Trust your numbers only after the compiler, the sample, and the machine have each earned that trust."
 
 Stop. Leave the final questions slide up.
@@ -298,7 +296,7 @@ Stop. Leave the final questions slide up.
 ## Public references for questions
 
 | Claim | Public reference |
-|---|---|
+| --- | --- |
 | OPERA connector fault | <https://home.cern/news/press-release/cern/opera-experiment-reports-anomaly-flight-time-neutrinos-cern-gran-sasso> |
 | Google 500 ms result | <https://glinden.blogspot.com/2006/11/marissa-mayer-at-web-20.html> |
 | Daniel Martí's talk | <https://www.youtube.com/watch?v=BF3qhVmXflw> |
