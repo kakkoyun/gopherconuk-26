@@ -28,114 +28,10 @@ And How to Stop Them
 
 ---
 
-<!-- _class: vcenter -->
-
-## Why listen to me
-
-<div class="columns">
-<div>
-
-**Prometheus Steering Committee**
-<div class="small">elected 2026 · one of seven</div>
-
-**Maintainer**
-`client_golang` · `promu` ·
-OTel `go-compile-instrumentation`
-
-**Emeritus**
-Thanos · Parca
-
-</div>
-<div>
-
-Writing Go since 2017 —
-in the open since 2018
-
-**963** merged PRs in Go repos
-**3,150** PRs reviewed for others
-
-The Zen of Prometheus: my talk,
-now the project's own docs
-
-GopherCon UK 2025 → back again
-
-</div>
-</div>
-
-<div class="tiny">
-
-Every number here: `github.com/kakkoyun/gopherconuk-26/blob/main/research/about-speaker.md`
-
-</div>
-
----
-
 <!-- _class: section -->
 <!-- _paginate: false -->
 
 ###### 01
-
-# Why Benchmark?
-
-Performance is a feature.
-
----
-
-## Latency and throughput
-
-<div class="columns">
-<div>
-
-### Latency
-Time for a single operation to complete.
-
-Low latency = fast response.
-
-*Users feel this directly.*
-
-</div>
-<div>
-
-### Throughput
-Operations completed per unit of time.
-
-High throughput = more capacity.
-
-*Your system's ceiling.*
-
-</div>
-</div>
-
----
-
-## The cost of slowness
-
-| Response time | User perception |
-|---|---|
-| 100–200ms | Minimally noticeable |
-| 300–500ms | Quick but slightly slow |
-| 1–3s | Amount of work noticeable |
-| 5–10s+ | User switches away |
-
-<br>
-
-A 500ms delay cost Google 20% of search traffic.
-
----
-
-<!-- _class: vcenter -->
-
-> "Not all fast software is world-class,
-> but all world-class software is fast."
-
-Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
-
----
-
-<!-- _class: section -->
-<!-- _paginate: false -->
-
-###### 02
 
 # A Loose Cable
 
@@ -155,11 +51,11 @@ Months of rechecking. The maths. The sensors. The calibration.
 
 An improperly seated **fibre-optic connector** in the GPS timing chain.
 
-A **~73 ns** bias, making neutrinos appear early.
+A **~73 ns** bias made neutrinos appear early.
 
 <br>
 
-A second fault — an oscillator defect — pushed the other way, *partially masking the first*.
+A second fault, an oscillator defect, pushed the other way and *partially masked the first*.
 
 <div class="small">
 
@@ -187,7 +83,7 @@ You have `testing.B`, a laptop, and background Chrome tabs.
 
 <br>
 
-**The cables are your compiler, your OS scheduler, and your statistics.**
+**The cables are your compiler, OS scheduler, and statistics.**
 
 ---
 
@@ -215,6 +111,134 @@ If you can't trust it locally, CI will industrialise the lie.
 
 ---
 
+<!-- _class: vcenter -->
+
+## Why listen to me
+
+<div class="columns">
+<div>
+
+**Go and observability**
+
+Prometheus Steering Committee
+
+Maintainer of `client_golang`, `promu`, and OpenTelemetry Go compile-time instrumentation
+
+</div>
+<div>
+
+**Built across the stack**
+
+Former maintainer of Thanos, Parca, and parca-agent
+
+Talks on Go tooling, instrumentation, benchmarking, and profiling at GopherCon, FOSDEM, KubeCon, and PromCon
+
+</div>
+</div>
+
+---
+
+<!-- _class: vcenter -->
+
+## Why Datadog cares
+
+<div class="columns">
+<div>
+
+### Inside customer workloads
+
+Datadog ships SDKs for several languages.
+
+Those SDKs consume part of a customer's CPU, memory, and latency budget.
+
+</div>
+<div>
+
+### Continuous evidence
+
+PGO reduced production CPU usage by **3.4%**.
+
+Benchmark gates protect tracer and instrumentation hot paths.
+
+</div>
+</div>
+
+<br>
+
+### Instrumentation overhead is product correctness
+
+---
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 02
+
+# Why Benchmark?
+
+Performance is a feature.
+
+---
+
+## Latency and throughput
+
+<div class="columns">
+<div>
+
+### Latency
+
+Time for a single operation to complete.
+
+Low latency means a fast response.
+
+*Users feel this directly.*
+
+</div>
+<div>
+
+### Throughput
+
+Operations completed per unit of time.
+
+High throughput means more capacity.
+
+*Your system's ceiling.*
+
+</div>
+</div>
+
+---
+
+## The cost of slowness
+
+| Response time | User perception |
+| --- | --- |
+| 100-200 ms | Minimally noticeable |
+| 300-500 ms | Quick but slightly slow |
+| 1-3 s | Amount of work noticeable |
+| 5-10 s+ | User switches away |
+
+<br>
+
+A 500 ms delay cost Google 20% of search traffic.
+
+<div class="tiny">
+
+Google search team data, cited by [Coding Horror](https://blog.codinghorror.com/performance-is-a-feature/)
+
+</div>
+
+---
+
+<!-- _class: vcenter -->
+
+> "Not all fast software is world-class,
+> but all world-class software is fast."
+
+Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
+
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
@@ -228,21 +252,31 @@ Measure symptoms. Set targets.
 
 ## Is it actually slow?
 
-Measure in production before writing a single benchmark.
+Measure in production before writing a benchmark.
 
-- **pprof** — CPU, memory, goroutine, block; the standard Go profiler
+<div class="columns">
+<div>
 
-  ```bash
-  go tool pprof http://localhost:6060/debug/pprof/profile
-  ```
+### Inside the process
 
-- **Always-on, pprof-based** — Datadog Continuous Profiler (low-overhead sampling, all signal types)
-- **eBPF-based** — no code changes, whole-system view
-  - [opentelemetry-ebpf-profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler) · [Parca](https://parca.dev) (open source)
-  - Currently CPU only — memory profiling is in progress; this is a new OpenTelemetry (OTel) profiling signal
-- **Real metrics** — p50 / p95 / p99 latency from your observability stack
+- `pprof`: CPU, heap, goroutine, block
+- Datadog Continuous Profiler
 
-*If nothing shows as hot, there may be nothing worth optimizing.*
+</div>
+<div>
+
+### Across the system
+
+- [OpenTelemetry eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)
+- [Parca](https://parca.dev)
+- p50 / p95 / p99 from production
+
+</div>
+</div>
+
+<br>
+
+**Benchmark the path your production evidence says is hot.**
 
 ---
 
@@ -250,9 +284,9 @@ Measure in production before writing a single benchmark.
 
 Define a target before you start. Without one, you never finish.
 
-- **SLOs** — "p99 < 200 ms" is an objective, not a wish
-- **Error budgets** — within budget, optimization is optional
-- **Amdahl's Law** — only the hottest path produces meaningful wins
+- **SLOs:** "p99 < 200 ms" is an objective, not a wish
+- **Error budgets:** within budget, optimization is optional
+- **Amdahl's Law:** only the hottest path produces meaningful wins
 
 *Benchmark what your profiler tells you is hot, not what looks interesting.*
 
@@ -292,7 +326,7 @@ Two kinds. Know which one you need.
 - Prone to compiler tricks
 - Risk: **not representative**
 
-`testing.B` — the focus of this talk
+`testing.B` is the focus of this talk.
 
 </div>
 <div>
@@ -314,7 +348,7 @@ Load testing tools
 ## When to use which
 
 | Use case | Benchmark type |
-|---|---|
+| --- | --- |
 | Comparing algorithms | Micro |
 | Validating a specific optimization | Micro |
 | Regression detection | Both |
@@ -344,7 +378,7 @@ It reads your benchmark.
 
 It notices the result is unused.
 
-It removes the work — **correctly**, per the language spec.
+It removes the work **correctly**, according to the language specification.
 
 <br>
 
@@ -369,7 +403,7 @@ func BenchmarkMakeBuffer_DCE(b *testing.B) {
 
 ---
 
-## DEMO: `make bench-dce`
+## Captured result: `make bench-dce`
 
 ```text
 DCE       0.2532 ns/op   0 B/op   0 allocs/op
@@ -403,7 +437,7 @@ An allocation either **happened** or it **did not**.
 ## The fix: the two-variable sink
 
 ```go
-var sink []byte // package-level — compiler can't prove it's never read
+var sink []byte // package-level: compiler can't prove it is never read
 
 func BenchmarkMakeBuffer_Correct(b *testing.B) {
     var s []byte
@@ -428,13 +462,13 @@ The compiler evaluates it at compile time. You benchmark a **constant load**.
 
 <br>
 
-Both versions time the same on Apple Silicon — near the timer floor.
+Both versions time the same on Apple Silicon, near the timer floor.
 
 The assembly tells the truth.
 
 ---
 
-## DEMO: `make asm-dce`
+## Assembly check: `make asm-dce`
 
 <div class="columns">
 <div>
@@ -473,8 +507,8 @@ Route inputs through a **package-level variable**.
 
 Inlining is good in production. In a benchmark it *feeds* DCE.
 
-Once the body is inlined into the loop, the compiler can see the result is unused —
-and eliminate the now-inlined body.
+Once the body is inlined into the loop, the compiler can see the unused result
+and eliminate the inlined body.
 
 <br>
 
@@ -520,7 +554,7 @@ Get the order wrong and you time the fixture, not the function.
 
 ---
 
-## DEMO: `make bench-timer`
+## Captured result: `make bench-timer`
 
 ```text
 buggy    415.8 ns/op  128 B/op  1 allocs/op
@@ -543,14 +577,14 @@ A benchmark that measures the wrong thing does not look broken. It looks like go
 
 ---
 
-## The one that hangs
+## What if the timer never restarts?
 
-`StopTimer` with **no** `StartTimer`.
+`StopTimer` with **no** matching `StartTimer`.
 
 <br>
 
-The framework accumulates timed duration until it hits the target.
-The timer never runs. Duration never accumulates.
+The framework waits for enough timed duration.
+The timer never runs, so duration never accumulates.
 
 It doubles `b.N` and tries again. Forever.
 
@@ -558,13 +592,13 @@ It doubles `b.N` and tries again. Forever.
 
 <div class="small">
 
-We tried to demo it. Don't.
+We tried it. It hung.
 
 </div>
 
 ---
 
-## `testing.B.Loop` — Go 1.24
+## `testing.B.Loop` in Go 1.24
 
 ```go
 func BenchmarkHash_BLoop(b *testing.B) {
@@ -634,7 +668,7 @@ BenchmarkMakeBuffer_Correct-16    52521198    27.54 ns/op
 
 <br>
 
-**A 43% swing.** Run it once, file the PR, and you're up to 43% off — either direction.
+**A 43% swing.** Run it once, file the PR, and you can be 43% off in either direction.
 
 ---
 
@@ -647,16 +681,16 @@ benchstat old.txt new.txt  # golang.org/x/perf/cmd/benchstat
 
 | Environment | sec/op | Difference |
 | --- | --- | --- |
-| idle | `11.32n ± 5%` | — |
+| idle | `11.32n ± 5%` | n/a |
 | noisy | `37.40n ± 25%` | `+230.34% (p=0.000 n=20)` |
 
 ---
 
 ## Read the output
 
-- `11.32n` — the **median**, not the mean
-- `± 5%` — spread of the distribution
-- `p=0.000` — distinguishable from noise
+- `11.32n`: the **median**, not the mean
+- `± 5%`: spread of the distribution
+- `p=0.000`: distinguishable from noise
 - `~` instead of a delta means **no measurable difference**. That is a result.
 
 ---
@@ -675,8 +709,8 @@ $$ CV = \frac{\sigma}{\mu} $$
 
 <br>
 
-Benchstat deliberately doesn't report CV — it compares distributions rather than
-characterising the environment producing them. Separate pass, ~20 lines of awk.
+Benchstat deliberately does not report CV. It compares distributions rather than
+characterising the environment producing them. A separate pass takes about 20 lines of awk.
 
 ---
 
@@ -740,7 +774,7 @@ So we measured it.
 
 ---
 
-## DEMO: `make bench-docker`
+## Isolation experiment: `make bench-docker`
 
 Same benchmark. `-count=20 -benchtime=1s`. Apple M4 Max, 16 logical CPUs.
 
@@ -752,7 +786,7 @@ Same benchmark. `-count=20 -benchtime=1s`. Apple M4 Max, 16 logical CPUs.
 
 <br>
 
-Loaded: **3× slower and 4× noisier**. Pinned: back to the idle noise floor —
+Loaded: **3× slower and 4× noisier**. Pinned: back to the idle noise floor
 while the host is still fully saturated.
 
 ---
@@ -767,7 +801,7 @@ Bare-metal Linux, Simultaneous Multi-Threading (SMT) off: **~0.05%**. A hundred 
 
 ---
 
-## The macOS caveat — say it out loud
+## The macOS caveat
 
 Docker Desktop on macOS runs containers **inside a Linux VM**.
 
@@ -793,7 +827,7 @@ Docker Desktop on macOS runs containers **inside a Linux VM**.
 
 ---
 
-## `perflock` — read the source, not the README
+## `perflock`: read the source
 
 ```bash
 perflock go test -bench=. -count=10 -benchtime=2s ./...
@@ -804,8 +838,8 @@ perflock go test -bench=. -count=10 -benchtime=2s ./...
 
 <br>
 
-**On macOS:** it builds, and the mutual-exclusion lock works. Frequency pinning does not —
-the default `-governor 90` reads Linux sysfs and errors. Pass `-governor=none`
+**On macOS:** it builds, and the mutual-exclusion lock works. Frequency pinning does not.
+The default `-governor 90` reads Linux sysfs and errors. Pass `-governor=none`
 and you get serialisation between runs. Nothing more.
 
 ---
@@ -856,11 +890,11 @@ This is an **environment** problem, not a statistics problem.
 
 ---
 
-## The numbers — AWS m5.metal
+## AWS m5.metal results
 
 | Configuration | Runtime | **CV** |
 | --- | --- | --- |
-| SMT enabled, CPU-bound | — | **~23%** |
+| SMT enabled, CPU-bound | n/a | **~23%** |
 | SMT disabled, task 1 | 737.37 ± 0.32 ms | **0.044%** |
 | SMT disabled, task 2 | 737.93 ± 1.74 ms | **0.235%** |
 | Dynamic Frequency Scaling (DFS) on, 1 task | 533.97 ± 2.046 ms | **0.383%** |
@@ -907,18 +941,18 @@ CI is for **detecting** regressions. It is not your primary measurement.
 
 ---
 
-## Don't build this yourself
+## Existing CI tools
 
-| Tool | Verdict |
+| Tool | Fit |
 | --- | --- |
-| **bencher.dev** | Hosted, Go-native, PR comments — the default recommendation |
-| **github-action-benchmark** | Self-hosted, simple, good for a first gate |
+| **bencher.dev** | Hosted, Go-native, PR comments; default recommendation |
+| **github-action-benchmark** | Self-hosted, simple first gate |
 | **Apache Otava** | Change-point detection over a rolling window |
-| **gobenchdata** | Go-specific, GitHub Pages dashboards |
+| **gobenchdata** | Go-specific GitHub Pages dashboards |
 
 <br>
 
-Full survey and wire-up in the talk repo.
+The talk repository contains the full survey and setup notes.
 
 ---
 
@@ -927,9 +961,7 @@ Full survey and wire-up in the talk repo.
 
 ###### 09
 
-# The CI Regression
-
-That Was a Speedup
+# The CI Regression That Was a Speedup
 
 ---
 
@@ -937,7 +969,7 @@ That Was a Speedup
 
 A change to tracer and orchestrion internals across `ddtrace/tracer`. June 2026.
 
-The benchmark bot comments: **`BenchmarkOTLPProtoSize` 6–9% slower than main.**
+The benchmark bot comments: **`BenchmarkOTLPProtoSize` 6-9% slower than main.**
 
 ---
 
@@ -954,7 +986,7 @@ It never calls `ContextWithSpan`, `SpanFromContext`, or **any code the PR touche
 
 <br>
 
-Locally: **<0.1% run-to-run variance.** The 6–9% was specific to CI.
+Locally: **<0.1% run-to-run variance.** The 6-9% was specific to CI.
 
 ---
 
@@ -985,7 +1017,7 @@ branch-target-buffer boundaries.
 <br>
 
 At ~390 ns per iteration, small alignment shifts produce several-percent swings
-**in either direction** — enough to flip the verdict on a runner that cannot
+**in either direction**, enough to flip the verdict on a runner that cannot
 lock CPU frequency.
 
 <br>
@@ -996,9 +1028,9 @@ lock CPU frequency.
 
 ## This is a known phenomenon
 
-[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A) — Emery Berger · Strange Loop 2019
+[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A), Emery Berger · Strange Loop 2019
 
-Code layout — which symbol lands at which address — can swing
+Code layout, meaning which symbol lands at which address, can swing
 performance by ±10% or more. Berger demonstrated this by randomising
 object placement and measuring the effect.
 
@@ -1007,24 +1039,23 @@ performance-critical code, yet the linker placed one function differently,
 and the benchmark flipped sign.
 
 **Implication:** micro-benchmark deltas smaller than ~10% need statistical
-confidence to be trusted at all. This is precisely what benchstat gives you.
+confidence. This is precisely what benchstat gives you.
+
+---
 
 ## The lesson
 
-A number from a noisy environment is not merely **imprecise**.
+A noisy result can be **directionally wrong**.
 
 <br>
 
 <div class="big">
 
-It can be **directionally wrong**.
+It can block a good change
+
+and wave a regression through.
 
 </div>
-
-<br>
-
-A gate that is directionally wrong blocks good changes
-and waves bad ones through.
 
 ---
 
@@ -1047,11 +1078,11 @@ benchgate   -pkg=./... -count=10 -cv-threshold=5    # CV gate
 benchenv                                             # env diagnosis
 ```
 
-Stdlib-only Go modules — also wrapped as Claude Code skills.
+Stdlib-only Go modules, also wrapped as Claude Code skills.
 
 ---
 
-## `honestbench` — static analysis for benchmarks
+## `honestbench`: static analysis for benchmarks
 
 Go Abstract Syntax Tree (AST) analysis. No benchmark needs to run. Finds problems before you measure.
 
@@ -1067,11 +1098,9 @@ timer_bench_test.go:80:3: high: stoptimer-without-starttimer:
 17 findings (2 high, 4 medium, 11 info) across 12 functions
 ```
 
-Exit 1 on any `high` finding — usable as a CI gate.
-
 ---
 
-## `benchgate` — CV gate
+## `benchgate`: CV gate
 
 Runs the benchmark N times and fails if variance is too high to trust.
 
@@ -1089,28 +1118,38 @@ Catches the case where your environment is too noisy before the numbers go into 
 
 ---
 
-## `benchenv` — diagnose your environment
+## `benchenv`: diagnose your environment
 
-No flags needed. Run it once before any serious benchmarking session.
+No flags needed. Run it before any serious benchmarking session.
 
-```text
-benchenv: benchmarking environment diagnosis (darwin/arm64, 16 CPUs)
+<div class="columns">
+<div>
 
-  [unavailable]  SMT control — use a Linux machine for publication-quality numbers
-  [unavailable]  CPU frequency governor — not exposed on macOS
-  [unavailable]  Turbo Boost — no user-space control
-  [warn]         load average — close background applications first
-  [warn]         perflock not installed
-  [ok]           benchstat installed
-  [warn]         benchdiff not installed
-  [ok]           GOMAXPROCS / NumCPU — NumCPU=16 GOMAXPROCS=16
+### Hardware and scheduler
 
-Summary: 2 ok, 3 warn, 4 unavailable.
-```
+- SMT control
+- CPU frequency governor
+- Turbo Boost
+- Load average
+
+</div>
+<div>
+
+### Benchmark toolchain
+
+- `perflock`
+- `benchstat`
+- `benchdiff`
+- `GOMAXPROCS` versus `NumCPU`
+
+</div>
+</div>
+
+Unsupported controls are reported as **unavailable**, not guessed.
 
 ---
 
-## DEMO: `benchenv` on this laptop
+## `benchenv` on this laptop
 
 ```text
 benchenv: benchmarking environment diagnosis (darwin/arm64, 16 CPUs)
@@ -1165,11 +1204,39 @@ Under an hour. The benchmarks you write after today will tell the truth.
 
 ---
 
+<!-- _class: dark -->
+
+# Take it with you
+
+<div class="columns">
+<div>
+
+### Benchmarks you can audit
+
+[github.com/kakkoyun/gopherconuk-26](https://github.com/kakkoyun/gopherconuk-26)
+
+- `honestbench`: static benchmark checks
+- `benchgate`: coefficient-of-variation gate
+- `benchenv`: environment diagnosis
+- Captured benchmark outputs and both decks
+
+[Earlier FOSDEM version](https://youtu.be/8211fNI_nc4)
+
+</div>
+<div class="center">
+
+![w:250](../../assets/gopherconuk-26-repo-qr.png)
+
+**Scan for the repository**
+
+</div>
+</div>
+
+---
+
 <!-- _class: end gopher-rocket -->
 <!-- _paginate: false -->
 
-# Thank you
+# Questions?
 
-- [github.com/kakkoyun/gopherconuk-26](https://github.com/kakkoyun/gopherconuk-26)
-- Demo modules, three CLIs, and the full research corpus
-- Kemal Akkoyun · Datadog
+[Website](https://kakkoyun.me) · [LinkedIn](https://www.linkedin.com/in/kakkoyun/) · [Bluesky](https://bsky.app/profile/kakkoyun.me) · [X](https://x.com/kakkoyun_me) · [GitHub](https://github.com/kakkoyun)

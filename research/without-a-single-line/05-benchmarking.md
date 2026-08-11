@@ -1,48 +1,30 @@
-# Benchmarking Methodology
+# Benchmarking methodology
 
-> **Status:** ⬜ Pending deep-research (methodology) + ⬜ Pending experiments (actual numbers)
-> **Blog post:** "Benchmark: overhead of zero-touch instrumentation in Go"
-> **Note:** This doc covers methodology only. Actual numbers come from `talks/without-a-single-line/demo/` experiments and are marked TODO until produced.
+> **Status:** Deferred from the keynote
+> **Decision:** The talk makes no comparative overhead claim for OBI, otelc, or the eBPF Profiler.
 
-## What to measure
+## Why the shootout was removed
 
-| Axis | Metric | Tool |
-|------|--------|------|
-| Latency | p50 / p95 / p99 request latency | hey / k6 / wrk2 |
-| CPU overhead | % CPU increase vs uninstrumented baseline | top / perf stat / pprof |
-| Memory / allocations | heap alloc rate, GC pressure | `go test -benchmem`, runtime/metrics |
-| Binary size | binary size delta (compile-time approaches only) | `ls -lh`, `size` |
-| Compile time | wall-clock build time delta (compile-time approaches only) | `time go build` |
+A fair comparison needs a dedicated experiment rather than a placeholder table:
 
-## Fairness controls
+- otelc adds SDK work inside the application process.
+- OBI and the eBPF Profiler consume host CPU outside the application.
+- Kernel version, enabled probes, workload shape, concurrency, and signal configuration change the result.
+- Application p99 latency alone cannot account for node-level observer cost.
 
-- Same demo service, same workload, same hardware for all comparisons
-- Warm-up period before measurement (avoid cold-start bias)
-- Run at realistic concurrency (not single-threaded microbenchmarks)
-- Measure at the service level, not just Go-level benchmarks (eBPF overhead is host-level)
-- Report hardware: CPU model, core count, RAM, OS, kernel version
-- Report software: Go version, OBI version, otelc version, profiler version
-- Each run repeated N times; report median + stddev, not cherry-picked best
+The keynote has a 30-minute limit and prioritizes mechanism, constraints, and composition. Any future benchmark belongs in a separate experiment and must not be reconstructed from rehearsal notes.
 
-## Benchmark design questions (to research)
+## Requirements for a future experiment
 
-- [ ] What demo service is realistic? HTTP+DB (net/http + database/sql) covers the most common integrations
-- [ ] What workload generator is appropriate for a 30-min talk demo? (k6 is scriptable, good for demos)
-- [ ] Are there existing official benchmarks from OBI / otelc / profiler projects? (cite those too)
-- [ ] How to isolate eBPF overhead from application overhead at the system level?
-- [ ] What kernel tuning (if any) affects eBPF profiler overhead?
+| Axis | Metric | Example tool |
+| --- | --- | --- |
+| Request latency | p50, p95, p99 | k6 or wrk2 |
+| Application CPU | CPU time per request | `perf stat`, runtime metrics |
+| Observer CPU | OBI/profiler CPU by node | cgroup or container metrics |
+| Memory | Heap and resident-set delta | runtime metrics, cgroup metrics |
+| Binary size | Compile-time binary delta | `size`, file metadata |
+| Build cost | Clean and cached build duration | hyperfine or controlled shell timing |
 
-## Numbers (TODO — produced in experiments phase)
+A valid run must pin hardware, kernel, Go version, tool versions, integration configuration, warm-up, workload, and sample count. It must report distributions rather than a single best result.
 
-> Do not fabricate numbers. All figures here are placeholders until experiments are run.
-
-| Approach | p99 latency vs baseline | CPU overhead | Notes |
-|----------|------------------------|--------------|-------|
-| Baseline | — | — | `talks/without-a-single-line/demo/baseline/` |
-| OBI | TODO | TODO | kernel X.X, OBI vX.X.X |
-| otelc | TODO | TODO | Go X.X, otelc vX.X.X |
-| ebpf-profiler | TODO | TODO | kernel X.X, profiler vX.X.X |
-
-## Content (to be filled by deep-research — methodology section)
-
-<!-- Deep-research output goes here -->
+Until those measurements exist, the public deck should make no overhead ranking.

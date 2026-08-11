@@ -1,7 +1,7 @@
 # opentelemetry-ebpf-profiler — The Profiling Signal
 
 > **Status:** ✅ Research complete (deep-research workflow, 2026-07-22)
-> **Blog post:** "The third signal: continuous profiling without code changes"
+> **Blog post:** "The fourth signal: continuous profiling without code changes"
 > **Key claims:** C-030 ✅ CONFIRMED · C-031 ✅ CONFIRMED · C-032 ✅ CONFIRMED
 
 ---
@@ -32,6 +32,7 @@ The profiler is **100% non-intrusive** — the README states verbatim:
 > reconfiguration, instrumentation or restarts of HLL interpreters and VMs."
 
 **Mechanism:**
+
 1. An eBPF program fires on CPU sample events at the **kernel level**.
 2. It reads process-internal data structures *from outside* the target process (via BPF maps).
 3. Stack frames are reconstructed using language-specific unwinding strategies (see below).
@@ -84,7 +85,7 @@ addressed in the primary sources reviewed. Do not claim these without further ve
 The profiling signal occupies **two distinct stability axes**:
 
 | Axis | Status | Source |
-|------|--------|--------|
+| ------ | -------- | -------- |
 | OTel specification (`/docs/specs/otel/profiles/`) | **Alpha** | [S-P-07] |
 | OTLP wire format (OTLP 1.11.0) | **Development** (lowest tier) | [S-P-08] |
 | Traces / metrics / logs (for comparison) | Stable / Stable / Stable | [S-P-08] |
@@ -101,9 +102,11 @@ spec sense. It is Alpha/Development — evolving, not guaranteed backward-compat
 ## 6. Supported Profiling Types
 
 **Confirmed in current release:**
+
 - **CPU profiling** (on-CPU): core capability, fully supported.
 
 **Status uncertain (PLAUSIBLE but not CONFIRMED):**
+
 - **Off-CPU / blocking profiling:** The OTel profiles data format is *designed* to support off-CPU
   event capture (timestamped per-event data), but off-CPU collection by the current profiler
   implementation appears to be **future work**, not a current release capability. Do not assert this
@@ -119,6 +122,7 @@ spec sense. It is Alpha/Development — evolving, not guaranteed backward-compat
 
 The profiler supports multiple language runtimes via per-language unwinders. Confirmed support
 includes:
+
 - **Go** (.gopclntab-based)
 - **C/C++** (.eh_frame-based)
 - **System libraries** (stripped, no frame pointers)
@@ -145,6 +149,7 @@ The "zero code changes" claim holds for the **profiled applications**: no recomp
 injection, no restarts.
 
 Deployment does require:
+
 - The `otelcol-ebpf-profiler` Collector distribution deployed (as a DaemonSet or sidecar to the Collector).
 - Root/CAP_BPF + CAP_PERFMON on the profiler agent node.
 - A minimum Linux kernel version (verify exact version from repo).
@@ -155,14 +160,15 @@ For a macOS development machine, this means **a Linux VM or container runtime** 
 
 ## 10. Fit With the Talk
 
-The profiler is the **third signal**: traces (OBI/otelc) + metrics (OBI) + **profiles** (ebpf-profiler).
+The profiler supplies the **fourth observability signal**: profiles, alongside logs, metrics, and traces.
 
 The complementarity story:
+
 - OBI: zero-touch **traces + metrics** in production.
-- otelc: zero-touch **granular spans** at compile time (local dev).
+- otelc: portable, production-capable **build-time instrumentation** with supported Go semantics.
 - ebpf-profiler: zero-touch **continuous CPU profiles**, always-on, whole-system.
 
-Together they give observability's full signal triad without a single source change.
+Together they cover complementary signals and layers without requiring application source edits.
 
 ---
 
@@ -179,12 +185,12 @@ Together they give observability's full signal triad without a single source cha
 ## Sources Used
 
 | Key | Description | URL |
-|-----|-------------|-----|
-| S-P-01 | OTel blog: Elastic contributes continuous profiling agent (June 2024) | https://opentelemetry.io/blog/2024/elastic-contributes-continuous-profiling-agent/ |
-| S-P-02 | CNCF blog: OTel announces support for profiling (March 2024) | https://www.cncf.io/blog/2024/03/19/opentelemetry-announces-support-for-profiling/ |
-| S-P-03 | OTel blog: profiles-alpha (2026) | https://opentelemetry.io/blog/2026/profiles-alpha/ |
-| S-P-04 | OTel community issue #1918 (donation) | https://github.com/open-telemetry/community/issues/1918 |
-| S-P-05 | opentelemetry-ebpf-profiler README + internals.md | https://github.com/open-telemetry/opentelemetry-ebpf-profiler |
-| S-P-06 | opentelemetry-ebpf-profiler doc/gopclntab.md | https://github.com/open-telemetry/opentelemetry-ebpf-profiler/blob/main/doc/gopclntab.md |
-| S-P-07 | OTel specification: profiles signal | https://opentelemetry.io/docs/specs/otel/profiles/ |
-| S-P-08 | OTLP 1.11.0 specification | https://opentelemetry.io/docs/specs/otlp/ |
+| ----- | ------------- | ----- |
+| S-P-01 | OTel blog: Elastic contributes continuous profiling agent (June 2024) | <https://opentelemetry.io/blog/2024/elastic-contributes-continuous-profiling-agent/> |
+| S-P-02 | CNCF blog: OTel announces support for profiling (March 2024) | <https://www.cncf.io/blog/2024/03/19/opentelemetry-announces-support-for-profiling/> |
+| S-P-03 | OTel blog: profiles-alpha (2026) | <https://opentelemetry.io/blog/2026/profiles-alpha/> |
+| S-P-04 | OTel community issue #1918 (donation) | <https://github.com/open-telemetry/community/issues/1918> |
+| S-P-05 | opentelemetry-ebpf-profiler README + internals.md | <https://github.com/open-telemetry/opentelemetry-ebpf-profiler> |
+| S-P-06 | opentelemetry-ebpf-profiler doc/gopclntab.md | <https://github.com/open-telemetry/opentelemetry-ebpf-profiler/blob/main/doc/gopclntab.md> |
+| S-P-07 | OTel specification: profiles signal | <https://opentelemetry.io/docs/specs/otel/profiles/> |
+| S-P-08 | OTLP 1.11.0 specification | <https://opentelemetry.io/docs/specs/otlp/> |

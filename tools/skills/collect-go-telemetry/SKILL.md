@@ -1,208 +1,182 @@
 ---
 name: collect-go-telemetry
 description: >
-  Collect telemetry from a Go service to troubleshoot or optimize it — without
-  changing source code. Routes to OBI (eBPF, production/runtime, zero rebuild)
-  or otelc (compile-time, local dev, granular spans) based on context, then
-  pulls only the specific integration docs needed.
+  Collect telemetry from a Go service without changing its source. Routes to
+  OBI for rebuild-free Linux observation, otelc for portable build-time
+  instrumentation, or a combined deployment based on platform, privileges,
+  signal depth, and build ownership.
 use_when:
   - "collect go telemetry"
   - "instrument go service without code changes"
   - "troubleshoot go service production"
   - "attach obi to service"
-  - "otelc local dev traces"
+  - "build with otelc"
   - "zero touch go observability"
 disable-model-invocation: false
 ---
 
-# collect-go-telemetry
+# Collect Go telemetry
 
-Collect telemetry from a Go service for troubleshooting or optimization — no source changes required.
+Collect telemetry from a Go service without editing application source.
 
-## Step 1 — Determine backend
+## Step 1: identify the hard constraints
 
-Ask the user (or infer from context) which scenario applies:
+Ask or infer:
 
-**→ OBI** (v0, active dev) when any of these are true:
-- Service is already deployed (production, staging, k8s, docker-compose)
-- Rebuild/redeploy is not acceptable
-- Mixed-language fleet (Go, Java, Python, .NET, etc.)
-- Goal is HTTP/gRPC RED metrics or boundary-level library spans
-- User says: "production", "k8s", "pod", "cluster", "running", "no rebuild", "runtime"
-- Note: emitted telemetry fields may change between minor releases (v0 stability guarantee)
+1. Is the service running on Linux?
+2. Can the team rebuild the binary or change the build pipeline?
+3. Can a privileged observer run beside the workload?
+4. Does the user need boundary coverage or Go-specific semantic detail?
+5. Which signals are required: traces, metrics, logs, profiles?
 
-**→ otelc** (v1 stable, Go 1.25+) when any of these are true:
-- Working locally or in a dev environment
-- Need deep in-process spans (custom functions, business logic, third-party module internals)
-- Willing to rebuild with `otelc go build`
-- Debugging a specific slow path with exact trace data
-- Runtime is restricted (no root, no eBPF capabilities, serverless)
-- User says: "local", "dev", "debug", "granular", "custom span", "trace specific function"
+### Choose OBI when
 
-**→ Both together** when the service is Go and runs in a mixed-language environment:
-- otelc for the Go service internals (per-function spans, business logic)
-- OBI for infrastructure-level coverage + non-Go neighbours
+- The service is already deployed and a rebuild is unavailable.
+- The workload runs on supported Linux kernels.
+- A privileged DaemonSet, sidecar, or host process is acceptable.
+- The fleet uses several languages.
+- HTTP, gRPC, database, messaging, RED metrics, or trace-log correlation is sufficient.
 
-If context is ambiguous, ask: *"Is this for a running production service (OBI) or local development where you can rebuild (otelc)?"*
+OBI is a v0 project. Emitted telemetry and configuration may change between minor releases.
 
----
+### Choose otelc when
 
-## Backend A: OBI — eBPF, production, zero rebuild
+- The team controls the Go build command or CI pipeline.
+- The target includes Linux, macOS, or Windows.
+- Runtime privileges or eBPF access are unavailable.
+- Supported Go libraries need in-process semantic instrumentation.
+- The instrumentation bundle should emit traces, metrics, or supported log records.
 
-### What OBI gives you
-- HTTP/gRPC RED metrics and library-level spans: 13 Go libs including net/http, gin, gRPC, gorilla/mux, go-redis, Kafka, database/sql
-- No rebuild, no restart, no code changes — attaches from outside the process
-- Kernel 5.8+ with BTF required; 6 Linux capabilities (CAP_BPF, CAP_SYS_PTRACE, CAP_NET_RAW, CAP_CHECKPOINT_RESTORE, CAP_DAC_READ_SEARCH, CAP_PERFMON)
-- **Limitation:** custom spans, business-logic events, SQL query details still need code changes
+otelc is a stable production build-time tool. Local development is one use case, not its deployment boundary.
 
-### Fetch integration details (token-thrift)
+### Combine them when
 
-Before attaching, pull docs for only the libraries the service uses:
+- A Go service needs rich in-process semantics and also runs in a mixed-language Linux fleet.
+- Build-time instrumentation supplies request context that an out-of-process profiler can correlate.
+- OBI should cover service boundaries while otelc or Orchestrion covers supported Go internals.
+
+If context is ambiguous, ask: "Can you rebuild the service, what operating system does it run on, and can the runtime host a privileged eBPF observer?"
+
+## Backend A: OBI
+
+### What OBI provides
+
+- OTLP traces and metrics from network protocols and supported library operations.
+- Thirteen documented Go library baselines, including `net/http`, gin, gRPC, `database/sql`, go-redis, Kafka, and MongoDB.
+- Optional JSON trace-log correlation. OBI enriches logs in place; the existing logging pipeline still exports them.
+- No application rebuild or restart for node-level attachment.
+
+### Platform and privilege requirements
+
+- Linux `amd64` or `arm64`.
+- Kernel 5.8+ with BTF, or the documented RHEL-family 4.18+ backports.
+- Capabilities depend on the enabled mode:
+  - Network flow capture uses `CAP_BPF` and `CAP_NET_RAW`.
+  - Application observability adds executable/process access and `CAP_PERFMON`.
+  - Context propagation adds `CAP_NET_ADMIN`.
+  - Go library propagation may require `CAP_SYS_ADMIN`.
+- `kernel.perf_event_paranoid`, Secure Boot, and kernel lockdown can restrict features.
+
+### Pull one integration row
 
 ```bash
-# Usage: tools/cli/go-instr-pull/obi-integration.sh <library-name>
-# Examples:
 ./tools/cli/go-instr-pull/obi-integration.sh net/http
 ./tools/cli/go-instr-pull/obi-integration.sh gin
 ./tools/cli/go-instr-pull/obi-integration.sh grpc
 ```
 
-This fetches only the relevant section from OBI's SUPPORT_MATRIX.md — not the full catalog.
+The script fetches only the matching row from OBI's support matrix.
 
-### Attach: Kubernetes (DaemonSet)
+### Deploy on Kubernetes
+
+Follow the current upstream setup documentation:
+
+<https://opentelemetry.io/docs/zero-code/obi/setup/kubernetes/>
+
+The repository's `tools/cli/kubectl-obi` directory is a prototype. Its command parsing exists, but cluster operations are incomplete. Do not present it as a production installer.
+
+### Verify OBI
 
 ```bash
-# 1. Deploy OBI via Helm (one-time, instruments all pods on the node)
-#    Using kubectl-obi plugin (repo: tools/cli/kubectl-obi):
-kubectl obi attach
-
-#    Or directly with Helm:
-helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
-helm upgrade --install obi open-telemetry/opentelemetry-ebpf-instrumentation \
-  --namespace obi-system --create-namespace
-
-# 2. Verify OBI is running
-kubectl obi status
-# or: kubectl get pods -n obi-system -l app.kubernetes.io/instance=obi
-
-# 3. Check that spans are flowing (assumes OTel Collector configured)
+uname -r
+ls /sys/kernel/btf/vmlinux
+kubectl get pods -n obi-system
 kubectl logs -n obi-system -l app.kubernetes.io/instance=obi --tail=50
 ```
 
-### Attach: Docker Compose
+Check that the service uses a supported library and that the OTLP endpoint is reachable.
 
-```yaml
-# Add to docker-compose.yml alongside your service:
-obi:
-  image: ghcr.io/open-telemetry/opentelemetry-ebpf-instrumentation:v0.10.0
-  pid: host          # required: access host process namespace
-  privileged: true   # or use specific capabilities
-  environment:
-    OTEL_EXPORTER_OTLP_ENDPOINT: http://otel-collector:4317
-  volumes:
-    - /sys/fs/bpf:/sys/fs/bpf
-    - /sys/kernel/debug:/sys/kernel/debug
-```
+### OBI boundary
 
-```bash
-docker compose up -d obi
-```
+OBI does not infer arbitrary business events, domain attributes, unsupported internal functions, or application-specific sampling decisions. Add manual instrumentation or a compile-time rule when those semantics matter.
 
-### Verify output
+## Backend B: otelc
 
-```bash
-# If using Jaeger locally:
-open http://localhost:16686
+### What otelc provides
 
-# If tailing OTLP stdout exporter:
-docker compose logs obi -f
-```
+- Build-time instrumentation for supported code, dependencies, and standard-library paths.
+- Traces, HTTP and gRPC metrics, Go runtime metrics, and supported `slog` or Logrus records.
+- No runtime agent, root access, eBPF capability, or Linux-kernel dependency.
+- Build and test coverage across Linux, macOS, and Windows.
 
-### OBI troubleshooting checklist
-- [ ] Kernel ≥ 5.8 with BTF: `uname -r && ls /sys/kernel/btf/vmlinux`
-- [ ] Capabilities present: `cat /proc/$(pgrep obi)/status | grep Cap`
-- [ ] Service uses a supported library (check SUPPORT_MATRIX.md via script above)
-- [ ] OTEL_EXPORTER_OTLP_ENDPOINT points to a live collector
+Current otelc requires Go 1.25 or newer. Coverage is limited to the integrations and versions declared by the project.
 
----
+Orchestrion with dd-trace-go uses the same build-time family and can also enable Datadog runtime metrics, log correlation, and continuous profiling.
 
-## Backend B: otelc — compile-time, local dev, granular spans
-
-### What otelc gives you
-- Granular OTel spans for all supported Go frameworks, injected at compile time
-- Instruments your code, its dependencies, and parts of the standard library
-- No runtime overhead beyond the OTel SDK
-- **Requires:** rebuild with `otelc go build`; Linux/macOS dev machine; **Go 1.25+** (hard requirement)
-
-### Fetch integration details (token-thrift)
-
-Pull docs for only the packages the service uses:
+### Pull integration details
 
 ```bash
-# Usage: tools/cli/go-instr-pull/otelc-aspect.sh <import-path>
-# Examples:
 ./tools/cli/go-instr-pull/otelc-aspect.sh net/http
 ./tools/cli/go-instr-pull/otelc-aspect.sh github.com/gin-gonic/gin
 ./tools/cli/go-instr-pull/otelc-aspect.sh google.golang.org/grpc
 ```
 
-### Install otelc
+### Install and build
 
 ```bash
 go install go.opentelemetry.io/otelc/tool/cmd/otelc@latest
-```
 
-### Build and run with instrumentation
-
-```bash
-# Replace your normal go build with:
 otelc go build -o ./myapp ./...
 
-# Or for go run:
-otelc go run ./...
-
-# With OTel SDK environment:
 OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 \
 OTEL_SERVICE_NAME=my-go-service \
 ./myapp
 ```
 
-### Configure OTel SDK (if not already present)
+The same wrapper can run tests and other Go commands where supported:
 
 ```bash
-# Minimal: stdout exporter for local dev
-OTEL_EXPORTER_OTLP_PROTOCOL=grpc \
-OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4317 \
-./myapp
+otelc go test ./...
+otelc go run ./...
 ```
 
-Or use Jaeger all-in-one for local trace UI:
+### Verify otelc
 
 ```bash
-docker run -d --name jaeger \
-  -p 16686:16686 -p 4317:4317 \
-  jaegertracing/all-in-one:latest
-open http://localhost:16686
+otelc version
+otelc go build -v ./... 2>&1 | grep -i instrument
 ```
 
-### otelc troubleshooting checklist
-- [ ] `otelc version` — confirm binary is on PATH
-- [ ] `go.mod` uses a Go version otelc supports
-- [ ] OTel Collector or Jaeger running at `OTEL_EXPORTER_OTLP_ENDPOINT`
-- [ ] Run `otelc go build -v` to see which packages are being instrumented
-- [ ] If zero spans: check `OTEL_SDK_DISABLED` is not set
+Also verify that an OTLP receiver is reachable and that the service uses a supported integration.
 
----
+## Add profiling
+
+The OpenTelemetry eBPF Profiler provides whole-node CPU profiles without changing the application. It requires Linux and profiler-agent privileges. Use it beside either instrumentation path when CPU evidence matters.
+
+For request-correlated profiles, ensure the in-process instrumentation publishes suitable pprof labels. OTEP 4947 describes the proposed Go-specific context-sharing path:
+
+<https://github.com/open-telemetry/opentelemetry-specification/blob/main/oteps/profiles/4947-thread-ctx.md#alternative-for-go-support>
+
+Treat this OTEP path as proposed work unless the selected SDK documents a shipped implementation.
 
 ## Decision summary
 
-| Need | Use | Maturity |
-|------|-----|----------|
-| Production service, no rebuild | **OBI** | v0 — expect breaking changes in minors |
-| Mixed-language fleet | **OBI** | v0 |
-| HTTP/gRPC RED metrics, boundary spans | **OBI** | v0 |
-| Local dev, deep in-process traces | **otelc** | v1 stable |
-| Custom business-logic spans | **otelc** | v1 stable |
-| Restricted runtime (no root/eBPF) | **otelc** | v1 stable |
-| Go service in mixed fleet | **Both** | see above |
-| Always-on CPU profiling | `ebpf-profiler` | Development |
+| Constraint | First choice |
+| --- | --- |
+| No rebuild window on supported Linux | OBI |
+| Non-Linux target | otelc / Orchestrion |
+| Mixed-language boundary coverage | OBI |
+| Rich supported Go semantics | otelc / Orchestrion |
+| No privileged runtime agent | otelc / Orchestrion |
+| Whole-node CPU profiles | OpenTelemetry eBPF Profiler |
+| Request-correlated profiles | Build-time context plus profiler |

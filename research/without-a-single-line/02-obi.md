@@ -27,7 +27,7 @@ Grafana Beyla continues to exist as Grafana Labs' distribution of the upstream O
   - Still in **Development** status. From the README: *"OBI is currently in Development. Users
     should expect breaking changes between minor releases while the project remains in `v0`."*
 - **Previous release:** v0.9.0 (2026-05-11). No v1.x release exists yet.
-- **Official docs:** https://opentelemetry.io/docs/zero-code/obi/
+- **Official docs:** <https://opentelemetry.io/docs/zero-code/obi/>
 
 **Sources:** [S-OBI-01], [S-OBI-02], [S-OBI-03]
 
@@ -39,6 +39,7 @@ OBI places **eBPF uprobes and kprobes** at the kernel/binary level. eBPF program
 **JIT-compiled to the host native architecture** (x86-64, ARM64, etc.) by the Linux kernel.
 
 For the standard case (HTTP/gRPC RED metrics — Rate, Errors, Duration):
+
 - **Zero source code changes** required for the profiled applications.
 - **Zero recompilation, zero restarts, zero agent injection** into process memory.
 
@@ -57,7 +58,7 @@ require manual instrumentation or compile-time tools like otelc.
 ## 3. Linux Kernel Requirements
 
 | Requirement | Detail |
-|-------------|--------|
+| ------------- | -------- |
 | **Kernel version** | Linux **5.8+** |
 | **RHEL exception** | Linux **4.18+** for RHEL 8, CentOS 8, Rocky Linux 8, AlmaLinux 8, and compatible derivatives with required eBPF backports |
 | **BTF required** | Yes — BPF Type Format must be enabled. BTF became default on most Linux distros with kernel **5.14+** |
@@ -71,47 +72,46 @@ From the OBI docs (last modified 2026-07-20, compatibility table):
 
 ---
 
-## 4. Required Linux Capabilities
+## 4. Linux Capabilities Vary by Feature
 
-OBI requires **six always-required capabilities** in unprivileged mode:
+OBI does not have one universal unprivileged capability set. The required access grows with the enabled mode:
 
-| Capability | Purpose |
-|------------|---------|
-| `CAP_BPF` | Required for most eBPF probes |
-| `CAP_SYS_PTRACE` | Required for process inspection |
-| `CAP_NET_RAW` | Required for network-level probing |
-| `CAP_CHECKPOINT_RESTORE` | Required for process state access |
-| `CAP_DAC_READ_SEARCH` | Required for file/binary reading |
-| `CAP_PERFMON` | Required for performance monitoring |
+| Mode | Required access |
+| ------------ | --------- |
+| Network flow capture | `CAP_BPF`, `CAP_NET_RAW` |
+| Application observability | Process and ELF access, `CAP_PERFMON`, uprobes |
+| Context propagation | `CAP_NET_ADMIN` |
+| Go library propagation | May require `CAP_SYS_ADMIN` for `bpf_probe_write_user` |
 
-**Seventh (conditional):** `CAP_SYS_ADMIN` is required when using Go trace propagation
-or when `perf_event_paranoid` is set high.
+`CAP_SYS_PTRACE` allows access to process information under `/proc`; OBI does not use it to call `PTRACE_ATTACH`. Restrictive `kernel.perf_event_paranoid` settings may force `CAP_SYS_ADMIN` instead of `CAP_PERFMON`. Secure Boot and kernel lockdown can disable context-propagation helpers.
 
-Alternatively, `privileged: true` can be used in Kubernetes (simpler but broader).
+Alternatively, `privileged: true` can be used in Kubernetes, but it grants much broader access.
 
-**Sources:** [S-OBI-05]
+**Sources:** [S-OBI-05], [S-OBI-07]
 
 ---
 
 ## 5. Go Library-Level Support
 
-OBI provides Go-specific **library-level uprobe instrumentation** (distinct from generic
-network-level interception) for **13 named libraries**:
+OBI provides Go-specific **library-level uprobe instrumentation** (distinct from generic network-level interception) for **13 documented baselines**:
 
-| Library | Min Go version |
-|---------|---------------|
+| Library | Baseline |
+| --------- | --------------- |
 | `net/http` | Go 1.17+ |
-| `golang.org/x/net/http2` | ≥ 0.12.0 |
-| `gorilla/mux` | ≥ v1.5.0 |
-| `gin-gonic/gin` | ≥ v1.6.0 |
-| `google.golang.org/grpc` | (see SUPPORT_MATRIX.md) |
-| `go-redis/redis` v8/v9 | added in v0.7.1 |
-| Kafka (sarama/confluent) | added in v0.5.0 |
-| `database/sql` | fixed in v0.7.0 |
-| + 5 more | see SUPPORT_MATRIX.md |
+| `golang.org/x/net/http2` | >= 0.12.0 |
+| `github.com/gorilla/mux` | >= v1.5.0 |
+| `github.com/gin-gonic/gin` | >= v1.6.0, except v1.7.5 |
+| `google.golang.org/grpc` | >= 1.40 |
+| `net/rpc/jsonrpc` | Go 1.17+ |
+| `database/sql` | Go 1.17+ |
+| `github.com/go-sql-driver/mysql` | >= v1.5.0 |
+| `github.com/lib/pq` | All versions |
+| `github.com/redis/go-redis/v9` | >= v9.0.0 |
+| `github.com/segmentio/kafka-go` | >= v0.4.11 |
+| `github.com/IBM/sarama` | >= 1.37 |
+| `go.mongodb.org/mongo-driver` | v1 >= v1.10.1; v2 >= v2.0.1 |
 
-**Action required before talk:** Read `SUPPORT_MATRIX.md` in the v0.10.0 tag for the complete
-list with exact version constraints. The list above is verified but may be incomplete.
+The support matrix is the source of truth. Internal layouts can change even when an import path remains compatible.
 
 **Sources:** [S-OBI-06]
 
@@ -120,6 +120,7 @@ list with exact version constraints. The list above is verified but may be incom
 ## 6. Language-Agnostic Support
 
 At the **network-protocol level**, OBI is language-agnostic. It supports:
+
 - Go (1.17+)
 - Java (JDK 8+, with an embedded Java agent extracted at runtime)
 - .NET
@@ -138,12 +139,14 @@ This means OBI can instrument a polyglot microservices environment with a single
 Two models:
 
 ### DaemonSet (recommended for production)
+
 - One OBI pod per node; instruments all workloads on the node.
 - Requires `hostPID: true` (to access all processes on the node).
 - Standard Linux capabilities or `privileged: true`.
 - No changes to application pods.
 
 ### Sidecar
+
 - One OBI container per application pod.
 - Requires `shareProcessNamespace: true` and `privileged: true` on the sidecar.
 - More granular control; less efficient at scale.
@@ -155,7 +158,7 @@ Two models:
 ## 8. "Zero Code Changes" — Precise Scope
 
 | Scenario | Zero code changes? |
-|----------|--------------------|
+| ---------- | -------------------- |
 | HTTP/gRPC RED metrics (rate, errors, duration) | ✅ Yes |
 | Library-level spans (13 supported Go libs) | ✅ Yes |
 | Custom spans / business-logic events | ❌ No — requires manual instrumentation |
@@ -174,13 +177,15 @@ once; all services on the node emit RED metrics and library-level spans. No CI c
 deployment coordination with app teams.
 
 **Complementarity with otelc:**
+
 - OBI: breadth (13 Go libs + any language on the network level), zero rebuild, production-safe.
 - otelc: depth (granular custom spans, stdlib instrumentation, business-logic events), requires rebuild.
 - ebpf-profiler: profiles (CPU, system-wide, always-on), separate signal.
 
 **Decision rule** (for the agent skill):
+
 - `"production"` / `"k8s"` / `"runtime"` / `"no rebuild"` → **OBI**
-- `"local"` / `"dev"` / `"debug"` / `"granular"` / `"custom span"` → **otelc**
+- Build ownership / non-Linux target / richer supported Go semantics / no runtime privileges → **otelc**
 
 ---
 
@@ -197,10 +202,10 @@ deployment coordination with app teams.
 ## Sources Used
 
 | Key | Description | URL |
-|-----|-------------|-----|
-| S-OBI-01 | Grafana Beyla OSS page (donation announcement) | https://grafana.com/oss/beyla-ebpf/ |
-| S-OBI-02 | Grafana Beyla README (donation reference + #2406) | https://github.com/grafana/beyla |
-| S-OBI-03 | OBI pkg.go.dev (v0.10.0 release date, module path) | https://pkg.go.dev/go.opentelemetry.io/obi |
-| S-OBI-04 | OBI official docs (zero-code, language support, kernel) | https://opentelemetry.io/docs/zero-code/obi/ |
-| S-OBI-05 | OBI Kubernetes setup docs | https://opentelemetry.io/docs/zero-code/obi/setup/kubernetes/ |
-| S-OBI-06 | OBI SUPPORT_MATRIX.md (v0.10.0) | https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/SUPPORT_MATRIX.md |
+| ----- | ------------- | ----- |
+| S-OBI-01 | Grafana Beyla OSS page (donation announcement) | <https://grafana.com/oss/beyla-ebpf/> |
+| S-OBI-02 | Grafana Beyla README (donation reference + #2406) | <https://github.com/grafana/beyla> |
+| S-OBI-03 | OBI pkg.go.dev (v0.10.0 release date, module path) | <https://pkg.go.dev/go.opentelemetry.io/obi> |
+| S-OBI-04 | OBI official docs (zero-code, language support, kernel) | <https://opentelemetry.io/docs/zero-code/obi/> |
+| S-OBI-05 | OBI Kubernetes setup docs | <https://opentelemetry.io/docs/zero-code/obi/setup/kubernetes/> |
+| S-OBI-06 | OBI SUPPORT_MATRIX.md (v0.10.0) | <https://github.com/open-telemetry/opentelemetry-ebpf-instrumentation/blob/main/SUPPORT_MATRIX.md> |
