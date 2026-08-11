@@ -14,7 +14,7 @@ DataDog and Alibaba both proposed donations to OpenTelemetry in early 2025. Neit
 accepted as-is. Instead, both orgs joined forces to **bootstrap a new OTel SIG** and build
 `otelc` from scratch — a unified, vendor-neutral codebase picking the best of both approaches.
 
-> Source: https://opentelemetry.io/blog/2025/go-compile-time-instrumentation/
+> Source: <https://opentelemetry.io/blog/2025/go-compile-time-instrumentation/>
 
 Orchestrion **remains actively maintained** as a standalone Datadog project. Its README makes
 no mention of donation or deprecation. otelc is the OTel SIG output (v1.0.1, first stable).
@@ -23,7 +23,7 @@ no mention of donation or deprecation. otelc is the OTel SIG output (v1.0.1, fir
 is the more mature input and remains the Datadog-specific option.
 
 | | DataDog/orchestrion | open-telemetry/opentelemetry-go-compile-instrumentation |
-|---|---|---|
+| --- | --- | --- |
 | **CLI binary** | `orchestrion` | `otelc` |
 | **Repo** | github.com/DataDog/orchestrion | github.com/open-telemetry/opentelemetry-go-compile-instrumentation |
 | **Owner** | Datadog (active standalone) | OTel SIG (Datadog + Alibaba joint) |
@@ -81,56 +81,64 @@ From the OTel blog on otelc:
 
 ---
 
-## 3. The Goroutine-Local Storage Hack (⚠️ STILL PENDING)
+## 3. The Goroutine-Local Storage Mechanism (Confirmed)
 
-The prior research lead claims Orchestrion fakes goroutine-local storage via `go:linkname`,
-injecting a synthetic field into the runtime `g` struct at `internal/orchestrion/gls.go`.
+The Datadog integration bundle defines a compile-time aspect in `dd-trace-go/internal/orchestrion/gls.orchestrion.yml`. It adds `__dd_gls_v2 any` to `runtime.g`, injects typed `go:linkname` accessors, and clears the field in `runtime.goexit1`.
 
-**Verdict: PENDING — not confirmed by deep-research web search.** The deep-research agents stalled
-on this question. This requires a direct read of the DataDog/orchestrion repo source.
+The location matters: dd-trace-go owns this tracer-specific context integration; Orchestrion or otelc supplies the rewriting engine that applies it. This is why the public example should keep the dd-trace-go path instead of relabeling it as an otelc file.
 
-**Action required:** Read `internal/orchestrion/gls.go` (or equivalent) directly from the repo to
-verify the exact `go:linkname` usage and what it injects. Pin commit SHA.
+Variable `go:linkname` resolution remains fragile. When both sides are BSS symbols, selection can depend on load order; this caused a Go 1.22 to 1.23 break tracked in golang/go#72032.
 
-This is the "killer proof-point" for the thesis — the most technically striking detail in the talk.
-Do not assert it until confirmed with a primary source read.
-
-*See `claims-ledger.md` entry C-002 — remains PENDING.*
+**Sources:** [S-TH-05a], [S-TH-05b], [S-TH-06]
 
 ---
 
 ## 4. What It Instruments
 
 ### otelc (OTel SIG) — current supported list
-**TODO:** Verify the complete supported frameworks list from the `opentelemetry-go-compile-instrumentation`
-repo's current release. The deep-research web search did not return a definitive list for otelc specifically.
-Check: `github.com/open-telemetry/opentelemetry-go-compile-instrumentation` — look at the
-instrumentation packages or the README's supported integrations table.
+
+The official documentation currently lists instrumentation for:
+
+- `net/http`, gRPC, `database/sql`, gin, go-redis v9, MongoDB, and segmentio Kafka.
+- OpenAI and Anthropic clients.
+- Kubernetes client-go informer caches.
+- `log/slog` and Logrus records.
+
+HTTP and gRPC integrations produce spans and metrics, Go runtime metrics are collected by default, and the logging integrations emit records through the configured SDK. The repository's instrumentation rules remain the source of truth because coverage continues to expand.
+
+**Sources:** [S-O-07]
 
 ### DataDog/orchestrion + dd-trace-go v2 — confirmed list
+
 Verified from `contrib/supported_integrations.md` in DataDog/dd-trace-go v2 repo:
 
 **HTTP/Frameworks:**
+
 - Gin, Gorilla Mux, chi, echo v4, Fiber, net/http
 
 **RPC:**
+
 - gRPC
 
 **Databases:**
+
 - database/sql, sqlx, MongoDB (mongo-driver v1+v2), Gorm v2
 - Redis: go-redis v6-v9, redigo, rueidis, valkey-go
 - Cassandra: gocql
 - Memcache
 
 **GraphQL:**
+
 - graph-gophers, graphql-go, gqlgen
 
 **Cloud / Infrastructure:**
+
 - AWS SDK v1 (deprecated) + v2
 - Kafka: confluent-kafka-go v1+v2, IBM/sarama (Shopify/sarama deprecated)
 - Vault, Consul
 
 **Kubernetes:**
+
 - client-go
 
 **Sources:** [S-O-06]
@@ -161,7 +169,7 @@ CI pipeline integration: set `GOTOOLCHAIN` or add the tool to `$PATH` and prefix
 ## 6. Version & Go Compatibility
 
 | Tool | Current version | Go min version |
-|------|----------------|----------------|
+| ------ | ---------------- | ---------------- |
 | DataDog/orchestrion | v1.11.0 (2026-06-25) | Verify from go.mod |
 | otelc | v1.0.1 (2026-07-14) | **Go 1.25+** (confirmed from README badge) |
 
@@ -169,7 +177,7 @@ CI pipeline integration: set `GOTOOLCHAIN` or add the tool to `$PATH` and prefix
 This is a significant constraint for the talk: services on Go 1.23/1.24 cannot use otelc.
 For those, OBI or Orchestrion (check its go.mod) are the alternatives.
 
-**TODO:** Check DataDog/orchestrion `go.mod` for minimum Go version.
+**Maintenance:** Re-check each tool's supported Go versions before presenting; otelc currently requires Go 1.25+.
 
 ---
 
@@ -190,7 +198,8 @@ This is relevant for the talk: Orchestrion can wire in OTel SDK too — it's not
 "inspiration / predecessor" that shows the same idea at production scale (Datadog uses it internally).
 
 **Decision framework**:
-- otelc → local dev, granular OTel spans, requires `go build` with `otelc` wrapper, no runtime overhead
+
+- otelc → production-capable build-time instrumentation, requires a build through the `otelc` wrapper, and has no attached runtime agent
 - Orchestrion → same mechanism, battle-tested, defaults to dd-trace-go, vendor-agnostic
 
 **Relationship to the thesis**: The `-toolexec` mechanism is a *compile-time workaround* for Go
@@ -212,10 +221,10 @@ approaches must reach into Go internals to support goroutine-aware tracing.
 ## Sources Used
 
 | Key | Description | URL |
-|-----|-------------|-----|
-| S-O-01 | Datadog open-source page: Orchestrion | https://opensource.datadoghq.com/projects/orchestrion/ |
-| S-O-02 | golang/go#69887 (OTel SIG context from Orchestrion maintainer) | https://github.com/golang/go/issues/69887 |
-| S-O-03 | DataDog/orchestrion repo (HEAD df04ed94b69e, 2026-07-06) | https://github.com/DataDog/orchestrion |
-| S-O-04 | OTel blog: go-compile-time-instrumentation-v1 (2026-07-16) | https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/ |
-| S-O-05 | open-telemetry/opentelemetry-go-compile-instrumentation | https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation |
-| S-O-06 | DataDog/dd-trace-go contrib/supported_integrations.md | https://github.com/DataDog/dd-trace-go |
+| ----- | ------------- | ----- |
+| S-O-01 | Datadog open-source page: Orchestrion | <https://opensource.datadoghq.com/projects/orchestrion/> |
+| S-O-02 | golang/go#69887 (OTel SIG context from Orchestrion maintainer) | <https://github.com/golang/go/issues/69887> |
+| S-O-03 | DataDog/orchestrion repo (HEAD df04ed94b69e, 2026-07-06) | <https://github.com/DataDog/orchestrion> |
+| S-O-04 | OTel blog: go-compile-time-instrumentation-v1 (2026-07-16) | <https://opentelemetry.io/blog/2026/go-compile-time-instrumentation-v1/> |
+| S-O-05 | open-telemetry/opentelemetry-go-compile-instrumentation | <https://github.com/open-telemetry/opentelemetry-go-compile-instrumentation> |
+| S-O-06 | DataDog/dd-trace-go contrib/supported_integrations.md | <https://github.com/DataDog/dd-trace-go> |

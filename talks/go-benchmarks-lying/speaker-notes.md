@@ -1,296 +1,310 @@
-# Speaker Notes — Why Your Go Benchmarks Are Lying
+# Speaker notes: Why Your Go Benchmarks Are Lying
 
-GopherCon UK 2026 · 60 minutes TOTAL INCLUDING Q&A · advanced audience
-Deck: `slides/presentation.md` (72 slides, 10 sections) · Demo: `demo/`
+GopherCon UK 2026 · 60 minutes including Q&A · advanced audience
 
-Last updated: 2026-08-10
+Deck: `slides/presentation.md` (76 slides)
 
----
+## Timing
 
-## Timing plan
+This is the additive review version. The scripted estimate is about 66 minutes before Q&A, so it does not yet fit the slot. Kemal will choose the pruning pass after reviewing and rehearsing the complete deck.
 
-> ⚠️ Full delivery runs ~65 min. You must apply cuts to fit 60 min. See cut order below.
+| Block | Slides | Expanded target | Running total |
+| --- | ---: | ---: | ---: |
+| Loose-cable story and thesis | 2-8 | 4:00 | 4:00 |
+| Personal and Datadog context | 9-10 | 1:30 | 5:30 |
+| Why benchmark | 11-14 | 3:30 | 9:00 |
+| Before optimizing | 15-18 | 4:00 | 13:00 |
+| Micro vs macro | 19-21 | 3:00 | 16:00 |
+| Compiler honesty | 22-37 | 14:00 | 30:00 |
+| Statistical interpretation | 38-45 | 10:00 | 40:00 |
+| Local reproduction | 46-53 | 11:00 | 51:00 |
+| CI escalation | 54-58 | 5:00 | 56:00 |
+| War story | 59-65 | 5:00 | 61:00 |
+| Tools and close | 66-76 | 5:00 | 66:00 |
 
-| Block | Slides | Target | Running total |
-|---|---|---|---|
-| §01 Why Benchmark? | 1–5 | 3 min | 0:03 |
-| §02 A Loose Cable (OPERA) + thesis | 6–13 | 4 min | 0:07 |
-| §03 Before You Optimize | 14–17 | 4 min | 0:11 |
-| §04 The Art of Benchmarking | 18–20 | 3 min | 0:14 |
-| §05 Compiler honesty | 21–37 | 14 min | 0:28 |
-| §06 Statistical interpretation | 38–47 | 11 min | 0:39 |
-| §07 Local reproduction | 48–57 | 12 min | 0:51 |
-| §08 CI escalation | 58–63 | 5 min | 0:56 |
-| §09 War story | 64–67 | 4 min | 1:00 |
-| §10 Wire It Up + close | 68–72 | 3 min | 1:03 |
-| Q&A buffer | — | 2 min | 1:05 |
+Do not prune during this pass. Candidate rehearsal cuts include assembly detail, some Linux-control detail, and one of the two `benchenv` output slides. Never cut the DCE evidence, CV experiment, macOS caveat, war story, three questions, or Datadog rationale without Kemal's review.
 
-**Checkpoints.** §05 Compiler open by **0:14**. §06 Stats open by **0:28**. War story by **1:00**.
+## Slides 2-8: the loose-cable story
 
-If behind at §05: cut §03 Before You Optimize entirely (saves 4 min) and compress §01 to 2 min (saves 1 min). That recovers 5 min and puts you back on budget.
+### Slides 2-4: setup and reveal
 
----
+Open on the story. Do not introduce yourself first.
 
-## Ethos slide (slide 2)
+Ninety seconds is enough for OPERA. Resist the physics details. The audience needs three beats: a careful instrument, a surprising result, and a connector.
 
-Twenty seconds. Do not read the slide aloud — the audience reads faster than you speak.
-Land one sentence: "I'm on the Prometheus Steering Committee, which means someone besides me
-thinks I know what I'm doing about Go observability." Then move on without lingering.
+The two-fault detail matters. The fibre connector biased the result in one direction; an oscillator defect pushed the other way and partially masked it. A benchmark environment can contain several systematic errors that cancel until one changes.
 
-The steering-committee line is the only one worth saying. Everything else on the slide is
-warrant for later claims; let them absorb it visually while you transition.
+The 73 ns figure comes from CERN's 22 February 2012 release and Cartlidge, *Science* 335(6072):1027.
 
----
+### Slides 5-6: pivot to Go
 
-## §01 Why Benchmark? (slides 2–6)
+Say: "The point is not that particle physicists were careless. The point is that a precise system can be wrong in a way that survives expert review."
 
-Move through this at conversational pace — 3 minutes is plenty. The audience of experienced Go
-engineers does not need a lecture on why latency matters. The goal is to plant two specific
-frames: (1) latency and throughput are the two levers, and (2) measurement is a prerequisite for
-optimization, not a follow-on. The Lütke quote lands the stakes without overstating them.
+Then make the scale contrast. OPERA had an international collaboration. We have `testing.B`, a laptop, and background processes.
 
-**If behind schedule:** compress to 2 min by skipping the user perception table and going straight
-from the latency/throughput definitions to the Lütke quote. The table is useful context, not the
-argument.
+### Slides 7-8: plant the contract
 
----
+The three questions are the talk's contract. Pause after each one.
 
-## §02 A Loose Cable — cold open (slides 6–13)
+The local-first rule is the first answer: if the number is unstable on your machine, CI can only automate that instability.
 
-Ninety seconds on OPERA. Resist the physics. The audience does not need the baseline distance or
-the detector mass, and every detail invites a question you do not want in the Q&A.
+## Slides 9-10: personal and Datadog context
 
-Land three beats: a precise instrument, a surprising result, a cable.
+### Slide 9: personal context
 
-The **two-faults** detail is worth keeping — it is the part that maps onto benchmarking. Two
-systematic errors pushing in opposite directions, partially masking each other, is exactly what a
-noisy benchmark environment does.
+Twenty seconds. Do not read the slide. Say:
 
-**Do not say the 73 ns figure came from the OPERA erratum.** It did not. The erratum reports the
-corrected result and contains no fault analysis. If asked: CERN's press release of 22 Feb 2012
-for the cable, Cartlidge in *Science* 335(6072):1027 for the number.
+"I work where Go meets observability and performance: Prometheus, OpenTelemetry compile-time instrumentation, and, previously, Parca's eBPF profiler. I gave the first version of this material at FOSDEM."
 
-Then the pivot — quick and a little flat, no drum roll:
+Do not mention contribution counts.
 
-> "Your benchmark just reported a 12% speedup. Did you ship a faster binary, or did you measure
-> dead-code elimination? The cable isn't loose. The compiler removed the loop."
+### Slide 10: why Datadog cares
 
----
+This is not a generic company slide. Say:
 
-## §03 Before You Optimize (slides 14–17)
+"Datadog SDKs execute inside customer processes. Every allocation and nanosecond we add comes out of someone else's workload budget. That is why continuous benchmarking is product correctness for us."
 
-Most likely to be cut under time pressure — useful but not load-bearing for the argument.
+Use the public PGO result: production CPU dropped by about 3.4%. The later dd-trace-go story shows why benchmark gates still need human scrutiny.
 
-**pprof slide:** resist explaining pprof deeply. One line: "attach it to a running service, find
-the hot path, then write a benchmark for *that* — not for something that looks interesting." The
-eBPF tier (Parca, OTel ebpf-profiler) is for the "what about continuous profiling" question —
-say it once and move on.
+## Slides 11-14: the data-backed reason to benchmark
 
-**SLOs slide:** the key message is "without a target you never finish." Do not over-explain
-Amdahl's Law; the audience knows it.
+### Slides 12-13: latency, throughput, and user cost
 
-**Martí slide:** one sentence. "Daniel Martí's GopherCon 2019 talk covers how to find what to
-optimize; this talk covers how to trust the measurement once you have a target. Both are
-required."
+Move briskly but keep the data. Latency is what one operation costs; throughput is system capacity. An optimization can improve one and damage the other.
 
-**If cutting:** skip this section entirely after §02, go straight to §04. Saves 4 min.
+The Google result is attributed to the search team: adding 500 ms cost about 20% of traffic. Do not attribute it to Marissa Mayer.
 
----
+### Slide 14: performance as a feature
 
-## §04 The Art of Benchmarking (slides 18–20)
+Let the audience read Tobi Lütke's quote. The point is not that speed is the only feature. It establishes that reliable performance measurement affects product quality.
 
-Three slides. Orientation, not content — keep the pace up.
+## Slides 15-18: choose the right target
 
-The micro/macro slide answers "should I benchmark or load test?" Point at the bold risk labels
-("not representative" vs "hard to isolate"). Do not read the bullets.
+### Slide 16: production evidence first
 
-The "when to use which" table: one sentence. "Comparing two implementations? Micro. Validating
-10k RPS? Macro. Regression detection? Both."
+Say: "Use pprof or continuous profiling to find the hot path, and production percentiles to identify the user symptom. Then write a benchmark for that path."
 
-Close with the scope declaration: "For the rest of this talk, we are doing microbenchmarks with
-Go's `testing.B`. Everything I show runs in under 30 seconds on a laptop."
+The OpenTelemetry eBPF Profiler and Parca provide whole-system CPU evidence without changing application source. The slide intentionally keeps in-process and out-of-process options.
 
----
+### Slide 17: define success
 
-## §05 Making the Compiler Honest (slides 21–37)
+Without a target, optimization never ends. Use a concrete SLO, check the error budget, and apply Amdahl's Law before polishing cold code.
 
-### DEMO 1 — `make bench-dce`
+### Slide 18: prior work
 
-```bash
-cd talks/go-benchmarks-lying/demo && make bench-dce
+One sentence: "Daniel Martí's GopherCon 2019 talk explains how to find what to optimize; this talk explains how to trust the measurement once you have a target."
+
+## Slides 19-21: microbenchmarks and macrobenchmarks
+
+Microbenchmarks isolate a mechanism and expose compiler tricks. Macrobenchmarks preserve workload shape but make attribution harder. Regression detection usually needs both.
+
+Scope the rest of the talk: Go's `testing.B` microbenchmarks.
+
+## Slides 22-37: making the compiler honest
+
+### Slides 23-27: dead-code elimination
+
+The compiler is doing its job when it removes unused work. The benchmark author failed to create an observable result.
+
+The captured result on slide 25 is the key evidence:
+
+```text
+DCE       0.2532 ns/op   0 B/op   0 allocs/op
+correct  11.14 ns/op  64 B/op   1 allocs/op
 ```
 
-About 20 seconds at `-count=10`. **The output is already on the slide as a fallback** — if the
-terminal misbehaves, keep talking and point at the slide.
+`make([]byte, 64)` has no path that avoids allocation. Zero allocations means the call disappeared.
 
-The line to land, slowly:
+Land this line slowly: "`ns/op` has a timer floor. `allocs/op` tells us whether the allocation happened."
 
-> "`make([]byte, 64)` is unconditional. There is no path through that function that skips the
-> allocation. And it reports zero allocations per operation."
+The two-variable sink avoids a global write on every iteration. Keep a local result in the loop and publish once after it.
 
-Let it sit. This is the moment the room gets it.
+### Slides 28-30: constant folding and inlining
 
-Then the principle: **ns/op has a floor, allocs/op has no floor.** An empty loop and a genuinely
-fast function both sit near 0.25 ns and look identical. An allocation is discrete — it happened or
-it did not, on any hardware. That is why this is the demo rather than a timing comparison.
+Constant inputs can turn work into a literal load. The assembly slide is captured evidence, not a terminal switch. One side contains `MOVD $3`; the other contains the real count instruction.
 
-### DEMO 2 — `make asm-dce`
+Inlining helps production code and gives DCE more visibility inside a benchmark. A non-constant input and an observable result are both required.
 
-Instant. The slide already has the diff, so the live run is optional. If you are behind schedule,
-**this is the first thing to cut** — the DCE demo makes the same point and constant folding is the
-third example, not the first.
+### Slides 31-34: timer ordering
 
-### The hanging benchmark (slide 21)
+`ResetTimer` clears elapsed time but does not stop the timer. Use it after one-time setup.
 
-Never run this live. Explain why it hangs: the framework accumulates *timed* duration until it
-reaches the target, the timer never runs, duration never accumulates, `b.N` doubles forever.
+For per-iteration setup, stop before fixture creation and restart before the operation under test. The captured output shows the broken benchmark looking 25% faster because it excludes the function it claims to measure.
 
-The aside gets a laugh and costs three seconds: "We tried to demo it. That is how we found out."
+Slide 34 preserves the non-terminating case. Without a matching `StartTimer`, timed duration never accumulates, so the framework keeps increasing `b.N`. The short line is enough: "We tried it. It hung."
 
-### `B.Loop` (slides 22–23)
+### Slides 35-37: `B.Loop`
 
-The table is the payload. Do not read it aloud — point at the two rows that matter (setup
-exclusion, DCE prevention) and let people read the rest.
+Go 1.24's `b.Loop()` excludes setup before the loop, stops timing after the loop, calls the benchmark function once per `-count`, and prevents DCE when the condition appears literally as `b.Loop()`.
 
-Mention the literal-syntax footgun: assigning the method to a variable first defeats the compiler
-transformation. This audience appreciates that kind of detail.
+Do not read the table. Point to setup exclusion and DCE prevention.
 
----
+Close Layer 1 by answering the first question: sink pattern, `-benchmem`, `allocs/op`, and `B.Loop`.
 
-## §06 Statistical interpretation (slides 38–47)
+## Slides 38-45: statistical interpretation
 
-The 43% swing is real captured data from `results/noisy.txt`, two runs of the same binary eight
-apart. If someone asks whether the machine was deliberately loaded — yes, sixteen spinners. Say so.
-It makes the point stronger, not weaker.
+### Slide 39: one point is not a distribution
 
-**`11.32n` is the median.** Not the geometric mean. Benchstat's geomean is a summary row across
-multiple benchmarks. This is genuinely easy to get wrong on stage — a draft of the companion blog
-post got it wrong — so if challenged: the median of those twenty runs is exactly 11.32, the geomean
-is 11.444.
+The 43% swing is captured data from two runs of the same binary on a deliberately loaded machine. Say that if asked; it strengthens the point.
 
-The `~` output deserves a beat. A benchmark reporting no measurable difference **has given you a
-result**. People treat it as a failed run and re-roll. That is the p-hacking slide.
+### Slides 40-42: benchstat and CV
 
-To save time here, drop the effect-size row from the rules-of-thumb table and move on.
+`11.32n` is the median, not the mean. Benchstat's geomean appears only as a summary across benchmarks.
 
----
+A `~` result means no measurable difference. That is a result, not an invitation to rerun until a delta appears.
 
-## §07 Local reproduction (slides 48–57)
+Benchstat compares distributions. It does not tell us whether the machine itself is trustworthy. CV, `sigma / mu`, provides that environmental check.
 
-### DEMO 3 — `make bench-docker`
+### Slides 43-45: discipline before results
 
-**Do not run this live.** Three conditions at `-count=20 -benchtime=1s` plus container startup
-takes several minutes and saturates the machine you are presenting from. The numbers are on the
-slide and committed under `demo/results/`.
+Ten runs are the floor; twenty are better. Fixed-iteration runs can improve per-commit reproducibility. A significant tiny effect and a useful effect are different questions.
 
-If you want something live, run `make cv` — it recomputes the table from committed output in under
-a second and demonstrates the raw files are real.
+Set the run count before looking at the result. Repeating until the desired p-value appears is p-hacking.
 
-### The macOS caveat (slide 38)
+Close Layer 2: enough samples, benchstat, and CV before comparison.
 
-**Do not skip this and do not soften it.** Delivering the good result without the ceiling is the
-exact failure this talk is about. The sequence:
+## Slides 46-53: local reproduction
 
-1. Pinning takes a fully saturated machine from 18.88% CV back to 5.25%. Real and useful.
-2. Bare-metal Linux with SMT off reaches 0.05%. A hundred times tighter.
-3. Docker Desktop on macOS pins vCPUs inside a VM. You cannot disable host SMT or Turbo from there.
+### Slides 47-49: measured isolation
 
-Then the summary: containers on a Mac buy isolation from your other processes. They do not buy
-controlled hardware. Good enough to catch an obvious regression while developing; not good enough
-to publish.
+The Docker results are committed captured output, not a live run:
 
-Expect a question about Colima, OrbStack, or Linux VMs generally. Honest answer: we measured Docker
-Desktop, the VM layer is structural to all of them on macOS, and we have not measured the others.
+| Condition | Mean ns/op | CV |
+| --- | ---: | ---: |
+| Idle host | 11.46 | 4.75% |
+| Host with 16 spinners | 34.97 | 18.88% |
+| Container pinned to vCPU 0 | 16.28 | 5.25% |
 
-### perflock (slide 40)
+The loaded machine was three times slower and four times noisier. Pinning restored the idle noise floor while the host stayed saturated.
 
-The detail worth having: **the README documents none of this.** The findings come from reading
-`internal/cpupower/cpupower.go` and `cmd/perflock/main.go`. On macOS it builds and the lock works;
-frequency pinning does not, because the default `-governor 90` reads Linux sysfs and errors.
+Then state the ceiling: 5.25% is useful isolation, not publication-quality control. Bare-metal Linux with SMT disabled reached about 0.05% in the referenced experiments.
 
-This matters because "just use perflock" is standard Go advice and most of the room is holding a Mac.
+### Slide 50: the macOS boundary
 
----
+Do not soften this. Docker Desktop pins a vCPU inside a Linux VM, not a physical host core. The host can still migrate that vCPU and change frequency. Containers on macOS isolate co-running processes; they do not provide controlled hardware.
 
-## §08 CI escalation (slides 58–63)
+### Slides 51-53: Linux controls and the inner loop
 
-Fast section. The SMT/DFS table is the argument; everything else is scaffolding.
+`taskset`, isolated cores, scheduling priority, and a locked clock attack different noise sources.
 
-The line: **three sysfs writes and a `taskset` buy you two orders of magnitude.** Five seconds in a
-CI step.
+The perflock caveat comes from source inspection. On macOS the mutual-exclusion lock works, but the cpufreq and thermal controls are Linux-only. Do not imply identical control on both platforms.
 
-On the tool table, give the recommendation and move on. A survey that does not end in an answer
-wastes the audience's time.
+End with the local workflow: stable baseline, isolated change, same conditions, repeated samples, benchstat comparison.
 
----
+## Slides 54-58: escalation to CI
 
-## §09 War story (slides 64–67)
+### Slides 55-56: why shared runners fail
 
-Tell it as a detective story, in order. Do not reveal the ending early.
+Shared runners change neighbors, CPU frequency, host model, thermal state, and virtualization overhead between runs.
 
-1. The bot says 6–9% slower.
-2. First instinct is that the restructure hurt the encoding path. Resist it — read the benchmark.
-3. The timed loop is one line: `proto.Size(tracesData)`, on a struct built before `ResetTimer`. It
-   never touches the changed code.
-4. Locally, under 0.1% variance. So the noise is specific to CI.
-5. Same machine, both branches: the PR is *faster*.
-6. The mechanism: code layout shifted function addresses, moving a hot loop relative to cache-line
-   and branch-target boundaries. At ~390 ns per iteration that is several percent, either direction.
-7. Resolution: nothing. No code change. The PR shipped as written.
+Use the AWS m5.metal result to show why hardware control matters:
 
-Then the lesson slide, plainly: not merely imprecise — **directionally wrong**.
+- SMT on with dynamic frequency scaling: 3.74% CV.
+- SMT off with dynamic frequency scaling: 2.09% CV.
+- SMT off with a fixed 2.5 GHz clock: 0.05% CV.
 
-Worth adding if time allows: the same benchmark tripped again eleven days later and was dismissed in
-under a minute, because the false positive had been documented. Documented false positives pay for
-themselves.
+That is roughly a 75-times noise reduction from controlling the machine.
 
----
+### Slides 57-58: two CI patterns and existing tools
 
-## §10 Wire It Up + close (slides 68–72)
+PR-gate CI compares before and after on the same controlled host. Nightly trending detects gradual drift with a rolling baseline. Mature teams often need both.
 
-The three questions are the takeaway. Say them, then stop. Do not summarise the summary.
+Preserve the survey. Bencher, Go Benchmarks, BenchDiff, and Gobenchdata provide useful persistence, visualization, or comparison. The gap addressed by this repository is a small Go-native stack that also records environment metadata and applies a CV gate.
 
-**Q&A seed** — if the room is quiet, answer the question they are thinking:
+## Slides 59-65: the dd-trace-go war story
 
-> "What is the single highest-leverage change for someone starting on Monday?"
-> `-count=10` and `benchstat`. Everything else compounds on top of that.
+### Slides 60-61: apparent regression
 
----
+Set up the surprise: PR #4891 introduced a targeted allocation optimization, but CI reported that `BenchmarkStartSpan/1` was 1.62% slower with p=0.000.
 
-## Contingencies
+Do not dismiss the CI result. Inspect it.
 
-| Problem | Response |
-|---|---|
-| No network | Every demo is local. Nothing needs the network. |
-| Docker not running | `make bench-docker` was never going to be live. Use the slide. |
-| A benchmark hangs | It is the `StopTimer` bug. Ctrl-C, use it as the joke, move on. |
-| Projector mangles the code | Full deck as PDF; demo output is on the slides. |
-| 10 min behind at 0:35 | Cut Layer 3b to the SMT table alone, go straight to the war story. |
-| 5 min short at the end | Take back cut material: constant folding, effect size, the eleven-days-later coda. |
+### Slides 62-63: sign inversion and mechanism
 
-**Cut order if running long** (first to go at the top):
+On the same controlled machine, the branch was 0.38% faster. The signs disagree. A real effect should not reverse merely because the host changed.
 
-1. `make asm-dce` constant-folding demo
-2. Effect size vs significance
-3. Core isolation and process priority detail
-4. The tool comparison table — name the recommendation only
-5. The eleven-days-later coda on the war story
+The changed code was not on that benchmark's path. The plausible mechanism is binary layout: code movement changed instruction-cache or branch-prediction behavior. The measured difference was small, real on a specific binary, and not evidence that the PR slowed its target path.
 
-Never cut: the DCE demo, the CV table, the macOS caveat, the war story, the three questions.
+### Slides 64-65: known phenomenon and lesson
 
----
+Keep the citations short. Causal profiling, Stabilizer, and LLVM's Machine Function Splitter establish that code layout can move benchmark results.
 
-## Facts you might be challenged on
+Then state the lesson separately: `p=0.000` can coexist with a directionally wrong conclusion. Environment matching, path validation, effect size, and stability still matter.
 
-| Claim | Where it comes from |
-|---|---|
-| OPERA ~73 ns connector bias | CERN press release 22 Feb 2012; Cartlidge, *Science* 335(6072):1027. **Not** arXiv:1109.4897. |
-| SMT 23% → 0.05% CV | FOSDEM 2026 experiments, AWS m5.metal |
-| CV 4.75 / 18.88 / 5.25 | Our own run, `demo/results/`, M4 Max, `-count=20` |
-| `allocs/op` 0 vs 1 | `demo/dce_bench_test.go`, reproducible via `make bench-dce` |
-| dd-trace-go figures | PR #4891, merged 2026-06-12; same-machine A/B |
-| perflock macOS behaviour | Source inspection, not the README |
-| `B.Loop` in Go 1.24 | Release notes; proposal #61515 (Austin Clements) |
+## Slides 66-71: captured tools and results
 
-Everything above is a `verified` row in `research/go-benchmarks-lying/claims-ledger.md`.
-If a claim is not in that file, do not make it on stage.
+Do not switch to a terminal. These are captured outputs from tested repository tools.
+
+### Slide 67: the three tools
+
+- `honestbench` statically analyzes benchmark source for discarded results, sink mistakes, timer ordering, and `b.N` loops that can migrate to `B.Loop`.
+- `benchgate` runs benchmarks repeatedly and rejects samples above a configurable CV threshold. It can also hand results to benchstat for baseline comparison.
+- `benchenv` diagnoses noise controls and missing benchmark tools.
+
+The tools are small and composable. They do not claim to replace hosted benchmark services.
+
+### Slide 68: `honestbench`
+
+Read the findings, not the whole output. The analyzer catches a discarded `makeBuffer` result and a `StartTimer` placed after the work under test. It reports 17 findings across 12 benchmark functions without running a benchmark.
+
+### Slide 69: `benchgate`
+
+The same benchmark exceeds the 5% CV threshold in one capture and passes an 8% threshold in another. The point is not that 8% is a good default; it is that the policy is explicit and machine-enforced.
+
+### Slides 70-71: `benchenv`
+
+Slide 70 shows the diagnostic categories and remedies. Slide 71 is the captured output from this laptop.
+
+The four unavailable checks are deliberate. macOS does not expose Linux sysfs controls for SMT, frequency governors, or Turbo Boost. The honest output is `unavailable`, not a fabricated zero or a green check.
+
+The repository also includes agent skills that wrap all three CLIs.
+
+## Slides 72-76: close
+
+### Slide 72: the honest answer
+
+Pause on the punchline. Missing hardware controls are information. They tell us when a laptop result is useful for iteration but not strong enough for a publication-quality claim.
+
+### Slide 73: minimum discipline
+
+This is the short workflow the audience can apply today: add a sink, run enough samples, compare with benchstat, and inspect the environment with benchenv.
+
+### Slide 74: return to the three questions
+
+Make the structure explicit:
+
+1. Compiler honesty: sink patterns, `-benchmem`, and `B.Loop`.
+2. Sample stability: repeated runs, benchstat, and CV.
+3. Effect versus noise: read the interval and control the environment.
+
+### Slides 75-76: CTA and final questions
+
+Point at the QR on the CTA. Name what is there: the deck, captured experiments, three CLIs, and the benchmark skills. Mention the prior FOSDEM recording for anyone who wants the earlier version.
+
+End with: "Trust your numbers only after the compiler, the sample, and the machine have each earned that trust."
+
+Stop. Leave the final questions slide up.
+
+## Delivery constraints
+
+- No live or recorded demos. Every output shown is captured from the repository.
+- If a command result is challenged, identify its committed result file and explain the environment; do not improvise a rerun on stage.
+- Do not treat Docker Desktop on macOS as hardware isolation.
+- Do not claim statistical significance proves practical importance.
+- Do not imply that existing CI tools are defective; explain the specific environment and gating gap addressed here.
+
+## Public references for questions
+
+| Claim | Public reference |
+| --- | --- |
+| OPERA connector fault | <https://home.cern/news/press-release/cern/opera-experiment-reports-anomaly-flight-time-neutrinos-cern-gran-sasso> |
+| Google 500 ms result | <https://glinden.blogspot.com/2006/11/marissa-mayer-at-web-20.html> |
+| Daniel Martí's talk | <https://www.youtube.com/watch?v=BF3qhVmXflw> |
+| Go benchmark implementation | <https://github.com/golang/go/blob/go1.26.1/src/testing/benchmark.go> |
+| Go `B.Loop` behavior | <https://pkg.go.dev/testing#B.Loop> |
+| Benchstat | <https://pkg.go.dev/golang.org/x/perf/cmd/benchstat> |
+| Causal profiling | <https://arxiv.org/abs/1608.03676> |
+| Stabilizer | <https://people.cs.umass.edu/~emery/pubs/stabilizer-asplos13.pdf> |
+| LLVM Machine Function Splitter | <https://llvm.org/docs/MachineFunctionSplitter.html> |
+| Datadog PGO result | <https://www.datadoghq.com/blog/datadog-pgo-go/> |
+| Prior FOSDEM version | <https://youtu.be/8211fNI_nc4> |
