@@ -32,6 +32,9 @@ go.work.sum
 # .idea/
 # .vscode/
 
+# Static Analyzer temp files
+.ruff_cache
+
 # Per-talk living plans/trackers (gitignored — local only)
 plans/
 
