@@ -15,7 +15,7 @@ Posts live at `content/posts/<slug>.md`, flat files, `draft: true` until schedul
 | 2 | `go-benchmarks-lying-statistics` | `02-statistics.md` | benchstat output + CV from `demo/cv.awk` | draft |
 | 3 | `go-benchmarks-lying-local-reproduction` | `03-local-reproduction.md` | CV 4.75 / 18.88 / 5.25 from `demo/results/` | draft |
 | 4 | `go-benchmarks-lying-ci` | `04-ci-continuous.md`, `05-existing-tools.md` | FOSDEM SMT/DFS tables | draft |
-| 5 | `go-benchmarks-lying-three-questions` | `06-narrative.md`, `07-war-stories.md`, `tools/` | dd-trace-go war story; the three CLIs | draft |
+| 5 | `go-benchmarks-lying-three-questions` | `06-narrative.md`, `07-war-stories.md`, `github.com/kakkoyun/benchlab` | dd-trace-go war story; the three CLIs | draft |
 
 ## Cadence
 

@@ -80,10 +80,7 @@ Preserve useful existing facts, outputs, references, and cautionary examples. Th
 
 ## Audience resources
 
-- Repository: <https://github.com/kakkoyun/gopherconuk-26>
-- `tools/cli/honestbench`
-- `tools/cli/benchgate`
-- `tools/cli/benchenv`
-- `tools/skills/honest-benchmark`
-- `tools/skills/benchstat-gate`
-- `tools/skills/diagnose-noisy-bench`
+- Talk repository: <https://github.com/kakkoyun/gopherconuk-26>
+- Benchmark tools and skills: <https://github.com/kakkoyun/benchlab>
+- Binaries: `go install github.com/kakkoyun/benchlab/cmd/...@latest`
+- Agent Skills: `npx skills add kakkoyun/benchlab --all`

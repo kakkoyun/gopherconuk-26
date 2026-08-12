@@ -1078,7 +1078,12 @@ benchgate   -pkg=./... -count=10 -cv-threshold=5    # CV gate
 benchenv                                             # env diagnosis
 ```
 
-Stdlib-only Go modules, also wrapped as Claude Code skills.
+Ships from [github.com/kakkoyun/benchlab](https://github.com/kakkoyun/benchlab)
+
+```bash
+go install github.com/kakkoyun/benchlab/cmd/...@latest
+npx skills add kakkoyun/benchlab --all
+```
 
 ---
 
@@ -1213,12 +1218,14 @@ Under an hour. The benchmarks you write after today will tell the truth.
 
 ### Benchmarks you can audit
 
-[github.com/kakkoyun/gopherconuk-26](https://github.com/kakkoyun/gopherconuk-26)
+[github.com/kakkoyun/benchlab](https://github.com/kakkoyun/benchlab)
 
 - `honestbench`: static benchmark checks
 - `benchgate`: coefficient-of-variation gate
 - `benchenv`: environment diagnosis
-- Captured benchmark outputs and both decks
+- Agent Skills for all three commands
+
+[Talk repo, decks, and captured results](https://github.com/kakkoyun/gopherconuk-26)
 
 [Earlier FOSDEM version](https://youtu.be/8211fNI_nc4)
 
@@ -1227,7 +1234,7 @@ Under an hour. The benchmarks you write after today will tell the truth.
 
 ![w:250](../../assets/gopherconuk-26-repo-qr.png)
 
-**Scan for the repository**
+**Scan for the talk repo**
 
 </div>
 </div>

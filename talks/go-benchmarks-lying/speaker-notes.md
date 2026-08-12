@@ -233,7 +233,7 @@ Then state the lesson separately: `p=0.000` can coexist with a directionally wro
 
 ## Slides 66-71: captured tools and results
 
-Do not switch to a terminal. These are captured outputs from tested repository tools.
+Do not switch to a terminal. These are captured outputs from the tested benchlab tools.
 
 ### Slide 67: the three tools
 
@@ -241,7 +241,7 @@ Do not switch to a terminal. These are captured outputs from tested repository t
 - `benchgate` runs benchmarks repeatedly and rejects samples above a configurable CV threshold. It can also hand results to benchstat for baseline comparison.
 - `benchenv` diagnoses noise controls and missing benchmark tools.
 
-The tools are small and composable. They do not claim to replace hosted benchmark services.
+The tools are small and composable. They ship from `github.com/kakkoyun/benchlab`, so the audience can install all three commands with one `go install` or add the skills with `npx skills`. They do not claim to replace hosted benchmark services.
 
 ### Slide 68: `honestbench`
 
@@ -257,7 +257,7 @@ Slide 70 shows the diagnostic categories and remedies. Slide 71 is the captured 
 
 The four unavailable checks are deliberate. macOS does not expose Linux sysfs controls for SMT, frequency governors, or Turbo Boost. The honest output is `unavailable`, not a fabricated zero or a green check.
 
-The repository also includes agent skills that wrap all three CLIs.
+The benchlab repository also includes agent skills that wrap all three CLIs.
 
 ## Slides 72-76: close
 
@@ -279,7 +279,7 @@ Make the structure explicit:
 
 ### Slides 75-76: CTA and final questions
 
-Point at the QR on the CTA. Name what is there: the deck, captured experiments, three CLIs, and the benchmark skills. Mention the prior FOSDEM recording for anyone who wants the earlier version.
+Point at the QR on the CTA. The QR opens the talk repository with the deck and captured experiments. The benchlab link beside it contains the three CLIs and benchmark skills. Tell the audience they can install the binaries with `go install github.com/kakkoyun/benchlab/cmd/...@latest` or the skills with `npx skills add kakkoyun/benchlab --all`. Mention the prior FOSDEM recording for anyone who wants the earlier version.
 
 End with: "Trust your numbers only after the compiler, the sample, and the machine have each earned that trust."
 

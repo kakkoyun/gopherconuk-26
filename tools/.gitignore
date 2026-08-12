@@ -1,4 +1,0 @@
-# Built CLI binaries (produced by `go build -o <name> .`)
-/cli/honestbench/honestbench
-/cli/benchgate/benchgate
-/cli/benchenv/benchenv
