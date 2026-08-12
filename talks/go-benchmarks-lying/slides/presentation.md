@@ -23,6 +23,7 @@ style: |
   .hl-orange { color: #E8833A; font-weight: 700; }
   .centered-table table { margin-left: auto; margin-right: auto; }
   .comment { display: block; opacity: 0.45; font-size: 0.75em; line-height: 1.5; }
+  .checklist { display: grid; grid-template-columns: auto 1fr; gap: 0.6rem 0.5rem; align-items: baseline; font-size: 30px; }
 ---
 
 <!-- _class: title gopher-sage -->
@@ -1033,7 +1034,7 @@ benchstat old.txt new.txt
 
 ## What `benchstat` won't tell you
 
-<div class="columns" style="grid-template-columns: auto 1fr; gap: 0.8rem 1rem; align-items: baseline; font-size: 30px;">
+<div class="checklist">
 <div>✅</div><div>Is A different from B?</div>
 <div>❌</div><div>Is this machine trustworthy?</div>
 </div>
