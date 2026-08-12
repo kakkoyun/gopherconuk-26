@@ -3,7 +3,9 @@ SHELL := /bin/bash
 
 TALKS := go-benchmarks-lying without-a-single-line
 THEME_DIR := themes/gophercon-datadog
+THEME_SET := $(THEME_DIR)
 THEME_CSS := $(THEME_DIR)/gophercon-datadog.css
+THEME_MINIMAL_CSS := $(THEME_DIR)/gophercon-datadog-minimal.css
 SLIDE_MARKDOWN := $(foreach talk,$(TALKS),talks/$(talk)/slides/presentation.md)
 THEME_MARKDOWN := $(THEME_DIR)/README.md $(THEME_DIR)/deck.md
 SLIDE_PDFS := talks/go-benchmarks-lying/slides/presentation.pdf talks/without-a-single-line/slides/presentation.pdf
@@ -22,15 +24,15 @@ all: check
 build/html: build/html/go-benchmarks-lying build/html/without-a-single-line
 
 build/html/%: sync/theme
-	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_CSS)" -o talks/$*/slides/presentation.html
+	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_SET)" -o talks/$*/slides/presentation.html
 
 build/pdf: build/pdf/go-benchmarks-lying build/pdf/without-a-single-line
 
 build/pdf/%: sync/theme
-	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_CSS)" --pdf -o talks/$*/slides/presentation.pdf
+	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_SET)" --pdf -o talks/$*/slides/presentation.pdf
 
 watch/%: sync/theme
-	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_CSS)" --watch --preview
+	$(MARP) --config talks/$*/slides/marp/marp.config.js talks/$*/slides/presentation.md --allow-local-files --theme-set "$(THEME_SET)" --watch --preview
 
 serve/%: build/html/%
 	python3 -m http.server --directory talks/$*/slides 8000
@@ -55,7 +57,9 @@ check/theme:
 	@set -o errexit -o nounset -o pipefail; \
 	output="$(THEME_DIR)/.theme-check.pdf"; \
 	trap 'rm -f "$$output"' EXIT; \
-	$(MARP) "$(THEME_DIR)/deck.md" --allow-local-files --theme-set "$(THEME_CSS)" --pdf -o "$$output"; \
+	$(MARP) "$(THEME_DIR)/deck.md" --allow-local-files --theme-set "$(THEME_SET)" --pdf -o "$$output"; \
+	test -s "$$output"; \
+	$(MARP) "$(THEME_DIR)/deck.md" --allow-local-files --theme-set "$(THEME_SET)" --theme gophercon-datadog-minimal --pdf -o "$$output"; \
 	test -s "$$output"
 
 check/go:

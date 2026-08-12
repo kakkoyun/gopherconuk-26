@@ -3,12 +3,13 @@
 A Marp theme for GopherCon UK talks, with a quiet Datadog signature.
 
 ```
-gophercon-datadog.css     the theme
-deck.md                   sample deck exercising every layout
-preview.html              all slide types rendered, open it in a browser
-fonts/                    Space Grotesk + JetBrains Mono, self-hosted (247 KB)
-assets/gophers/           six CC0 gophers
-assets/placeholder-*.png  stand-ins for your meme and your QR code
+gophercon-datadog.css          the full theme
+gophercon-datadog-minimal.css  variant that hides the running title and Datadog mark
+deck.md                        sample deck exercising every layout
+preview.html                   all slide types rendered, open it in a browser
+fonts/                         Space Grotesk + JetBrains Mono, self-hosted (247 KB)
+assets/gophers/                six CC0 gophers
+assets/placeholder-*.png       stand-ins for your meme and your QR code
 ```
 
 ## Use it
@@ -16,14 +17,19 @@ assets/placeholder-*.png  stand-ins for your meme and your QR code
 VS Code — add to `.vscode/settings.json`:
 
 ```json
-{ "markdown.marp.themes": ["./gophercon-datadog.css"] }
+{
+  "markdown.marp.themes": [
+    "./gophercon-datadog.css",
+    "./gophercon-datadog-minimal.css"
+  ]
+}
 ```
 
 CLI:
 
 ```sh
-marp --theme ./gophercon-datadog.css --html deck.md -o deck.html
-marp --theme ./gophercon-datadog.css --html --pdf deck.md -o deck.pdf
+marp --theme-set . --theme gophercon-datadog --html deck.md -o deck.html
+marp --theme-set . --theme gophercon-datadog-minimal --html --pdf deck.md -o deck.pdf
 ```
 
 `--html` is only needed for the three layouts that use a `<div>` (chart, columns, QR).
@@ -40,6 +46,25 @@ footer: '@handle · #gopherconuk'
 html: true
 ---
 ```
+
+## Minimal mode
+
+Use `theme: gophercon-datadog-minimal` when you want less persistent chrome. It
+inherits the full theme, then hides only two elements:
+
+- the top-left running title from the Marp `header:` directive
+- the bottom-left Datadog mark from the footer
+
+The GopherCon UK logo, pagination, top tick strip, and progress bar stay visible.
+Slide padding is unchanged, so content and footer-zone checks do not reflow.
+
+Switch back by changing the same line to `theme: gophercon-datadog`. Keep the
+`header:` front matter and any per-slide `_header: ""` directives in place; leave
+them in source so the full theme can use them again.
+
+`preview.html` remains the reference render of the full theme. To preview minimal
+mode, export with `--theme-set . --theme gophercon-datadog-minimal` or switch a
+deck's `theme:` line.
 
 Marp puts theme CSS into exported HTML but retains these relative URLs. If you
 write HTML outside this directory, put `fonts/` and `assets/` beside it. This

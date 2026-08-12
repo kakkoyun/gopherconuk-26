@@ -1,0 +1,13 @@
+/* @theme gophercon-datadog-minimal */
+
+@import 'gophercon-datadog';
+
+/* Minimal mode keeps layout, pagination, and the GopherCon UK logo, but removes
+   the running title and the bottom-left Datadog mark. */
+header {
+	display: none;
+}
+
+footer::before {
+	content: none;
+}
