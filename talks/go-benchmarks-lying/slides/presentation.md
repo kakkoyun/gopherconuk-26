@@ -59,8 +59,8 @@ And How to Stop Them
 
 ## Is it actually slow?
 
-<div class="columns">
-<div>
+<div class="cols">
+<div class="card">
 
 ### In-process
 
@@ -69,7 +69,7 @@ And How to Stop Them
 Datadog Continuous Profiler
 
 </div>
-<div>
+<div class="card measure">
 
 ### Whole-system
 
@@ -107,8 +107,8 @@ p50 / p95 / **p99**
 
 ## Latency and throughput
 
-<div class="columns">
-<div>
+<div class="cols">
+<div class="card">
 
 ### Latency
 
@@ -117,7 +117,7 @@ One operation.
 *Users feel this.*
 
 </div>
-<div class="hidden">
+<div class="card measure hidden">
 
 ### Throughput
 
@@ -132,8 +132,8 @@ Operations per second.
 
 ## Latency and throughput
 
-<div class="columns">
-<div>
+<div class="cols">
+<div class="card">
 
 ### Latency
 
@@ -142,7 +142,7 @@ One operation.
 *Users feel this.*
 
 </div>
-<div>
+<div class="card measure">
 
 ### Throughput
 
@@ -204,7 +204,7 @@ This talk covers *whether you can trust the number*.
 </div>
 <div class="center">
 
-![width:360](../assets/gcuk19_daniel_marti_optimizing_go_code_without_blindfold.png)
+![width:480](../assets/gcuk19_daniel_marti_optimizing_go_code_without_blindfold.png)
 
 </div>
 </div>
@@ -226,7 +226,7 @@ holding wall time.
 </div>
 <div class="center">
 
-![width:360](../assets/strangeloop19_emery_berger_performance_matters.png)
+![width:480](../assets/strangeloop19_emery_berger_performance_matters.png)
 
 </div>
 </div>
@@ -276,7 +276,7 @@ from PGO alone.
 
 <div class="center">
 
-![width:110](../assets/dd_speedlab_logo.png)
+![width:200](../assets/dd_speedlab_logo.png)
 
 <span class="small">Datadog invests in performance testing internally. This talk is the spillover.</span>
 
@@ -301,7 +301,7 @@ comes from this earlier version.
 </div>
 <div class="center">
 
-![width:360](../assets/fosdem26_ka_how_to_reliabliy_measure_performance.png)
+![width:480](../assets/fosdem26_ka_how_to_reliabliy_measure_performance.png)
 
 </div>
 </div>
@@ -419,11 +419,9 @@ compiler · scheduler · statistics
 
 ## Every benchmark needs
 
-<div class="big center">
+## <span class="hl-blue">representative</span>
 
-**representative** · **repeatable**
-
-</div>
+## <span class="hl-orange">repeatable</span>
 
 ---
 
@@ -1090,14 +1088,25 @@ At ~390 ns/iteration, alignment is worth several percent, **either direction**.
 
 ## A known phenomenon
 
-[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A) · Emery Berger · Strange Loop 2019
+<div class="cols">
+<div>
 
-<br>
+[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A)
+Emery Berger · Strange Loop 2019
 
-<div class="big center">
+<div class="big">
 
-Code layout alone swings performance **±10%**.
+Code layout alone swings
+performance **±10%**.
 
+</div>
+
+</div>
+<div class="center">
+
+![width:420](../assets/strangeloop19_emery_berger_performance_matters.png)
+
+</div>
 </div>
 
 ---
