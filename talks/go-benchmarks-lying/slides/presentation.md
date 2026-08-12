@@ -25,9 +25,6 @@ style: |
   .hl-orange { color: #E8833A; font-weight: 700; }
   .centered-table table { margin-left: auto; margin-right: auto; }
   .comment { display: block; opacity: 0.45; font-size: 0.75em; line-height: 1.5; }
-  .badge { display: inline-block; padding: 0.1em 0.6em; border-radius: 4px;
-           background: rgba(232,131,58,0.16); color: #B4561A; font-size: 0.7em;
-           font-weight: 700; letter-spacing: 0.04em; }
 ---
 
 <!-- _class: title gopher-sage -->
@@ -523,7 +520,7 @@ Question 1: real work?
 
 <br>
 
-<span class="badge">TEST-ONLY SCAFFOLDING</span>
+<span class="chip caution">TEST-ONLY SCAFFOLDING</span>
 
 ---
 
@@ -547,6 +544,8 @@ It just runs empty.
 
 ## Dead-code elimination
 
+###### dce_bench_test.go
+
 ```go
 func makeBuffer(n int) []byte {
     return make([]byte, n) // heap-escaping allocation
@@ -562,6 +561,8 @@ func BenchmarkMakeBuffer_DCE(b *testing.B) {
 ---
 
 ## `make bench-dce`
+
+###### dce_bench_test.go
 
 ```text
 DCE       0.2532 ns/op   0 B/op   0 allocs/op
@@ -596,6 +597,8 @@ Always `-benchmem`.
 
 ## The two-variable sink
 
+###### dce_bench_test.go
+
 ```go
 var sink []byte // package-level: can't be proven unread
 
@@ -608,11 +611,13 @@ func BenchmarkMakeBuffer_Correct(b *testing.B) {
 }
 ```
 
-<span class="badge">TEST-ONLY</span> Never ship a sink to production.
+<span class="chip caution">TEST-ONLY</span> Never ship a sink to production.
 
 ---
 
 ## Constant folding
+
+###### dce_bench_test.go
 
 ```go
 s = bits.OnesCount(0b10110)   // every input is constant
@@ -658,7 +663,7 @@ ARM64 popcount.
 <div class="columns">
 <div>
 
-**Constant-folded**
+###### dce_bench_test.go
 
 ```asm
 MOVD  $3, R2
@@ -667,7 +672,7 @@ MOVD  $3, R2
 </div>
 <div>
 
-**Correct**
+###### dce_bench_test.go
 
 ```asm
 MOVD    onesInput(SB), R3
@@ -700,11 +705,13 @@ Either alone is not enough.
 
 </div>
 
-<span class="badge">TEST-ONLY</span> `//go:noinline` is a diagnostic.
+<span class="chip caution">TEST-ONLY</span> `//go:noinline` is a diagnostic.
 
 ---
 
 ## Timer: one-time setup
+
+###### bloop_bench_test.go
 
 ```go
 data := make([]byte, 1024)
@@ -726,6 +733,8 @@ for range b.N {
 
 ## Timer: per-iteration setup
 
+###### timer_bench_test.go
+
 ```go
 for range b.N {
     b.StopTimer()
@@ -738,6 +747,8 @@ for range b.N {
 ---
 
 ## `make bench-timer`
+
+###### timer_bench_test.go
 
 ```text
 buggy    415.8 ns/op  128 B/op  1 allocs/op
@@ -773,6 +784,8 @@ Duration never accumulates.
 ---
 
 ## `b.Loop()` — Go 1.24
+
+###### bloop_bench_test.go
 
 ```go
 func BenchmarkHash_BLoop(b *testing.B) {
@@ -825,6 +838,8 @@ Must be written literally as `b.Loop()`.
 ---
 
 ## Read the benchmark first
+
+###### dd-trace-go
 
 ```go
 // The entire timed loop:
@@ -974,6 +989,8 @@ Question 2: stable sample?
 ---
 
 ## One number is a point sample
+
+###### noisy.txt
 
 ```text
 BenchmarkMakeBuffer_Correct-16    41877204    39.39 ns/op
@@ -1863,6 +1880,8 @@ npx skills add kakkoyun/benchlab --all                    # agent skills
 
 ## `honestbench`
 
+###### benchlab
+
 ```text
 dce_bench_test.go:46:3: high: discarded-result:
     call to makeBuffer() result is discarded;
@@ -1884,6 +1903,8 @@ AST analysis. **Nothing has to run.**
 
 ## `benchgate`
 
+###### benchlab
+
 ```text
 # threshold 5%   → FAIL
 BenchmarkMakeBuffer_Correct  mean=11.8 ns/op  cv=5.2%  ✗
@@ -1901,6 +1922,8 @@ Catches a noisy machine **before** the number reaches a PR comment.
 ---
 
 ## `benchenv`
+
+###### benchlab
 
 ```text
 benchenv: environment diagnosis (darwin/arm64, 16 CPUs)
