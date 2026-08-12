@@ -9,7 +9,7 @@ THEME_MINIMAL_CSS := $(THEME_DIR)/gophercon-datadog-minimal.css
 SLIDE_MARKDOWN := $(foreach talk,$(TALKS),talks/$(talk)/slides/presentation.md)
 THEME_MARKDOWN := $(THEME_DIR)/README.md $(THEME_DIR)/deck.md
 SLIDE_PDFS := talks/go-benchmarks-lying/slides/presentation.pdf talks/without-a-single-line/slides/presentation.pdf
-GO_FILES := $(shell find talks tools -name '*.go' -type f -print | sort)
+GO_FILES := $(shell find talks/go-benchmarks-lying/demo -name '*.go' -type f -print | sort)
 MARP := npx marp
 
 .DEFAULT_GOAL := help
@@ -90,8 +90,6 @@ check/go:
 	fi
 	printf '%s\n' '==> talks/go-benchmarks-lying/demo'
 	cd talks/go-benchmarks-lying/demo && go vet ./... && go test -race -count=1 ./...
-	printf '%s\n' '==> tools/cli/kubectl-obi'
-	cd tools/cli/kubectl-obi && go vet ./... && go test -race -count=1 ./...
 
 lint/md:
 	$(MARP) --version >/dev/null

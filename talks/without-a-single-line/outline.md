@@ -4,7 +4,7 @@
 > **Deck:** `slides/presentation.md` (52 slides)
 > **Current state:** additive review version; pruning follows Kemal's deck review and rehearsal
 > **Scripted estimate:** 30:30
-> **Demonstrations:** none; attendees get repository tools and skills instead
+> **Demonstrations:** none; attendees get release-pinned zeroins commands and an Agent Skill instead
 
 ## Thesis
 
@@ -23,7 +23,7 @@ The approaches complement one another. Build-time instrumentation can publish re
 | Story and reason to care | 2-5 | 2:15 | Ask who instruments by hand, pose the zero-touch alternative, show how coverage decays, and establish why Go is different. |
 | Personal and Datadog context | 6-7 | 1:15 | Establish relevant Go/observability experience, then explain why Datadog works across build-time, startup, and kernel instrumentation. |
 | Why Go resists instrumentation | 8-13 | 4:00 | Native code, static linking, movable goroutine stacks, `go:linkname`, and the limited runtime-injection surface. Introduce the lifecycle map. |
-| OBI | 14-24 | 6:30 | Explain deployment, signal coverage, the 13 documented Go baselines, platform and privilege constraints, and honest uprobe costs. Replace the demo with repository tooling. |
+| OBI | 14-24 | 6:30 | Explain deployment, signal coverage, the 13 documented Go baselines, platform and privilege constraints, and honest uprobe costs. Replace the demo with zeroins catalog tooling. |
 | otelc and Orchestrion | 25-35 | 6:45 | Explain the three-organization convergence, `-toolexec`, production adoption, portability, signal depth, GLS, variable-linkname fragility, and build-path limits. |
 | Profiles and request correlation | 36-43 | 4:45 | Establish profiles as the fourth signal, preserve the `.gopclntab` proof, then connect OTEP 4947's Go pprof-label path to compile-time instrumentation. |
 | Decision framework | 44-46 | 2:00 | Choose by constraints, then show a practical combined deployment. |
@@ -78,12 +78,14 @@ Return to the lifecycle map. Start with the constraint the audience cannot chang
 - OTEP 4947 proposes a Go-specific pprof-label path. Present it as proposed work, not a shipped guarantee.
 - The OpenTelemetry host injector does not inject Go. The OpenTelemetry Operator has a separate feature-gated Go eBPF sidecar.
 - Do not imply that Kemal contributes to OBI. His eBPF experience comes from Parca and parca-agent.
+- The zeroins catalog commands are offline and read-only. Its Kubernetes wrappers are experimental and require explicit telemetry endpoints plus confirmation of context, namespace, transport, and privilege impact.
 - Do not discuss an Orchestrion sunset.
 - Keep the 20% adoption statement within its approved wording. Do not add a denominator or the "mostly new users" interpretation.
 
 ## Public audience resources
 
 - Talk repository: <https://github.com/kakkoyun/gopherconuk-26>
+- zeroins toolkit: <https://github.com/kakkoyun/zeroins>
 - Prior FOSDEM version: <https://youtu.be/0TvrSebuDPk>
 - OBI documentation: <https://opentelemetry.io/docs/zero-code/obi/>
 - Go compile-time instrumentation: <https://opentelemetry.io/docs/zero-code/go/compile-time/>

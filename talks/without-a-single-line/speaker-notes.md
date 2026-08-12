@@ -146,9 +146,16 @@ Compatibility cost: uprobes target compiled locations and inferred layouts. Go 1
 
 ### Slide 24: no demo
 
-Say: "I am not going to bet the keynote on conference Wi-Fi or a cluster context. The repository has a skill that chooses the path from your constraints and scripts that pull only the integration row you need."
+Say: "I am not going to bet the keynote on conference Wi-Fi or a cluster context. zeroins has a release-pinned offline catalog and a skill that chooses the path from your constraints."
 
-The `kubectl-obi` code in the repository is a prototype, not the CTA. Point to `collect-go-telemetry` and the support-matrix puller.
+The exact commands on screen are:
+
+```bash
+go run github.com/kakkoyun/zeroins/cmd/obi-integration@latest net/http
+npx skills add kakkoyun/zeroins --all
+```
+
+`kubectl-obi` and `kubectl-profiler` are experimental privileged wrappers, not production installers. Before an agent runs `attach` or `detach`, it must confirm the Kubernetes context, namespace, telemetry endpoint, transport, and privilege impact. Both wrappers require an explicit destination.
 
 ## Slides 25-35: otelc and Orchestrion
 
@@ -205,7 +212,14 @@ This is the compile-time caveat. Build ownership replaces root access as the har
 
 ### Slide 35: attendee path
 
-No live build. Show the two commands and move on.
+No live build. Show the lookup and build commands, then move on. The catalog command can also be installed with the other three zeroins commands:
+
+```bash
+go install github.com/kakkoyun/zeroins/cmd/...@latest
+otelc-aspect net/http
+```
+
+The direct `go run github.com/kakkoyun/zeroins/cmd/otelc-aspect@latest net/http` form on the slide avoids making installation a prerequisite.
 
 Optional speaker-only detail about Orchestrion v2:
 
@@ -272,7 +286,21 @@ Do not read the columns. Land the result: Go now has credible zero-code paths at
 
 ### Slides 51-52: CTA and questions
 
-Point at the QR and name what is there: both decks, focused scripts, and the `collect-go-telemetry` skill. Mention the earlier FOSDEM recording for anyone who wants the previous version.
+Point at the QR and say that it still opens the talk repository: both decks, research, and the earlier FOSDEM recording. Do not imply that the QR opens zeroins.
+
+Then point beside it to <https://github.com/kakkoyun/zeroins>. Name the four commands: `obi-integration`, `otelc-aspect`, `kubectl-obi`, and `kubectl-profiler`. The full install command is:
+
+```bash
+go install github.com/kakkoyun/zeroins/cmd/...@latest
+```
+
+The `collect-go-telemetry` Agent Skill installs with:
+
+```bash
+npx skills add kakkoyun/zeroins --all
+```
+
+Remind the room that catalog lookups are offline and read-only, while the Kubernetes wrappers are experimental, privileged, and require explicit telemetry endpoints. Mention the earlier FOSDEM recording for anyone who wants the previous version.
 
 End with: "Pick the constraint you cannot change. Then choose the layer that can still reach your service."
 
@@ -282,6 +310,7 @@ Stop. Let the questions slide stay up.
 
 | Claim | Public reference |
 | --- | --- |
+| zeroins toolkit and Agent Skill | <https://github.com/kakkoyun/zeroins> |
 | OBI requirements and signals | <https://opentelemetry.io/docs/zero-code/obi/> |
 | OBI capability ladder | <https://opentelemetry.io/docs/zero-code/obi/security/> |
 | OBI trace-log correlation | <https://opentelemetry.io/docs/zero-code/obi/trace-log-correlation/> |

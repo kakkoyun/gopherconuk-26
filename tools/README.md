@@ -1,29 +1,39 @@
 # Tools
 
-## Benchmark tools
+The tooling built for these talks now lives in its own MIT-licensed
+repositories.
 
-The benchmark commands and their Agent Skills now live in [`github.com/kakkoyun/benchlab`](https://github.com/kakkoyun/benchlab).
+## Benchmark toolkit
+
+[`github.com/kakkoyun/benchlab`](https://github.com/kakkoyun/benchlab) provides
+`honestbench`, `benchgate`, `benchenv`, and three benchmark Agent Skills.
 
 ```bash
-# Install honestbench, benchgate, and benchenv
 go install github.com/kakkoyun/benchlab/cmd/...@latest
-
-# Install all three skills for supported coding agents
 npx skills add kakkoyun/benchlab --all
 ```
 
-## Observability tools
+## Zero-touch observability toolkit
 
-The remaining tools support the *How to Instrument Go Without Changing a Single Line of Code* talk.
+[`github.com/kakkoyun/zeroins`](https://github.com/kakkoyun/zeroins) provides
+`obi-integration`, `otelc-aspect`, `kubectl-obi`, `kubectl-profiler`, and the
+`collect-go-telemetry` Agent Skill.
 
-| Path | Purpose |
-|---|---|
-| `cli/kubectl-obi/` | Kubernetes helper for deploying and inspecting OpenTelemetry eBPF Instrumentation (OBI) |
-| `cli/kubectl-profiler/` | Kubernetes helper for profiler workflows |
-| `cli/go-instr-pull/obi-integration.sh` | Queries OBI integration support for a Go package |
-| `cli/go-instr-pull/otelc-aspect.sh` | Queries `otelc` aspect support for a Go package |
-| `skills/collect-go-telemetry/SKILL.md` | Agent workflow for choosing and applying Go telemetry backends |
+```bash
+go install github.com/kakkoyun/zeroins/cmd/...@latest
+npx skills add kakkoyun/zeroins --all
+```
 
-## Repo checks
+The Kubernetes commands are experimental privileged wrappers. They require an
+explicit telemetry endpoint and confirmation of the target context, namespace,
+transport, and privilege impact before use.
 
-`check_slide_footer.py` verifies both generated PDFs during `make check`.
+## Repository checks
+
+The slide-specific checks remain here:
+
+- `check_slide_footer.py` catches content that overlaps the footer band.
+- `check_code_headers.py` verifies source labels on code panels.
+- `check_slide_fragments.py` protects progressive-reveal markers.
+
+`make check` runs them against both decks.

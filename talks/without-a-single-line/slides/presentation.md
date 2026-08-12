@@ -451,16 +451,16 @@ Go runtime and library layout changes can invalidate offsets. Go 1.26 required a
 # Inspect support before attaching
 
 ```bash
-# Pull only the support-matrix row you need.
-./tools/cli/go-instr-pull/obi-integration.sh net/http
+# Offline OBI v0.10.0 support catalog.
+go run github.com/kakkoyun/zeroins/cmd/obi-integration@latest net/http
 
-# Or let the skill choose the path from your constraints.
-tools/skills/collect-go-telemetry/SKILL.md
+# Install the decision workflow for your coding agent.
+npx skills add kakkoyun/zeroins --all
 ```
 
 <br>
 
-These are in the talk repository. No conference Wi-Fi demo required.
+`kubectl-obi` is experimental and requires an explicit OTLP endpoint.
 
 ---
 
@@ -647,7 +647,8 @@ No root access and no kernel version gate, but the binary must be rebuilt.
 # Try the build path yourself
 
 ```bash
-./tools/cli/go-instr-pull/otelc-aspect.sh net/http
+# Offline otelc v1.0.1 integration catalog.
+go run github.com/kakkoyun/zeroins/cmd/otelc-aspect@latest net/http
 
 otelc go build -o ./myapp ./...
 OTEL_SERVICE_NAME=my-service ./myapp
@@ -655,7 +656,7 @@ OTEL_SERVICE_NAME=my-service ./myapp
 
 <br>
 
-The repository includes the routing skill and focused documentation pullers.
+Catalog lookup is read-only. Build instrumentation still changes the binary.
 
 ---
 
@@ -903,23 +904,25 @@ Request correlation
 <div class="columns">
 <div>
 
-### Slides, examples, skills, tools
+### Talk material
 
 [github.com/kakkoyun/gopherconuk-26](https://github.com/kakkoyun/gopherconuk-26)
 
-- `collect-go-telemetry`
-- OBI support-matrix puller
-- otelc integration puller
-- Both GopherCon UK decks
+Both decks · research · [earlier FOSDEM version](https://youtu.be/0TvrSebuDPk)
 
-[Earlier FOSDEM version](https://youtu.be/0TvrSebuDPk)
+### zeroins toolkit
+
+[github.com/kakkoyun/zeroins](https://github.com/kakkoyun/zeroins)
+
+`obi-integration` · `otelc-aspect`<br>
+`kubectl-obi` · `kubectl-profiler`
 
 </div>
 <div class="center">
 
 ![w:250](../../assets/gopherconuk-26-repo-qr.png)
 
-**Scan for the repository**
+**Scan for the talk repository**
 
 </div>
 </div>
