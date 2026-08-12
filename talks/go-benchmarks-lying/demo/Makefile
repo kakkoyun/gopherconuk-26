@@ -106,9 +106,14 @@ bench-pprof:
 # same gotcha documented on asm-dce. -run XXX -bench XXX compiles the test
 # files (so -m sees them) without running anything. The filter keeps only the
 # file:line:col optimization messages, dropping build noise (PASS, ok, etc.).
+# Paths are shortened (./dce_bench_test.go:33:6: -> dce:33:) and the `as:`
+# inlined-body suffix is trimmed from can-inline lines, so the output fits the
+# code-panel width — the panel clips horizontal overflow silently.
 escape-inline:
 	go test -gcflags='-m -m' -run XXX -bench XXX . 2>&1 \
-		| grep -E '\.go:[0-9]+:[0-9]+:' > results/gcflags-m-m.txt
+		| grep -E '\.go:[0-9]+:[0-9]+:' \
+		| sed -E 's|\./([a-z]+)_bench_test\.go:|\1:|g; s/ as: .*//' \
+		> results/gcflags-m-m.txt
 	@echo "==> results/gcflags-m-m.txt"
 
 ## clean: remove captured benchmark output

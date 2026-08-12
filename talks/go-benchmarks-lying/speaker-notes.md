@@ -429,6 +429,15 @@ about to distrust.**
 >
 > And to be explicit: this is test-only. Do not put sinks in production code.
 
+### Escape analysis
+
+> **SAY:** Now see *why* the sink works. `-m -m` prints the escape-analysis
+> flow. In the broken benchmark, the discarded result `does not escape` — so the
+> compiler is free to delete it, and `allocs/op` is zero. In the fixed one, the
+> result flows to the package-level sink, so it `escapes to heap` — the
+> allocation must happen, and `allocs/op` is one. The sink is not magic; it is
+> the thing that forces the escape.
+
 ### Constant folding
 
 > **SAY:** Second trick. Every input here is a literal, so the compiler just
@@ -451,6 +460,15 @@ about to distrust.**
 > non-constant input and a captured result. Either one alone is not enough.
 >
 > `//go:noinline` is a diagnostic tool. Not production style.
+
+### Inlining decisions
+
+> **SAY:** `-m -m` also reports inlining costs. `makeBuffer` has cost three —
+> under the budget, so the compiler pastes the body in. That is what lets DCE
+> see the unused result and delete it. A bigger function goes over budget and
+> stays a call. `//go:noinline` does not fix anything — it forces the
+> over-budget case so you can see whether inlining is the problem. It is a
+> diagnostic, not a tool you ship.
 
 ### Timer: one-time setup
 

@@ -796,6 +796,24 @@ func BenchmarkMakeBuffer_Correct(b *testing.B) {
 
 ---
 
+## Escape analysis
+
+###### gcflags-m-m.txt
+
+```text
+dce:46:13: make([]byte, 64) does not escape
+dce:59:17: make([]byte, 64) escapes to heap
+dce:59:17:   flow: {heap} ← s:
+dce:59:17:     from sink = s (assign) at dce:61:7
+```
+
+* Discarded → `does not escape` → eliminable
+* Sunk → `escapes to heap` → the allocation must happen
+
+`-m -m` shows the flow that decides.
+
+---
+
 ## Constant folding
 
 ###### dce_bench_test.go
@@ -862,6 +880,21 @@ Either alone is not enough.
 </div>
 
 <span class="chip caution">TEST-ONLY</span> `//go:noinline` is a diagnostic.
+
+---
+
+## Inlining decisions
+
+###### gcflags-m-m.txt
+
+```text
+dce:33:6: can inline makeBuffer with cost 3
+dce:56:6: can inline BenchmarkMakeBuffer_Correct with cost 18
+```
+
+* `can inline` with a cost under the budget → body is pasted in
+* over budget → `cannot inline ... exceeds budget 80`
+* `//go:noinline` forces the second case — a diagnostic, not a fix
 
 ---
 
