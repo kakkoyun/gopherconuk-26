@@ -38,9 +38,9 @@ style: |
 
 # Why Your Go Benchmarks Are Lying
 
-### Kemal Akkoyun · Datadog
-
 And How to Stop Them
+
+### Kemal Akkoyun · Datadog
 
 ---
 

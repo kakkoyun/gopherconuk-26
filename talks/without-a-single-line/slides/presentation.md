@@ -32,9 +32,9 @@ style: |
 
 ### Go Instrumentation
 
-### Kemal Akkoyun · Datadog
-
 How to Instrument Go Without Changing a Single Line of Code
+
+### Kemal Akkoyun · Datadog
 
 ---
 
