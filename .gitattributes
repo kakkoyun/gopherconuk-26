@@ -1,0 +1,9 @@
+# Generated matplotlib charts imported from the FOSDEM deck. These are plot
+# exports, not hand-edited source: the DFS chart alone is ~181k lines because a
+# strip plot emits one <use> element per data point (~60k of them). Treating
+# them as text makes `git diff`, `git blame`, and `git log -p` unusable in this
+# directory for no benefit, since nobody reviews an SVG line by line.
+#
+# `-diff` keeps them versioned exactly as-is while telling git not to attempt a
+# textual diff. Regenerate from the experiment notebooks rather than editing.
+talks/*/assets/*.svg -diff linguist-generated=true

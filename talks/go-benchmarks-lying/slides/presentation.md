@@ -10,10 +10,20 @@ header: "Why Your Go Benchmarks Are Lying · GopherCon UK 2026"
 footer: " "
 style: |
   .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+  .columns3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
   .big    { font-size: 1.4em; }
   .medium { font-size: 1.0em; }
   .small  { font-size: 0.8em; }
   .tiny   { font-size: 0.6em; }
+  .center { text-align: center; }
+  /* Helpers ported from the FOSDEM deck for the arc-2 charts and tables.
+     Kept deck-local rather than in the shared theme so the sibling talk
+     is unaffected. */
+  .hidden { visibility: hidden; }
+  .hl-blue   { color: #00ADD8; font-weight: 700; }
+  .hl-orange { color: #E8833A; font-weight: 700; }
+  .centered-table table { margin-left: auto; margin-right: auto; }
+  .comment { display: block; opacity: 0.45; font-size: 0.75em; line-height: 1.5; }
 ---
 
 <!-- _class: title gopher-sage -->
