@@ -923,4 +923,8 @@ Both decks · research · [earlier FOSDEM version](https://youtu.be/0TvrSebuDPk)
 
 # Questions?
 
-[Website](https://kakkoyun.me) · [LinkedIn](https://www.linkedin.com/in/kakkoyun/) · [Bluesky](https://bsky.app/profile/kakkoyun.me) · [X](https://x.com/kakkoyun_me) · [GitHub](https://github.com/kakkoyun)
+[kakkoyun.me](https://kakkoyun.me) · [github.com/kakkoyun](https://github.com/kakkoyun)
+
+[linkedin.com/in/kakkoyun](https://www.linkedin.com/in/kakkoyun/) · [bsky.app/profile/kakkoyun.me](https://bsky.app/profile/kakkoyun.me) · [x.com/kakkoyun_me](https://x.com/kakkoyun_me)
+
+<span class="small">Talk repo [github.com/kakkoyun/gopherconuk-26](https://github.com/kakkoyun/gopherconuk-26) · Tools [github.com/kakkoyun/zeroins](https://github.com/kakkoyun/zeroins)</span>
