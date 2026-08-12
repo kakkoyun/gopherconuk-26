@@ -7,10 +7,13 @@ Companion files: `outline.md` (structure, timing) · `speaker-notes.md` (the spo
 script) · `slides/presentation.md` (the deck) ·
 `../../research/without-a-single-line/claims-ledger.md` (every load-bearing claim).
 
-**State:** 53 slides, 30-minute keynote, scripted estimate 30:30. Ledger holds 32
+**State:** 52 pages, 30-minute keynote, scripted estimate 30:30. Ledger holds 32
 claims: 30 `CONFIRMED`, 1 `PLAUSIBLE`, 1 `REFUTED`. `outline.md` describes itself
 as "additive review version; pruning follows Kemal's deck review and rehearsal",
 so the deck is known to be un-pruned.
+
+Count `---` separators minus one to get pages, not the separators themselves. An
+earlier revision of this file said 53 for that reason.
 
 This file was written straight after delivering *Why Your Go Benchmarks Are
 Lying*. The second half is the transferable recipe from that talk; the first half
@@ -57,9 +60,9 @@ section content, not a measurement.** On the previous talk that construction was
 wrong three times running, and the deck went on stage untimed and came back with
 "too dense to digest" as the feedback.
 
-This deck is 53 slides in 30 minutes. That is roughly 1.8 slides per minute,
-which is close to the ~2 per minute measured on the other talk, so the estimate
-is plausible rather than safe. Time it, and write the real number here.
+This deck is 52 pages in 30 minutes. That is roughly 1.7 pages per minute, close
+to the ~2 per minute measured on the other talk, so the estimate is plausible
+rather than safe. Time it, and write the real number here.
 
 ---
 
@@ -67,11 +70,11 @@ is plausible rather than safe. Time it, and write the real number here.
 
 ### Decide the reveal question deliberately, once
 
-This deck has `fragment-floor: 0`, zero `*` bullets and **55 `-` bullets**. The
+This deck has `fragment-floor: 0`, zero `*` bullets and **54 `-` bullets**. The
 other talk is `*`-only with a floor of 60. Neither is wrong, but the difference
 should be a decision rather than drift.
 
-If you want reveals, do **not** bulk-convert all 55: that produces 55 reveals and
+If you want reveals, do **not** bulk-convert all 54: that produces 54 reveals and
 a deck that advances a line at a time. Pick the lists where staging actually helps
 and convert only those, then set the floor to that count so
 `make check/fragments` protects them.
@@ -79,7 +82,7 @@ and convert only those, then set the floor to that count so
 If you do not want reveals, leave it and the current frontmatter comment is
 already correct.
 
-### Prune, because 53 additive slides is the known state
+### Prune, because 52 additive pages is the known state
 
 `outline.md` says pruning is outstanding. Do it *before* rehearsing, not after,
 and write a cut ladder while you do: an ordered list of what goes first with the
@@ -101,6 +104,11 @@ the slide unreproducible from this repo.
 
 At minimum, capture the probe output to a committed text file and cite it, so the
 claim has an artefact behind it.
+
+The tooling moved to [github.com/kakkoyun/zeroins](https://github.com/kakkoyun/zeroins),
+so the captured-output panels are now **cross-repo evidence with no tripwire**,
+exactly like the other talk's benchlab panels. That bit once already there. Rebuild
+from zeroins and re-run before any delivery.
 
 ---
 
@@ -195,10 +203,13 @@ Two failure modes, both hit on the other talk:
   sayable. The instruction that makes it usable on stage is to memorise the beat,
   the bold line before each block, and let the words follow.
 
-**Here the script is roughly 5.5 lines per slide against 9.4 on the other talk.**
-That is thin for a keynote, where you have less room to recover if a beat does not
-land. The section that most needs words is whichever one you would struggle to
-improve without them.
+**Here the script is roughly 6.4 lines per page against 9.4 on the other talk.**
+Thinner than the other talk, and thin for a keynote, where there is less room to
+recover if a beat does not land. The section that most needs words is whichever one
+you would struggle to improvise.
+
+These ratios move whenever either file changes, so treat them as a direction
+rather than a target.
 
 ---
 
