@@ -12,7 +12,7 @@ stories → the numbers. Everything else is recoverable on stage.
 
 ---
 
-## The 15 beats
+## The 16 beats
 
 | # | Section | The one thing |
 | --- | --- | --- |
@@ -20,20 +20,25 @@ stories → the numbers. Everything else is recoverable on stage.
 | 02 | Why I Care | Consequences, not credentials |
 | 03 | A Loose Cable | Careful people ship broken measurements |
 | 04 | Before You Measure | Pick the target before the tool |
-| 05 | Local and Micro | Trust the laptop first |
-| 06 | Compiler Honest | The compiler deletes your work |
-| 07 | Regression That Was a Speedup | Noise can be directionally wrong |
-| 08 | Statistics | One number is not a measurement |
-| 09 | Local Reproduction | Know your noise ceiling |
-| 10 | CI and Macro | Same questions, hardware answers |
-| 11 | Macrobenchmark Design | Representative is the hard part |
-| 12 | CI Environment | Three sysfs writes buy 100× |
-| 13 | Change Over Time | A/B cannot see drift |
-| 14 | Wiring Into CI | Detect, don't measure |
-| 15 | Wire It Up | Under an hour |
+| 05 | Benchmarking, Quickly | The instrument we are about to distrust |
+| 06 | Local and Micro | Trust the laptop first |
+| 07 | Compiler Honest | The compiler deletes your work |
+| 08 | Regression That Was a Speedup | Noise can be directionally wrong |
+| 09 | Statistics | One number is not a measurement |
+| 10 | Local Reproduction | Know your noise ceiling |
+| 11 | CI and Macro | Same questions, hardware answers |
+| 12 | Macrobenchmark Design | Representative is the hard part |
+| 13 | CI Environment | Three sysfs writes buy 100× |
+| 14 | Change Over Time | A/B cannot see drift |
+| 15 | Wiring Into CI | Detect, don't measure |
+| 16 | Wire It Up | Under an hour |
 
-**Checkpoints:** §05 by 14:00 · §10 by 31:00 · §15 by 46:00.
-If §10 has not started by 33:00, start cutting (ladder in `outline.md`).
+**Checkpoints:** §06 by 14:00 · §11 by 31:00 · §16 by 46:00.
+If §11 has not started by 33:00, start cutting (ladder in `outline.md`).
+
+> **Note.** Section numbers reflect the 16-section deck; the per-section timing
+> is provisional pending the timed read-through (see `TODO.md`) and is rebased
+> in the final commit.
 
 ---
 
@@ -296,7 +301,58 @@ reintroduce it.
 
 ---
 
-## 05 · Local and Micro — 17 min total
+## 05 · Benchmarking, Quickly — 5 min
+
+**Beat: shared vocabulary for an advanced room — here is the instrument we are
+about to distrust.**
+
+`DO` This is a fast pass, not a tutorial. The room is advanced; do not teach
+`testing.B` from scratch. Name the parts, flag the default mistake, move.
+
+### Writing one
+
+> **SAY:** One slide on the shape, because we are about to distrust this
+> instrument and you should know what it looks like. A `testing.B` benchmark
+> is a function. Setup before the loop is excluded from timing. The loop is
+> `b.Loop` — the measured body. And the result has to sink somewhere the
+> compiler can see, or the body vanishes. We will spend the next section on
+> that last part.
+
+### Running one
+
+> **SAY:** The flags that matter. `-bench` picks what runs. `-benchmem` shows
+> allocations — leave it on, always. `-count` is how many times you repeat, and
+> `-count=1` is the default mistake: one run is one draw from a distribution,
+> not a measurement. `-benchtime` is either a duration or a fixed iteration
+> count. We come back to `-count` in the statistics section.
+
+### Reading the output
+
+> **SAY:** Three columns. `ns/op` is nanoseconds per iteration — it has a
+> floor, the timer costs about a quarter of a nanosecond, so it can lie.
+> `B/op` and `allocs/op` are bytes and allocations per iteration. An
+> allocation either happened or it did not. Remember this pair: `ns/op` can
+> lie, `allocs/op` cannot. That is the next section's motto.
+
+### Benchmark + pprof
+
+> **SAY:** When `ns/op` is not enough, profile. `-cpuprofile` and
+> `-memprofile` dump a profile you read with `go tool pprof`. `-top` prints the
+> hottest functions. Here the whole benchmark is one call to `sha256.Sum256`,
+> and ninety percent of the time is in the block function. The profile tells
+> you where the time is — not whether the time is real.
+
+### Reading compiler output
+
+> **SAY:** Last piece of vocabulary: the compiler can tell you what it did.
+> `-gcflags=-S` prints the assembly — each line shows the instruction and the
+> source it came from. `GOSSAFUNC` dumps every SSA rewrite phase to a browser,
+> so you can watch the compiler think. We use `-S` in the next section to
+> prove the compiler deleted our work.
+
+---
+
+## 06 · Local and Micro — 17 min total
 
 ### The three questions, micro scale
 
@@ -325,7 +381,7 @@ reintroduce it.
 
 ---
 
-## 06 · Making the Compiler Honest — ~10 min
+## 07 · Making the Compiler Honest — ~10 min
 
 ### Stop the compiler deleting your work
 
@@ -378,17 +434,6 @@ reintroduce it.
 > **SAY:** Second trick. Every input here is a literal, so the compiler just
 > computes the answer at build time. You are now benchmarking how fast your CPU
 > can load a constant.
-
-### Reading the next slide
-
-`DO` Two sentences per side. Most of the room does not read ARM64.
-
-> **SAY:** We are about to look at assembly, so here is all you need. On the
-> left, `MOVD $3` — move the literal three into a register. The answer is
-> already baked into the binary. On the right, `VCNT` and `VUADDLV` — the
-> actual ARM64 population-count instructions. The CPU is doing the work.
->
-> One is a constant. One is work.
 
 ### `make asm-dce`
 
@@ -451,7 +496,7 @@ reintroduce it.
 
 ---
 
-## 07 · The Regression That Was a Speedup — ~5 min
+## 08 · The Regression That Was a Speedup — ~5 min
 
 ### Read the benchmark first
 
@@ -525,7 +570,7 @@ reintroduce it.
 
 ---
 
-## 08 · Statistical Interpretation — ~5 min
+## 09 · Statistical Interpretation — ~5 min
 
 ### One number is a point sample
 
@@ -575,7 +620,7 @@ reintroduce it.
 
 ---
 
-## 09 · Local Reproduction — ~5 min
+## 10 · Local Reproduction — ~5 min
 
 ### What does isolation actually buy?
 
@@ -643,7 +688,7 @@ No QEMU, no cross-architecture emulation.
 
 ---
 
-## 10 · CI and Macro — 15 min total
+## 11 · CI and Macro — 15 min total
 
 ### The three questions, macro scale
 
@@ -694,7 +739,7 @@ CI-only, on a dedicated runner.
 
 ---
 
-## 11 · Designing a Macrobenchmark — ~5 min
+## 12 · Designing a Macrobenchmark — ~5 min
 
 ### What does your app actually do? (reveal)
 
@@ -752,7 +797,7 @@ CI-only, on a dedicated runner.
 
 ---
 
-## 12 · Controlling the CI Environment — ~5 min
+## 13 · Controlling the CI Environment — ~5 min
 
 ### Why shared runners lie
 
@@ -835,7 +880,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 13 · Detecting Change Over Time — ~3 min
+## 14 · Detecting Change Over Time — ~3 min
 
 ### A/B is the wrong model for CI
 
@@ -866,7 +911,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 14 · Wiring It Into CI — ~3 min
+## 15 · Wiring It Into CI — ~3 min
 
 ### Two patterns
 
@@ -909,7 +954,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 15 · Wire It Up — 4 min
+## 16 · Wire It Up — 4 min
 
 ### Three tools
 

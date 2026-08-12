@@ -537,6 +537,103 @@ Risk: **cause is unclear**
 
 ###### 05
 
+# Benchmarking, Quickly
+
+The instrument we are about to distrust.
+
+---
+
+## Writing one
+
+###### bloop_bench_test.go
+
+```go
+func BenchmarkHash_BLoop(b *testing.B) {
+    data := make([]byte, 1024)
+    copy(data, payload)
+    var s [32]byte
+    for b.Loop() {
+        s = sha256.Sum256(data)
+    }
+}
+```
+
+* Setup before the loop — excluded from timing
+* `b.Loop()` runs the measured body; the result sinks somewhere visible
+
+---
+
+## Running one
+
+```bash
+go test -bench=. -benchmem -count=10 -benchtime=1s ./...
+```
+
+* `-bench` — what to run (`.` = all)
+* `-benchmem` — show allocs (always on)
+* `-count` — repetitions; `-count=1` is the default mistake
+* `-benchtime` — duration, or `Nx` fixed iterations
+
+`-count=1` is one draw from the distribution.
+
+---
+
+## Reading the output
+
+###### bloop_bench_test.go
+
+```text
+BenchmarkHash_BLoop-16   6834830   356.2 ns/op   0 B/op   0 allocs/op
+```
+
+* `ns/op` — time per iteration (has a floor; can lie)
+* `B/op` — bytes allocated per iteration
+* `allocs/op` — allocations per iteration (cannot lie)
+
+`ns/op` can lie. `allocs/op` cannot.
+
+---
+
+## Benchmark + pprof
+
+```bash
+go test -bench=BenchmarkHash_BLoop -cpuprofile=cpu.prof .
+go tool pprof -top cpu.prof
+```
+
+###### pprof-top.txt
+
+```text
+      flat  flat%   sum%        cum   cum%
+     2.02s 94.84% 94.84%      2.02s 94.84%  sha256.blockSHA2
+     0.06s  2.82% 97.65%      0.06s  2.82%  runtime.pthread_cond_signal
+     0.01s  0.47% 98.12%      2.04s 95.77%  sha256.(*Digest).Write
+```
+
+`-cpuprofile` / `-memprofile` → `go tool pprof -top`.
+
+---
+
+## Reading compiler output
+
+```bash
+go test -gcflags='-S' -run XXX -bench XXX .        # print assembly
+GOSSAFUNC=BenchmarkHash_BLoop go test -bench=BenchmarkHash_BLoop .   # interactive SSA
+```
+
+* `-S` — disassembly; each line shows the instruction and its source
+* `GOSSAFUNC` — dump every SSA rewrite phase to a browser
+* Read what the compiler *actually did*, not what you wrote
+
+`-S` shows the end state. `GOSSAFUNC` shows every step.
+
+---
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 06
+
 # Local and Micro
 
 Trust your laptop before you trust CI.
@@ -588,7 +685,7 @@ Nothing in the diff touches OTLP encoding.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 06
+###### 07
 
 # Making the Compiler Honest
 
@@ -713,31 +810,6 @@ Evaluated at compile time.
 
 You benchmarked a **constant load**.
 
-</div>
-
----
-
-## Reading the next slide
-
-<div class="columns">
-<div>
-
-### `MOVD $3`
-
-Load the literal `3`.
-
-**The answer is baked in.**
-
-</div>
-<div>
-
-### `VCNT` / `VUADDLV`
-
-ARM64 popcount.
-
-**The CPU is counting.**
-
-</div>
 </div>
 
 ---
@@ -915,7 +987,7 @@ Must be written literally as `b.Loop()`.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 07
+###### 08
 
 # The Regression That Was a Speedup
 
@@ -1064,7 +1136,7 @@ It blocks good changes and waves regressions through.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 08
+###### 09
 
 # Statistical Interpretation
 
@@ -1176,7 +1248,7 @@ With enough draws, noise looks like signal.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 09
+###### 10
 
 # Local Reproduction
 
@@ -1313,7 +1385,7 @@ A sub-10% delta can be **layout noise**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 10
+###### 11
 
 # CI and Macro
 
@@ -1416,7 +1488,7 @@ Same tell: **a benchmark moved that could not have moved.**
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 11
+###### 12
 
 # Designing a Macrobenchmark
 
@@ -1548,7 +1620,7 @@ you can't attribute a delta.**
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 12
+###### 13
 
 # Controlling the CI Environment
 
@@ -1744,7 +1816,7 @@ and be ignored**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 13
+###### 14
 
 # Detecting Change Over Time
 
@@ -1833,7 +1905,7 @@ Netflix, at scale
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 14
+###### 15
 
 # Wiring It Into CI
 
@@ -1940,7 +2012,7 @@ A shared runner cannot be fixed with **more samples**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 15
+###### 16
 
 # Wire It Up
 

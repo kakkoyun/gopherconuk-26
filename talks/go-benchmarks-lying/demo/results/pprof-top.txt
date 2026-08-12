@@ -1,25 +1,25 @@
 File: demo.test
 Type: cpu
-Time: 2026-08-12 13:39:48 BST
-Duration: 2.52s, Total samples = 2.14s (84.82%)
-Showing nodes accounting for 2.12s, 99.07% of 2.14s total
-Dropped 8 nodes (cum <= 0.01s)
+Time: 2026-08-12 13:47:25 BST
+Duration: 2.53s, Total samples = 2.13s (84.36%)
+Showing nodes accounting for 2.11s, 99.06% of 2.13s total
+Dropped 4 nodes (cum <= 0.01s)
       flat  flat%   sum%        cum   cum%
-     1.94s 90.65% 90.65%      1.94s 90.65%  crypto/internal/fips140/sha256.blockSHA2
-     0.09s  4.21% 94.86%      0.09s  4.21%  runtime.pthread_cond_signal
-     0.03s  1.40% 96.26%      1.97s 92.06%  crypto/internal/fips140/sha256.block
-     0.02s  0.93% 97.20%      1.99s 92.99%  crypto/internal/fips140/sha256.(*Digest).Write
-     0.02s  0.93% 98.13%      0.13s  6.07%  crypto/internal/fips140/sha256.(*Digest).checkSum
-     0.01s  0.47% 98.60%      0.14s  6.54%  crypto/internal/fips140/sha256.(*Digest).Sum
-     0.01s  0.47% 99.07%      2.04s 95.33%  crypto/sha256.Sum256
-         0     0% 99.07%      2.05s 95.79%  github.com/kakkoyun/gopherconuk-26/demo.BenchmarkHash_BLoop
-         0     0% 99.07%      0.08s  3.74%  runtime.gopreempt_m (inline)
-         0     0% 99.07%      0.08s  3.74%  runtime.goschedImpl
-         0     0% 99.07%      0.08s  3.74%  runtime.morestack
-         0     0% 99.07%      0.08s  3.74%  runtime.newstack
-         0     0% 99.07%      0.09s  4.21%  runtime.notewakeup
-         0     0% 99.07%      0.09s  4.21%  runtime.semawakeup
-         0     0% 99.07%      0.09s  4.21%  runtime.startm
-         0     0% 99.07%      0.09s  4.21%  runtime.wakep
-         0     0% 99.07%      2.05s 95.79%  testing.(*B).run1.func1
-         0     0% 99.07%      2.05s 95.79%  testing.(*B).runN
+     2.02s 94.84% 94.84%      2.02s 94.84%  sha256.blockSHA2
+     0.06s  2.82% 97.65%      0.06s  2.82%  runtime.pthread_cond_signal
+     0.01s  0.47% 98.12%      2.04s 95.77%  sha256.(*Digest).Write
+     0.01s  0.47% 98.59%      0.12s  5.63%  sha256.(*Digest).checkSum
+     0.01s  0.47% 99.06%      2.03s 95.31%  sha256.block
+         0     0% 99.06%      0.13s  6.10%  sha256.(*Digest).Sum
+         0     0% 99.06%      2.07s 97.18%  crypto/sha256.Sum256
+         0     0% 99.06%      2.07s 97.18%  demo.BenchmarkHash_BLoop
+         0     0% 99.06%      0.06s  2.82%  runtime.gopreempt_m (inline)
+         0     0% 99.06%      0.06s  2.82%  runtime.goschedImpl
+         0     0% 99.06%      0.06s  2.82%  runtime.morestack
+         0     0% 99.06%      0.06s  2.82%  runtime.newstack
+         0     0% 99.06%      0.06s  2.82%  runtime.notewakeup
+         0     0% 99.06%      0.06s  2.82%  runtime.semawakeup
+         0     0% 99.06%      0.06s  2.82%  runtime.startm
+         0     0% 99.06%      0.06s  2.82%  runtime.wakep
+         0     0% 99.06%      2.07s 97.18%  testing.(*B).run1.func1
+         0     0% 99.06%      2.07s 97.18%  testing.(*B).runN

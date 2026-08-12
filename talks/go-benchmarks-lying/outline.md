@@ -1,8 +1,7 @@
 # Talk outline: Why Your Go Benchmarks Are Lying
 
-> **Format:** 60 minutes including Q&A · advanced Go audience
-> **Deck:** `slides/presentation.md` (110 pages, including progressive-reveal steps)
-> **Target:** 50 minutes presented, 10 minutes Q&A
+> **Format:** 60 minutes presented, Q&A opportunistic · advanced Go audience
+> **Deck:** `slides/presentation.md` (118 pages, including progressive-reveal steps)
 > **Demonstrations:** no live demos; every command and captured result stays in the repository
 
 ## Thesis
@@ -40,26 +39,27 @@ measured pace, not the estimate.
 Physical page count is no longer a good time proxy, because progressive reveals
 now spend several pages on one idea. Budget by section.
 
-> **Note.** The running order changed (WHY first, OPERA third) but no content
-> was added or removed in this pass, so the 50-minute target still holds. The
-> per-section targets below are reordered, not re-measured. A timed read-through
-> is still outstanding — see `TODO.md`.
+> **Note.** The running order changed (WHY first, OPERA third) and a basics
+> section was added, so the 60-minute target now covers the expanded content.
+> The per-section targets above are a construction from section content, not a
+> measurement — a timed read-through is still outstanding (see `TODO.md`).
 
 ## Beat sheet
 
 | Part | Section | Purpose | Target | Cumulative |
 | --- | --- | --- | ---: | ---: |
-| 1 | **01 Why Benchmark?** | Is it slow, could it go faster, is it worth it; latency/throughput, cost of slowness, Lütke; further watching | 4:00 | 4:00 |
-| 1 | **02 Why I Care** | How I got here, why Datadog cares | 2:00 | 6:00 |
-| 1 | **03 A Loose Cable** | OPERA, the three questions, the two-scales roadmap | 4:00 | 10:00 |
-| 1 | **04 Before You Measure** | Representative + repeatable, micro vs macro, when to use which, start macro | 4:00 | 14:00 |
-| 2 | **05–09 Arc 1 — local and micro** | bot-comment plant · compiler honesty · timers and `B.Loop` · code layout and Berger · statistics · local environment · recap | 17:00 | 31:00 |
-| 3 | **10–14 Arc 2 — CI and macro** | #643 opener · macro design · SMT and DFS · change-point detection · CI patterns · false-positive ledger · recap | 15:00 | 46:00 |
-| 4 | **15 Wire It Up** | Three CLIs, punchline, minimum discipline, 3×2 recap, CTA | 4:00 | 50:00 |
+| 1 | **01 Why Benchmark?** | Is it slow, could it go faster, is it worth it; latency/throughput, cost of slowness, Lütke; further watching | 6:00 | 6:00 |
+| 1 | **02 Why I Care** | How I got here, why Datadog cares, SpeedLab, FOSDEM prior work | 3:00 | 9:00 |
+| 1 | **03 A Loose Cable** | OPERA, the three questions, the two-scales roadmap | 4:00 | 13:00 |
+| 1 | **04 Before You Measure** | Representative + repeatable, micro vs macro, when to use which, start macro | 4:00 | 17:00 |
+| 1 | **05 Benchmarking, Quickly** | Write, run, read, profile, read compiler output — shared vocabulary | 5:00 | 22:00 |
+| 2 | **06–10 Arc 1 — local and micro** | bot-comment plant · compiler honesty · timers and `B.Loop` · code layout and Berger · statistics · local environment · recap | 17:00 | 39:00 |
+| 3 | **11–15 Arc 2 — CI and macro** | #643 opener · macro design · SMT and DFS · change-point detection · CI patterns · false-positive ledger · recap | 14:00 | 53:00 |
+| 4 | **16 Wire It Up** | Three CLIs, punchline, minimum discipline, 3×2 recap, CTA | 4:00 | 57:00 |
 
-**Rehearsal checkpoints:** arc 1 (§05) begins by 14:00 · arc 2 (§10) begins by
-31:00 · close (§15) begins by 46:00. If arc 2 has not started by 33:00, apply
-the cut ladder live.
+**Rehearsal checkpoints:** §05 by 17:00 · arc 1 (§06) by 22:00 · arc 2
+(§11) by 39:00 · close (§16) by 53:00 · finish by 57:00. If arc 2 has not
+started by 40:00, apply the cut ladder live.
 
 ## Narrative order
 

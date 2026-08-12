@@ -85,13 +85,18 @@ asm-dce:
 ## bench-pprof: capture a CPU profile and `pprof -top` of the B.Loop hash bench
 #
 # Feeds the §05 "Benchmark + pprof" slide. The .prof stays in /tmp; only the
-# -top text is committed under results/ so the evidence is plain text.
+# -top text is committed under results/ so the evidence is plain text. Long
+# stdlib and module paths are trimmed so the table fits the code-panel width
+# (the panel clips horizontal overflow silently) — same trimming principle as
+# asm-dce, applied to the function-name column only.
 PPROF_PROF := /tmp/gopherconuk26-cpu.prof
 
 bench-pprof:
 	go test -bench=BenchmarkHash_BLoop -benchmem -count=1 -benchtime=2s \
 		-cpuprofile=$(PPROF_PROF) .
-	go tool pprof -top $(PPROF_PROF) > results/pprof-top.txt
+	go tool pprof -top $(PPROF_PROF) \
+		| sed -E 's|crypto/internal/fips140/||g; s|github.com/kakkoyun/gopherconuk-26/||g' \
+		> results/pprof-top.txt
 	@echo "==> results/pprof-top.txt"
 
 ## escape-inline: capture `-gcflags='-m -m'` escape + inlining decisions
