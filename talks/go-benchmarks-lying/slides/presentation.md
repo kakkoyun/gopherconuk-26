@@ -2263,18 +2263,25 @@ Catches a noisy machine **before** the number reaches a PR comment.
 
 ###### benchlab
 
-```text
-benchenv: environment diagnosis (darwin/arm64, 16 CPUs)
+<div class="small">
 
-  [unavailable]  SMT control — no sysfs on macOS
-  [unavailable]  CPU frequency — not exposed
-  [unavailable]  Turbo Boost — no user-space control
-  [ok]           load average 6.15 ≤ 8.0
-  [warn]         perflock not installed
-  [ok]           benchstat installed
+```text
+benchenv: benchmarking environment diagnosis (darwin/arm64, 16 CPUs)
+
+  [unavailable]  SMT control        no sysfs on macOS
+  [unavailable]  CPU frequency      no governor exposed
+  [unavailable]  Turbo Boost        no user-space control
+  [unavailable]  thermal pressure   not readable from user space
+  [ok]           load average       2.65 ≤ 8.0
+  [ok]           benchstat          found on PATH
+  [ok]           GOMAXPROCS/NumCPU  16 / 16
+  [warn]         perflock           not installed
+  [warn]         benchdiff          not installed
 
 Summary: 3 ok, 2 warn, 4 unavailable.
 ```
+
+</div>
 
 ---
 
