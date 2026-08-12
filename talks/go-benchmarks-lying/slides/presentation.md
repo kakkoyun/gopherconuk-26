@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 56 — `*` is the ONLY list marker allowed on slides. Every list
+# fragment-floor: 56. `*` is the ONLY list marker allowed on slides. Every list
 # is an intentional Marp reveal; a `-` bullet here is a bug. `make check/fragments`
 # guards the count against formatters that rewrite markers.
 math: mathjax
@@ -99,9 +99,9 @@ p50 / p95 / **p99**
 
 ## Is it worth optimizing?
 
-* **SLO** — a target, not a wish
-* **Error budget** — in budget, optimizing is optional
-* **Amdahl** — only the hot path pays
+* **SLO**: a target, not a wish
+* **Error budget**: in budget, optimizing is optional
+* **Amdahl**: only the hot path pays
 
 ---
 
@@ -246,9 +246,9 @@ holding wall time.
 
 ## How I got here
 
-* `client_golang` — allocations in someone's scrape budget
-* Parca — a 5% profiler is not deployable
-* Datadog — SDKs inside *your* process
+* `client_golang`: allocations in someone's scrape budget
+* Parca: a 5% profiler is not deployable
+* Datadog: SDKs inside *your* process
 
 ---
 
@@ -278,7 +278,7 @@ from PGO alone.
 
 ![width:110](../assets/dd_speedlab_logo.png)
 
-<span class="small">Datadog invests in performance testing internally — this talk is the spillover.</span>
+<span class="small">Datadog invests in performance testing internally. This talk is the spillover.</span>
 
 </div>
 
@@ -512,17 +512,17 @@ Risk: **cause is unclear**
 
 ### Works
 
-1. Macro — does it move?
-2. Profile — which part?
-3. Micro — fix it
-4. Macro — did it hold?
+1. Macro: does it move?
+2. Profile: which part?
+3. Micro: fix it
+4. Macro: did it hold?
 
 </div>
 <div>
 
 ### Wastes weeks
 
-1. Micro — 40% faster
+1. Micro: 40% faster
 2. Ship
 3. Nothing changes
 4. Nobody knows why
@@ -558,7 +558,7 @@ func BenchmarkHash_BLoop(b *testing.B) {
 }
 ```
 
-* Setup before the loop — excluded from timing
+* Setup before the loop: excluded from timing
 * `b.Loop()` runs the measured body; the result sinks somewhere visible
 
 ---
@@ -569,10 +569,10 @@ func BenchmarkHash_BLoop(b *testing.B) {
 go test -bench=. -benchmem -count=10 -benchtime=1s ./...
 ```
 
-* `-bench` — what to run (`.` = all)
-* `-benchmem` — show allocs (always on)
-* `-count` — repetitions; `-count=1` is the default mistake
-* `-benchtime` — duration, or `Nx` fixed iterations
+* `-bench`: what to run (`.` = all)
+* `-benchmem`: show allocs (always on)
+* `-count`: repetitions; `-count=1` is the default mistake
+* `-benchtime`: duration, or `Nx` fixed iterations
 
 `-count=1` is one draw from the distribution.
 
@@ -586,9 +586,9 @@ go test -bench=. -benchmem -count=10 -benchtime=1s ./...
 BenchmarkHash_BLoop-16   6834830   356.2 ns/op   0 B/op   0 allocs/op
 ```
 
-* `ns/op` — time per iteration (has a floor; can lie)
-* `B/op` — bytes allocated per iteration
-* `allocs/op` — allocations per iteration (cannot lie)
+* `ns/op`: time per iteration (has a floor; can lie)
+* `B/op`: bytes allocated per iteration
+* `allocs/op`: allocations per iteration (cannot lie)
 
 `ns/op` can lie. `allocs/op` cannot.
 
@@ -621,8 +621,8 @@ go test -gcflags='-S' -run XXX -bench XXX .        # print assembly
 GOSSAFUNC=BenchmarkHash_BLoop go test -bench=BenchmarkHash_BLoop .   # interactive SSA
 ```
 
-* `-S` — disassembly; each line shows the instruction and its source
-* `GOSSAFUNC` — dump every SSA rewrite phase to a browser
+* `-S`: disassembly; each line shows the instruction and its source
+* `GOSSAFUNC`: dump every SSA rewrite phase to a browser
 * Read what the compiler *actually did*, not what you wrote
 
 `-S` shows the end state. `GOSSAFUNC` shows every step.
@@ -709,7 +709,7 @@ Question 1: real work?
 
 It sees the result is unused.
 
-It removes the work — **correctly**.
+It removes the work, **correctly**.
 
 <br>
 
@@ -894,7 +894,7 @@ dce:56:6: can inline BenchmarkMakeBuffer_Correct with cost 18
 
 * `can inline` with a cost under the budget → body is pasted in
 * over budget → `cannot inline ... exceeds budget 80`
-* `//go:noinline` forces the second case — a diagnostic, not a fix
+* `//go:noinline` forces the second case: a diagnostic, not a fix
 
 ---
 
@@ -972,7 +972,7 @@ Duration never accumulates.
 
 ---
 
-## `b.Loop()` — Go 1.24
+## `b.Loop()` · Go 1.24
 
 ###### bloop_bench_test.go
 
@@ -1078,7 +1078,7 @@ Cache lines and branch targets moved with them.
 
 <br>
 
-At ~390 ns/iteration, alignment is worth several percent — **either direction**.
+At ~390 ns/iteration, alignment is worth several percent, **either direction**.
 
 <div class="center">
 
@@ -1215,10 +1215,10 @@ benchstat old.txt new.txt
 
 ## Read the output
 
-* `11.32n` — the **median**
-* `± 5%` — spread
-* `p=0.000` — distinguishable from noise
-* `~` — **no measurable difference.** That is a result.
+* `11.32n`: the **median**
+* `± 5%`: spread
+* `p=0.000`: distinguishable from noise
+* `~`: **no measurable difference.** That is a result.
 
 ---
 
@@ -1249,7 +1249,7 @@ Benchstat compares distributions. **CV characterises the machine.**
 | --- | --- |
 | How many runs? | `-count=10` floor, 20 better |
 | Most reproducible? | `-benchtime=100x` |
-| CV too high? | **>5% — fix the machine first** |
+| CV too high? | **>5%: fix the machine first** |
 | Significant but tiny? | Different question |
 
 </div>
@@ -1369,7 +1369,7 @@ perflock go test -bench=. -count=10 ./...
 <div class="center">
 
 **macOS:** the lock works. Frequency pinning does not.
-Default `-governor 90` errors — pass `-governor=none`.
+Default `-governor 90` errors. Pass `-governor=none`.
 
 </div>
 
@@ -1531,9 +1531,9 @@ Representative is the hard part.
 
 ## What does your app actually do?
 
-* **CPU-bound** — crunching, compression, encryption
-* **I/O-bound** — queries, API calls, files
-* **Mixed** — almost everything real
+* **CPU-bound**: crunching, compression, encryption
+* **I/O-bound**: queries, API calls, files
+* **Mixed**: almost everything real
 
 <div class="center">
 
@@ -1716,10 +1716,10 @@ invisible co-tenant.
 ## Why SMT breaks benchmarks
 
 * A core has fixed execution units: ALUs, FPUs, load/store
-* Two threads share them — neither gets the full core
+* Two threads share them: neither gets the full core
 * The split is **nondeterministic**: whoever has instructions ready wins the slot
 * Run-to-run, your thread gets a different fraction of the units
-* That fraction swings the runtime — hence the 23% CV
+* That fraction swings the runtime: hence the 23% CV
 
 <div class="center">
 
@@ -1764,7 +1764,7 @@ bare metal, DFS disabled
 
 <div class="center big">
 
-**~100× less variance** — and twice as fast.
+**~100× less variance**, and twice as fast.
 
 </div>
 
@@ -1798,11 +1798,11 @@ Same code, different clock.
 
 ## Why DFS breaks benchmarks
 
-* The clock is not fixed — a governor picks frequency from load and thermals
+* The clock is not fixed: a governor picks frequency from load and thermals
 * Turbo boosts above base when the chip is cool
 * Run 1: cool chip, high clock, fast result
 * Run 20: warm chip, throttled clock, slower result
-* Same cycles, different wall time — the benchmark is **not comparable**
+* Same cycles, different wall time: the benchmark is **not comparable**
 
 <div class="center">
 
@@ -1832,7 +1832,7 @@ Pin to base frequency → every run at the same clock.
 
 <div class="center big">
 
-**~10× less variance** — and the mean got *slower*.
+**~10× less variance**, and the mean got *slower*.
 
 </div>
 
@@ -2040,7 +2040,7 @@ CI **detects**. It is not your primary measurement.
 
 <div class="small">
 
-> Known `BenchmarkOTLPProtoSize` false positive — documented for #4891 as a
+> Known `BenchmarkOTLPProtoSize` false positive, documented for #4891 as a
 > same-package code-layout artifact. Touches no code I changed;
 > local A/B was ~+0.3%. No action.
 
