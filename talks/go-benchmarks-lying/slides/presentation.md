@@ -55,19 +55,35 @@ A systematic measurement error can hide in plain sight.
 
 The OPERA collaboration announces muon neutrinos arriving **faster than light**.
 
+<div class="center">
+
+![width:620](../assets/particles-break-light-speed-headline.png)
+
+</div>
+
 Months of rechecking. The maths. The sensors. The calibration.
 
 ---
 
 ## The cause
 
+<div class="columns">
+<div>
+
 An improperly seated **fibre-optic connector** in the GPS timing chain.
 
 A **~73 ns** bias made neutrinos appear early.
 
-<br>
+A second fault, an oscillator defect, pushed the other way and
+*partially masked the first*.
 
-A second fault, an oscillator defect, pushed the other way and *partially masked the first*.
+</div>
+<div class="center">
+
+![width:380](../assets/opera-loose-cable.png)
+
+</div>
+</div>
 
 <div class="small">
 
