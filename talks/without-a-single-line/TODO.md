@@ -104,6 +104,104 @@ claim has an artefact behind it.
 
 ---
 
+## Content structure
+
+The shape that worked on the other talk, and what it implies here. This is the
+half of the recipe that is about craft rather than process, and it is where this
+talk currently differs most.
+
+### Open on why, not on the artefact
+
+The other deck used to open on its best story and was deliberately reordered to
+why first, then why I care, then the story. The reason: the story sets up a
+contract, and a contract means nothing until the audience knows why they should
+want it.
+
+This is recorded as contested rather than settled, and honestly so: opening on
+framing is a colder open than opening on a story, and that trade was made with
+eyes open.
+
+**Here it is already handled and better than talk one's version.** This deck opens
+on a direct question, who has wrapped every HTTP client and database call by hand,
+then "what if you did not have to?". That is a why built out of the audience's own
+pain rather than an abstraction. Do not replace it with a mechanism slide.
+
+### One real incident per major section
+
+The strongest device in the other talk was two war stories, one opening each half,
+deliberately built as mirror images with the same tell: a benchmark moved that
+could not have moved. Both are on the never-cut list.
+
+Two things made them work beyond being true. The first was **planted and paid off
+later**: the incident appears before the section that explains it, sits unresolved
+for ten minutes, and is answered only once the audience can read the evidence
+themselves. The second was that the two stories **rhymed**, so the second one
+landed as recognition rather than as a new fact.
+
+**This is the biggest structural gap here.** This deck contains no incident,
+postmortem or war story anywhere: no "we hit this", no "this broke". It is a survey
+of three mechanisms, and a survey is exactly the format that goes flat without
+someone getting hurt in it. Even one story would change the shape: the time an
+instrumentation gap cost you something, the debugging session that ended in "Go has
+no hook point", the rollout that needed no rollout.
+
+### Repeat the frame, never the argument
+
+The other talk states its three questions five times, at two scales, and the script
+says outright that the audience should hear them four times. That repetition is
+load-bearing: it is the spine, and the close returns to it as a grid.
+
+The density complaint after delivery was **not** caused by that. It was caused by
+slides that restated an argument already made, and those are exactly what got cut
+to pay for the memes. The distinction is the whole lesson:
+
+- Repeating the **frame** orients people. Keep it.
+- Repeating the **argument** is what makes a deck feel dense. Cut it.
+
+### Memes are pacing, and they are budgeted
+
+Three memes went in after delivery specifically because the feedback was "too dense
+to digest". They are not decoration and they were not free: each is paid for by a
+slide that repeated something, so the deck stayed page-neutral and got about two
+minutes cheaper.
+
+Rules that made them work rather than pad:
+
+- **Placed where the talk is heavy**, not where a joke fits. Straight after the
+  densest stretch, or on the bridge into the next section.
+- **Ten seconds, and the script says so.** Every meme carries a `DO` cue with the
+  time budget and a warning that explaining the joke spends the time it bought.
+- **Tied to the material.** The best of the three is captioned with the exact
+  numbers the audience saw two slides earlier, so it reads as a punchline rather
+  than as a break.
+- **On the never-cut list**, because cutting them to buy time recreates the
+  problem they were added to fix.
+
+**Here there are none, and this is a 30-minute keynote.** A keynote needs air more
+than a workshop does. Two would be plenty.
+
+### Keep the script in lockstep, and write it to be spoken
+
+The deck and the script are one artefact. Slides carry mottos, data, visuals and
+links; prose lives in the script; section headings match slide titles verbatim so
+you can find your place by what is on screen.
+
+Two failure modes, both hit on the other talk:
+
+- **Slides shipped without script.** Five went in during a rush and needed a
+  separate catch-up pass. Edit both in the same commit or the drift compounds.
+- **A script written to be read rather than said.** `SAY` blocks are short
+  sentences, one idea each, and `DO` lines are kept separate so the prose stays
+  sayable. The instruction that makes it usable on stage is to memorise the beat,
+  the bold line before each block, and let the words follow.
+
+**Here the script is roughly 5.5 lines per slide against 9.4 on the other talk.**
+That is thin for a keynote, where you have less room to recover if a beat does not
+land. The section that most needs words is whichever one you would struggle to
+improve without them.
+
+---
+
 ## The recipe
 
 What actually worked on *Why Your Go Benchmarks Are Lying*, in rough order of how
