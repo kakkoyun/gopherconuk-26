@@ -837,7 +837,13 @@ CI-only, on a dedicated runner.
 ### Three tools
 
 > **SAY:** I built three small things so you do not have to remember all of
-> this. Stdlib only, and they are in the repo.
+> this. They ship from a separate repo called benchlab — one `go install` gets
+> you all three binaries, and if you use coding agents, one command adds them as
+> skills.
+
+`DO` The tools live in `github.com/kakkoyun/benchlab`, **not** the talk repo.
+The talk repo has the decks and the captured results. Do not conflate them —
+the QR goes to the talk repo.
 
 ### `honestbench`
 
@@ -893,8 +899,11 @@ CI-only, on a dedicated runner.
 
 ### Take it with you
 
-> **SAY:** Everything is in the repo — the three tools, every captured output,
-> both decks. QR is there.
+> **SAY:** Two links. benchlab has the three tools and the agent skills. The
+> talk repo — that is the QR — has both decks and every captured result in this
+> talk, so you can check my numbers.
+>
+> And the earlier FOSDEM version is there if you want the language-agnostic take.
 
 ### Close
 
