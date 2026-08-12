@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 25 — `*` is the ONLY list marker allowed on slides. Every list
+# fragment-floor: 56 — `*` is the ONLY list marker allowed on slides. Every list
 # is an intentional Marp reveal; a `-` bullet here is a bug. `make check/fragments`
 # guards the count against formatters that rewrite markers.
 math: mathjax
@@ -44,6 +44,274 @@ And How to Stop Them
 <!-- _paginate: false -->
 
 ###### 01
+
+# Why Benchmark?
+
+---
+
+<!-- _class: vcenter -->
+
+## Measure customer happiness,
+
+## not CPU usage
+
+---
+
+## Is it actually slow?
+
+<div class="columns">
+<div>
+
+### In-process
+
+`pprof`
+
+Datadog Continuous Profiler
+
+</div>
+<div>
+
+### Whole-system
+
+[OTel eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)
+
+[Parca](https://parca.dev)
+
+p50 / p95 / **p99**
+
+</div>
+</div>
+
+<br>
+
+**Benchmark what production says is hot.**
+
+---
+
+## Could it go faster?
+
+* Detecting slowness ≠ proving headroom
+* The ceiling is physics: bandwidth, latency, IPC
+* Headroom is the gap between now and that ceiling
+* No headroom → "is it worth it" never comes up
+
+---
+
+## Is it worth optimizing?
+
+* **SLO** — a target, not a wish
+* **Error budget** — in budget, optimizing is optional
+* **Amdahl** — only the hot path pays
+
+---
+
+## Latency and throughput
+
+<div class="columns">
+<div>
+
+### Latency
+
+One operation.
+
+*Users feel this.*
+
+</div>
+<div class="hidden">
+
+### Throughput
+
+Operations per second.
+
+*Your ceiling.*
+
+</div>
+</div>
+
+---
+
+## Latency and throughput
+
+<div class="columns">
+<div>
+
+### Latency
+
+One operation.
+
+*Users feel this.*
+
+</div>
+<div>
+
+### Throughput
+
+Operations per second.
+
+*Your ceiling.*
+
+</div>
+</div>
+
+<br>
+
+*Improve one, damage the other.*
+
+---
+
+## The cost of slowness
+
+<div class="centered-table">
+
+| Response time | Perception |
+| --- | --- |
+| 100-200 ms | barely noticeable |
+| 300-500 ms | slightly slow |
+| 1-3 s | work is noticeable |
+| 5-10 s+ | user leaves |
+
+</div>
+
+<div class="center big">
+
+500 ms → <span class="hl-blue">−20%</span> Google search traffic
+
+</div>
+
+---
+
+<!-- _class: vcenter -->
+
+> "Not all fast software is world-class,
+> but all world-class software is fast."
+
+Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
+
+---
+
+## Finding what to optimize
+
+<div class="columns">
+<div>
+
+[**Optimizing Go Code Without a Blindfold**](https://www.youtube.com/watch?v=oE_vm7KeV_E)
+Daniel Martí · GopherCon 2019
+
+He covers *what* to optimize.
+
+This talk covers *whether you can trust the number*.
+
+</div>
+<div class="center">
+
+![width:360](../assets/gcuk19_daniel_marti_optimizing_go_code_without_blindfold.png)
+
+</div>
+</div>
+
+---
+
+## Finding what is worth optimizing
+
+<div class="columns">
+<div>
+
+[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A)
+Emery Berger · Strange Loop 2019
+
+The component that *looks* hot
+is not always the one
+holding wall time.
+
+</div>
+<div class="center">
+
+![width:360](../assets/strangeloop19_emery_berger_performance_matters.png)
+
+</div>
+</div>
+
+---
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 02
+
+# Why I Care
+
+---
+
+<!-- _class: vcenter -->
+
+## How I got here
+
+* `client_golang` — allocations in someone's scrape budget
+* Parca — a 5% profiler is not deployable
+* Datadog — SDKs inside *your* process
+
+---
+
+<!-- _class: vcenter -->
+
+## Why Datadog cares
+
+<div class="columns">
+<div>
+
+### Our code, your process
+
+Every ns comes out of a
+customer's budget.
+
+</div>
+<div>
+
+### <span class="hl-blue">−3.4%</span> production CPU
+
+from PGO alone.
+
+</div>
+</div>
+
+<div class="center">
+
+![width:110](../assets/dd_speedlab_logo.png)
+
+<span class="small">Datadog invests in performance testing internally — this talk is the spillover.</span>
+
+</div>
+
+### Overhead is product correctness
+
+---
+
+## This talk builds on
+
+<div class="columns">
+<div>
+
+[**How to Reliably Measure Software Performance**](https://youtu.be/8211fNI_nc4)
+Kemal Akkoyun & Augusto de Oliveira
+FOSDEM 2026
+
+The SMT and DFS data later in this talk
+comes from this earlier version.
+
+</div>
+<div class="center">
+
+![width:360](../assets/fosdem26_ka_how_to_reliabliy_measure_performance.png)
+
+</div>
+</div>
+
+---
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 03
 
 # A Loose Cable
 
@@ -138,195 +406,12 @@ compiler · scheduler · statistics
 
 ---
 
-<!-- _class: vcenter -->
-
-## How I got here
-
-* `client_golang` — allocations in someone's scrape budget
-* Parca — a 5% profiler is not deployable
-* Datadog — SDKs inside *your* process
-
----
-
-<!-- _class: vcenter -->
-
-## Why Datadog cares
-
-<div class="columns">
-<div>
-
-### Our code, your process
-
-Every ns comes out of a
-customer's budget.
-
-</div>
-<div>
-
-### <span class="hl-blue">−3.4%</span> production CPU
-
-from PGO alone.
-
-</div>
-</div>
-
-<br>
-
-### Overhead is product correctness
-
----
-
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 02
+###### 04
 
-# Why Benchmark?
-
----
-
-## Latency and throughput
-
-<div class="columns">
-<div>
-
-### Latency
-
-One operation.
-
-*Users feel this.*
-
-</div>
-<div class="hidden">
-
-### Throughput
-
-Operations per second.
-
-*Your ceiling.*
-
-</div>
-</div>
-
----
-
-## Latency and throughput
-
-<div class="columns">
-<div>
-
-### Latency
-
-One operation.
-
-*Users feel this.*
-
-</div>
-<div>
-
-### Throughput
-
-Operations per second.
-
-*Your ceiling.*
-
-</div>
-</div>
-
-<br>
-
-*Improve one, damage the other.*
-
----
-
-## The cost of slowness
-
-<div class="centered-table">
-
-| Response time | Perception |
-| --- | --- |
-| 100-200 ms | barely noticeable |
-| 300-500 ms | slightly slow |
-| 1-3 s | work is noticeable |
-| 5-10 s+ | user leaves |
-
-</div>
-
-<div class="center big">
-
-500 ms → <span class="hl-blue">−20%</span> Google search traffic
-
-</div>
-
----
-
-<!-- _class: vcenter -->
-
-> "Not all fast software is world-class,
-> but all world-class software is fast."
-
-Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
-
----
-
-<!-- _class: section -->
-<!-- _paginate: false -->
-
-###### 03
-
-# Before You Optimize
-
----
-
-## Is it actually slow?
-
-<div class="columns">
-<div>
-
-### In-process
-
-`pprof`
-
-Datadog Continuous Profiler
-
-</div>
-<div>
-
-### Whole-system
-
-[OTel eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)
-
-[Parca](https://parca.dev)
-
-p50 / p95 / **p99**
-
-</div>
-</div>
-
-<br>
-
-**Benchmark what production says is hot.**
-
----
-
-## Is it worth optimizing?
-
-* **SLO** — a target, not a wish
-* **Error budget** — in budget, optimizing is optional
-* **Amdahl** — only the hot path pays
-
----
-
-## Finding what to optimize
-
-[**Optimizing Go Code Without a Blindfold**](https://www.youtube.com/watch?v=oE_vm7KeV_E)
-Daniel Martí · GopherCon 2019
-
-<br>
-
-He covers *what* to optimize.
-
-This talk covers *whether you can trust the number*.
+# Before You Measure
 
 ---
 
@@ -450,7 +535,104 @@ Risk: **cause is unclear**
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 04
+###### 05
+
+# Benchmarking, Quickly
+
+The instrument we are about to distrust.
+
+---
+
+## Writing one
+
+###### bloop_bench_test.go
+
+```go
+func BenchmarkHash_BLoop(b *testing.B) {
+    data := make([]byte, 1024)
+    copy(data, payload)
+    var s [32]byte
+    for b.Loop() {
+        s = sha256.Sum256(data)
+    }
+}
+```
+
+* Setup before the loop — excluded from timing
+* `b.Loop()` runs the measured body; the result sinks somewhere visible
+
+---
+
+## Running one
+
+```bash
+go test -bench=. -benchmem -count=10 -benchtime=1s ./...
+```
+
+* `-bench` — what to run (`.` = all)
+* `-benchmem` — show allocs (always on)
+* `-count` — repetitions; `-count=1` is the default mistake
+* `-benchtime` — duration, or `Nx` fixed iterations
+
+`-count=1` is one draw from the distribution.
+
+---
+
+## Reading the output
+
+###### bloop_bench_test.go
+
+```text
+BenchmarkHash_BLoop-16   6834830   356.2 ns/op   0 B/op   0 allocs/op
+```
+
+* `ns/op` — time per iteration (has a floor; can lie)
+* `B/op` — bytes allocated per iteration
+* `allocs/op` — allocations per iteration (cannot lie)
+
+`ns/op` can lie. `allocs/op` cannot.
+
+---
+
+## Benchmark + pprof
+
+```bash
+go test -bench=BenchmarkHash_BLoop -cpuprofile=cpu.prof .
+go tool pprof -top cpu.prof
+```
+
+###### pprof-top.txt
+
+```text
+      flat  flat%   sum%        cum   cum%
+     2.02s 94.84% 94.84%      2.02s 94.84%  sha256.blockSHA2
+     0.06s  2.82% 97.65%      0.06s  2.82%  runtime.pthread_cond_signal
+     0.01s  0.47% 98.12%      2.04s 95.77%  sha256.(*Digest).Write
+```
+
+`-cpuprofile` / `-memprofile` → `go tool pprof -top`.
+
+---
+
+## Reading compiler output
+
+```bash
+go test -gcflags='-S' -run XXX -bench XXX .        # print assembly
+GOSSAFUNC=BenchmarkHash_BLoop go test -bench=BenchmarkHash_BLoop .   # interactive SSA
+```
+
+* `-S` — disassembly; each line shows the instruction and its source
+* `GOSSAFUNC` — dump every SSA rewrite phase to a browser
+* Read what the compiler *actually did*, not what you wrote
+
+`-S` shows the end state. `GOSSAFUNC` shows every step.
+
+---
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 06
 
 # Local and Micro
 
@@ -503,7 +685,7 @@ Nothing in the diff touches OTLP encoding.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 05
+###### 07
 
 # Making the Compiler Honest
 
@@ -614,6 +796,24 @@ func BenchmarkMakeBuffer_Correct(b *testing.B) {
 
 ---
 
+## Escape analysis
+
+###### gcflags-m-m.txt
+
+```text
+dce:46:13: make([]byte, 64) does not escape
+dce:59:17: make([]byte, 64) escapes to heap
+dce:59:17:   flow: {heap} ← s:
+dce:59:17:     from sink = s (assign) at dce:61:7
+```
+
+* Discarded → `does not escape` → eliminable
+* Sunk → `escapes to heap` → the allocation must happen
+
+`-m -m` shows the flow that decides.
+
+---
+
 ## Constant folding
 
 ###### dce_bench_test.go
@@ -628,31 +828,6 @@ Evaluated at compile time.
 
 You benchmarked a **constant load**.
 
-</div>
-
----
-
-## Reading the next slide
-
-<div class="columns">
-<div>
-
-### `MOVD $3`
-
-Load the literal `3`.
-
-**The answer is baked in.**
-
-</div>
-<div>
-
-### `VCNT` / `VUADDLV`
-
-ARM64 popcount.
-
-**The CPU is counting.**
-
-</div>
 </div>
 
 ---
@@ -705,6 +880,21 @@ Either alone is not enough.
 </div>
 
 <span class="chip caution">TEST-ONLY</span> `//go:noinline` is a diagnostic.
+
+---
+
+## Inlining decisions
+
+###### gcflags-m-m.txt
+
+```text
+dce:33:6: can inline makeBuffer with cost 3
+dce:56:6: can inline BenchmarkMakeBuffer_Correct with cost 18
+```
+
+* `can inline` with a cost under the budget → body is pasted in
+* over budget → `cannot inline ... exceeds budget 80`
+* `//go:noinline` forces the second case — a diagnostic, not a fix
 
 ---
 
@@ -830,7 +1020,7 @@ Must be written literally as `b.Loop()`.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 06
+###### 08
 
 # The Regression That Was a Speedup
 
@@ -979,7 +1169,7 @@ It blocks good changes and waves regressions through.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 07
+###### 09
 
 # Statistical Interpretation
 
@@ -1091,7 +1281,7 @@ With enough draws, noise looks like signal.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 08
+###### 10
 
 # Local Reproduction
 
@@ -1228,7 +1418,7 @@ A sub-10% delta can be **layout noise**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 09
+###### 11
 
 # CI and Macro
 
@@ -1331,7 +1521,7 @@ Same tell: **a benchmark moved that could not have moved.**
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 10
+###### 12
 
 # Designing a Macrobenchmark
 
@@ -1463,7 +1653,7 @@ you can't attribute a delta.**
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 11
+###### 13
 
 # Controlling the CI Environment
 
@@ -1519,6 +1709,22 @@ Your runtime depends on an
 invisible co-tenant.
 
 </div>
+</div>
+
+---
+
+## Why SMT breaks benchmarks
+
+* A core has fixed execution units: ALUs, FPUs, load/store
+* Two threads share them — neither gets the full core
+* The split is **nondeterministic**: whoever has instructions ready wins the slot
+* Run-to-run, your thread gets a different fraction of the units
+* That fraction swings the runtime — hence the 23% CV
+
+<div class="center">
+
+Same code. Same core. Different **share** each run.
+
 </div>
 
 ---
@@ -1586,6 +1792,22 @@ Run 20 is warm and throttles.
 Same code, different clock.
 
 </div>
+</div>
+
+---
+
+## Why DFS breaks benchmarks
+
+* The clock is not fixed — a governor picks frequency from load and thermals
+* Turbo boosts above base when the chip is cool
+* Run 1: cool chip, high clock, fast result
+* Run 20: warm chip, throttled clock, slower result
+* Same cycles, different wall time — the benchmark is **not comparable**
+
+<div class="center">
+
+Pin to base frequency → every run at the same clock.
+
 </div>
 
 ---
@@ -1659,7 +1881,7 @@ and be ignored**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 12
+###### 14
 
 # Detecting Change Over Time
 
@@ -1748,7 +1970,7 @@ Netflix, at scale
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 13
+###### 15
 
 # Wiring It Into CI
 
@@ -1855,7 +2077,7 @@ A shared runner cannot be fixed with **more samples**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 14
+###### 16
 
 # Wire It Up
 

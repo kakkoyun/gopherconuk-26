@@ -1,56 +1,198 @@
 # Script: Why Your Go Benchmarks Are Lying
 
-GopherCon UK 2026 · 50 minutes + 10 Q&A · 107 slides
+GopherCon UK 2026 · 50 minutes + 10 Q&A · 110 slides
 
 **How to use this.** `SAY` lines are the words. They are written to be spoken,
 not read — short sentences, one idea each. You do not need them verbatim; learn
 the **beat** (the bold line before each block) and the numbers, and the words
 will come. `DO` lines are delivery, not content.
 
-**Memorise in this order:** the 14 beats → the three questions → the two
+**Memorise in this order:** the 15 beats → the three questions → the two
 stories → the numbers. Everything else is recoverable on stage.
 
 ---
 
-## The 14 beats
+## The 16 beats
 
 | # | Section | The one thing |
 | --- | --- | --- |
-| 01 | A Loose Cable | Careful people ship broken measurements |
-| 02 | Why Benchmark? | Speed is a product decision |
-| 03 | Before You Optimize | Pick the target before the tool |
-| 04 | Local and Micro | Trust the laptop first |
-| 05 | Compiler Honest | The compiler deletes your work |
-| 06 | Regression That Was a Speedup | Noise can be directionally wrong |
-| 07 | Statistics | One number is not a measurement |
-| 08 | Local Reproduction | Know your noise ceiling |
-| 09 | CI and Macro | Same questions, hardware answers |
-| 10 | Macrobenchmark Design | Representative is the hard part |
-| 11 | CI Environment | Three sysfs writes buy 100× |
-| 12 | Change Over Time | A/B cannot see drift |
-| 13 | Wiring Into CI | Detect, don't measure |
-| 14 | Wire It Up | Under an hour |
+| 01 | Why Benchmark? | Speed is a product decision |
+| 02 | Why I Care | Consequences, not credentials |
+| 03 | A Loose Cable | Careful people ship broken measurements |
+| 04 | Before You Measure | Pick the target before the tool |
+| 05 | Benchmarking, Quickly | The instrument we are about to distrust |
+| 06 | Local and Micro | Trust the laptop first |
+| 07 | Compiler Honest | The compiler deletes your work |
+| 08 | Regression That Was a Speedup | Noise can be directionally wrong |
+| 09 | Statistics | One number is not a measurement |
+| 10 | Local Reproduction | Know your noise ceiling |
+| 11 | CI and Macro | Same questions, hardware answers |
+| 12 | Macrobenchmark Design | Representative is the hard part |
+| 13 | CI Environment | Three sysfs writes buy 100× |
+| 14 | Change Over Time | A/B cannot see drift |
+| 15 | Wiring Into CI | Detect, don't measure |
+| 16 | Wire It Up | Under an hour |
 
-**Checkpoints:** §04 by 14:00 · §09 by 31:00 · §14 by 46:00.
-If §09 has not started by 33:00, start cutting (ladder in `outline.md`).
+**Checkpoints:** §05 by 17:00 · §06 by 22:00 · §11 by 39:00 · §16
+by 53:00 · finish by 57:00.
+If §11 has not started by 40:00, start cutting (ladder in `outline.md`).
+
+> **Note.** Section numbers reflect the 16-section deck; the per-section timing
+> is provisional pending the timed read-through (see `TODO.md`) and is rebased
+> in the final commit.
 
 ---
 
-## 01 · A Loose Cable — 5 min
+## 01 · Why Benchmark? — 6 min
 
 ### Title slide
 
-> **SAY:** In 2011 a team of physicists announced they had broken the speed of
-> light. They were wrong. I want to tell you why, because the same thing is
-> probably happening in your benchmarks.
+> **SAY:** Every benchmark you have ever written is a measurement system, and
+> most of them are lying to you. Not on purpose — by default. I want to give you
+> three questions that turn a number into something you can trust.
 
-`DO` Do not introduce yourself. Straight into the story.
+`DO` Do not introduce yourself yet. The personal context is §02.
+
+### Measure customer happiness, not CPU usage
+
+**Beat: the frame for the whole section.**
+
+> **SAY:** One frame before we start. The number you are chasing is not CPU
+> usage, or allocations, or requests per second. It is whether your user is
+> happy. Everything else is a proxy. A benchmark measures the proxy. The point
+> of the proxy is the user.
+
+`DO` Land it, then straight into "is it actually slow".
+
+### Is it actually slow?
+
+> **SAY:** Before you write a single benchmark: check it is actually slow, in
+> production. In-process, that is pprof, or a continuous profiler. Across the
+> whole system, the OpenTelemetry eBPF profiler or Parca, and your p99.
+>
+> Benchmark the path your production evidence says is hot. Not the one that
+> looks interesting.
+
+### Could it go faster?
+
+**Beat: slow ≠ improvable.**
+
+> **SAY:** So you found it is slow. Next question: can it actually go faster?
+> Slow does not mean improvable. There is a ceiling — memory bandwidth,
+> instruction latency, the physics of the machine. Headroom is the gap between
+> where you are and that ceiling. No headroom, and the "is it worth it"
+> question is moot — you cannot optimize past the physics.
+
+### Is it worth optimizing? (reveal)
+
+> **SAY:** And decide what done looks like, or you will never stop.
+>
+> An SLO is a target, not a wish. If you are inside your error budget,
+> optimizing is optional — go fix something else. And Amdahl: only the hot path
+> pays. Ten percent off code that runs one percent of the time is nothing.
+
+### Latency and throughput (two-step reveal)
+
+> **SAY:** Two words, quickly, because people use them interchangeably and they
+> are not.
+>
+> *(reveal 1)* Latency is one operation, start to finish. That is what a user
+> feels.
+>
+> *(reveal 2)* Throughput is operations per second. That is your ceiling.
+>
+> They are not the same, and this matters: you can improve one and damage the
+> other. Batching is the classic — throughput up, latency worse.
+
+### The cost of slowness
+
+**Beat: this is a product decision, not an engineering one.**
+
+> **SAY:** Rough thresholds. Under two hundred milliseconds, nobody notices.
+> Half a second, it feels a bit slow. Past a second, people notice they are
+> waiting. Past five, they leave.
+>
+> Google measured this directly. Half a second of extra latency cost them
+> twenty percent of search traffic.
+
+`DO` Attribute to "the Google search team". Not Marissa Mayer.
+
+### Lütke quote
+
+`DO` Let them read it. Say one line, then move.
+
+> **SAY:** Not all fast software is world-class. But all world-class software
+> is fast.
+
+### Finding what to optimize
+
+> **SAY:** If you want the "what to optimize" half properly, Daniel Martí gave
+> it at GopherCon 2019 and it is still the best talk on it. He covers what to
+> optimize. I am covering whether you can believe the number when you get there.
+
+### Finding what is worth optimizing
+
+**Beat: plant Berger, paid off at the arc bridge.**
+
+> **SAY:** And the talk that pairs with Martí's is Emery Berger's "Performance
+> Matters". Same shelf, different question. Berger's point for us: in a
+> concurrent workflow, the component that looks hot on a profile is not
+> necessarily the one holding the wall time. We come back to that idea at the
+> bridge between the two halves.
+
+---
+
+## 02 · Why I Care — 3 min
+
+### How I got here
+
+`DO` Thirty seconds. Consequences, not achievements. No titles, no counts.
+
+> **SAY:** Quick word on why I care. I maintained `client_golang` — every
+> allocation I added landed in somebody's scrape budget. Then Parca, where a
+> profiler that costs five percent CPU is a profiler nobody deploys. Now Go
+> instrumentation at Datadog, where our SDKs run inside *your* process.
+>
+> Every one of those jobs punished me for trusting a benchmark I had not
+> questioned.
+
+### Why Datadog cares
+
+> **SAY:** That last one is the sharp version. Our code runs in your process.
+> Every nanosecond we spend comes out of your budget, not ours. So measurement
+> is not an engineering hobby for us, it is product correctness.
+>
+> One public number: profile-guided optimization took three point four percent
+> off production CPU. You only get to claim that if you can measure it.
+
+`DO` The SpeedLab logo is on screen as proof of investment. Say the name once
+and the framing line — that Datadog invests in performance testing internally
+and this talk is the spillover — then move. Do NOT ad-lib hardware, budgets,
+archetypes, gating, or scale. Ledger row 30 is scope-limited to name and
+existence; row 23 (internal macro practice) stays `pending` and out of scope.
+
+### This talk builds on
+
+**Beat: tie the bio to the data that comes later.**
+
+> **SAY:** One more piece of context. An earlier version of this material —
+> the FOSDEM talk Augusto and I gave — is where the SMT and DFS numbers you
+> will see later actually come from. So when those charts show up, they are
+> not new; they are the foundation this talk builds on.
+
+---
+
+## 03 · A Loose Cable — 4 min
+
+`DO` This is the story beat. It sets up the three questions, so it stays welded
+to them — do not let the §02 bio bleed into it.
 
 ### September 2011 (headline image)
 
 **Beat: a careful team, an extraordinary result.**
 
-> **SAY:** The OPERA collaboration fired neutrinos from CERN to a detector in
+> **SAY:** In 2011 a team of physicists announced they had broken the speed of
+> light. The OPERA collaboration fired neutrinos from CERN to a detector in
 > Italy, 730 kilometres away. The neutrinos arrived early. Faster than light.
 > They did not publish immediately. They spent months rechecking. The maths.
 > The sensors. The calibration. Then they published, and asked the world for
@@ -109,90 +251,9 @@ today.
 > usually fail on being *repeatable*. You will leave with the checks for both,
 > and three small tools that automate them.
 
-### How I got here
-
-`DO` Thirty seconds. Consequences, not achievements. No titles, no counts.
-
-> **SAY:** Quick word on why I care. I maintained `client_golang` — every
-> allocation I added landed in somebody's scrape budget. Then Parca, where a
-> profiler that costs five percent CPU is a profiler nobody deploys. Now Go
-> instrumentation at Datadog, where our SDKs run inside *your* process.
->
-> Every one of those jobs punished me for trusting a benchmark I had not
-> questioned.
-
-### Why Datadog cares
-
-> **SAY:** That last one is the sharp version. Our code runs in your process.
-> Every nanosecond we spend comes out of your budget, not ours. So measurement
-> is not an engineering hobby for us, it is product correctness.
->
-> One public number: profile-guided optimization took three point four percent
-> off production CPU. You only get to claim that if you can measure it.
-
 ---
 
-## 02 · Why Benchmark? — 4 min
-
-### Latency and throughput (two-step reveal)
-
-> **SAY:** Two words, quickly, because people use them interchangeably and they
-> are not.
->
-> *(reveal 1)* Latency is one operation, start to finish. That is what a user
-> feels.
->
-> *(reveal 2)* Throughput is operations per second. That is your ceiling.
->
-> They are not the same, and this matters: you can improve one and damage the
-> other. Batching is the classic — throughput up, latency worse.
-
-### The cost of slowness
-
-**Beat: this is a product decision, not an engineering one.**
-
-> **SAY:** Rough thresholds. Under two hundred milliseconds, nobody notices.
-> Half a second, it feels a bit slow. Past a second, people notice they are
-> waiting. Past five, they leave.
->
-> Google measured this directly. Half a second of extra latency cost them
-> twenty percent of search traffic.
-
-`DO` Attribute to "the Google search team". Not Marissa Mayer.
-
-### Lütke quote
-
-`DO` Let them read it. Say one line, then move.
-
-> **SAY:** Not all fast software is world-class. But all world-class software
-> is fast.
-
----
-
-## 03 · Before You Optimize — 5 min
-
-### Is it actually slow?
-
-> **SAY:** Before you write a single benchmark: check it is actually slow, in
-> production. In-process, that is pprof, or a continuous profiler. Across the
-> whole system, the OpenTelemetry eBPF profiler or Parca, and your p99.
->
-> Benchmark the path your production evidence says is hot. Not the one that
-> looks interesting.
-
-### Is it worth optimizing? (reveal)
-
-> **SAY:** And decide what done looks like, or you will never stop.
->
-> An SLO is a target, not a wish. If you are inside your error budget,
-> optimizing is optional — go fix something else. And Amdahl: only the hot path
-> pays. Ten percent off code that runs one percent of the time is nothing.
-
-### Finding what to optimize
-
-> **SAY:** If you want the "what to optimize" half properly, Daniel Martí gave
-> it at GopherCon 2019 and it is still the best talk on it. He covers what to
-> optimize. I am covering whether you can believe the number when you get there.
+## 04 · Before You Measure — 4 min
 
 ### Every benchmark needs
 
@@ -241,7 +302,58 @@ reintroduce it.
 
 ---
 
-## 04 · Local and Micro — 17 min total
+## 05 · Benchmarking, Quickly — 5 min
+
+**Beat: shared vocabulary for an advanced room — here is the instrument we are
+about to distrust.**
+
+`DO` This is a fast pass, not a tutorial. The room is advanced; do not teach
+`testing.B` from scratch. Name the parts, flag the default mistake, move.
+
+### Writing one
+
+> **SAY:** One slide on the shape, because we are about to distrust this
+> instrument and you should know what it looks like. A `testing.B` benchmark
+> is a function. Setup before the loop is excluded from timing. The loop is
+> `b.Loop` — the measured body. And the result has to sink somewhere the
+> compiler can see, or the body vanishes. We will spend the next section on
+> that last part.
+
+### Running one
+
+> **SAY:** The flags that matter. `-bench` picks what runs. `-benchmem` shows
+> allocations — leave it on, always. `-count` is how many times you repeat, and
+> `-count=1` is the default mistake: one run is one draw from a distribution,
+> not a measurement. `-benchtime` is either a duration or a fixed iteration
+> count. We come back to `-count` in the statistics section.
+
+### Reading the output
+
+> **SAY:** Three columns. `ns/op` is nanoseconds per iteration — it has a
+> floor, the timer costs about a quarter of a nanosecond, so it can lie.
+> `B/op` and `allocs/op` are bytes and allocations per iteration. An
+> allocation either happened or it did not. Remember this pair: `ns/op` can
+> lie, `allocs/op` cannot. That is the next section's motto.
+
+### Benchmark + pprof
+
+> **SAY:** When `ns/op` is not enough, profile. `-cpuprofile` and
+> `-memprofile` dump a profile you read with `go tool pprof`. `-top` prints the
+> hottest functions. Here the whole benchmark is one call to `sha256.Sum256`,
+> and ninety percent of the time is in the block function. The profile tells
+> you where the time is — not whether the time is real.
+
+### Reading compiler output
+
+> **SAY:** Last piece of vocabulary: the compiler can tell you what it did.
+> `-gcflags=-S` prints the assembly — each line shows the instruction and the
+> source it came from. `GOSSAFUNC` dumps every SSA rewrite phase to a browser,
+> so you can watch the compiler think. We use `-S` in the next section to
+> prove the compiler deleted our work.
+
+---
+
+## 06 · Local and Micro — 17 min total
 
 ### The three questions, micro scale
 
@@ -266,11 +378,11 @@ reintroduce it.
 >
 > Hold that thought. We come back to it once we can read a benchmark properly.
 
-`DO` Resist solving it. The payoff is §06.
+`DO` Resist solving it. The payoff is §07.
 
 ---
 
-## 05 · Making the Compiler Honest — ~10 min
+## 07 · Making the Compiler Honest — ~10 min
 
 ### Stop the compiler deleting your work
 
@@ -318,22 +430,20 @@ reintroduce it.
 >
 > And to be explicit: this is test-only. Do not put sinks in production code.
 
+### Escape analysis
+
+> **SAY:** Now see *why* the sink works. `-m -m` prints the escape-analysis
+> flow. In the broken benchmark, the discarded result `does not escape` — so the
+> compiler is free to delete it, and `allocs/op` is zero. In the fixed one, the
+> result flows to the package-level sink, so it `escapes to heap` — the
+> allocation must happen, and `allocs/op` is one. The sink is not magic; it is
+> the thing that forces the escape.
+
 ### Constant folding
 
 > **SAY:** Second trick. Every input here is a literal, so the compiler just
 > computes the answer at build time. You are now benchmarking how fast your CPU
 > can load a constant.
-
-### Reading the next slide
-
-`DO` Two sentences per side. Most of the room does not read ARM64.
-
-> **SAY:** We are about to look at assembly, so here is all you need. On the
-> left, `MOVD $3` — move the literal three into a register. The answer is
-> already baked into the binary. On the right, `VCNT` and `VUADDLV` — the
-> actual ARM64 population-count instructions. The CPU is doing the work.
->
-> One is a constant. One is work.
 
 ### `make asm-dce`
 
@@ -351,6 +461,15 @@ reintroduce it.
 > non-constant input and a captured result. Either one alone is not enough.
 >
 > `//go:noinline` is a diagnostic tool. Not production style.
+
+### Inlining decisions
+
+> **SAY:** `-m -m` also reports inlining costs. `makeBuffer` has cost three —
+> under the budget, so the compiler pastes the body in. That is what lets DCE
+> see the unused result and delete it. A bigger function goes over budget and
+> stays a call. `//go:noinline` does not fix anything — it forces the
+> over-budget case so you can see whether inlining is the problem. It is a
+> diagnostic, not a tool you ship.
 
 ### Timer: one-time setup
 
@@ -396,7 +515,7 @@ reintroduce it.
 
 ---
 
-## 06 · The Regression That Was a Speedup — ~5 min
+## 08 · The Regression That Was a Speedup — ~5 min
 
 ### Read the benchmark first
 
@@ -470,7 +589,7 @@ reintroduce it.
 
 ---
 
-## 07 · Statistical Interpretation — ~5 min
+## 09 · Statistical Interpretation — ~5 min
 
 ### One number is a point sample
 
@@ -520,7 +639,7 @@ reintroduce it.
 
 ---
 
-## 08 · Local Reproduction — ~5 min
+## 10 · Local Reproduction — ~5 min
 
 ### What does isolation actually buy?
 
@@ -588,7 +707,7 @@ No QEMU, no cross-architecture emulation.
 
 ---
 
-## 09 · CI and Macro — 15 min total
+## 11 · CI and Macro — 14 min total
 
 ### The three questions, macro scale
 
@@ -639,7 +758,7 @@ CI-only, on a dedicated runner.
 
 ---
 
-## 10 · Designing a Macrobenchmark — ~5 min
+## 12 · Designing a Macrobenchmark — ~5 min
 
 ### What does your app actually do? (reveal)
 
@@ -697,7 +816,7 @@ CI-only, on a dedicated runner.
 
 ---
 
-## 11 · Controlling the CI Environment — ~5 min
+## 13 · Controlling the CI Environment — ~5 min
 
 ### Why shared runners lie
 
@@ -720,6 +839,18 @@ CI-only, on a dedicated runner.
 > same units, so your runtime now depends on what some other process is doing.
 > A co-tenant you cannot see and did not schedule.
 
+### Why SMT breaks benchmarks
+
+**Beat: the mechanism, not just the assertion.**
+
+> **SAY:** So why does sharing a core produce twenty-three percent variance? A
+> core is a fixed bag of execution units — arithmetic, floating point,
+> load and store. Two threads share that bag. Neither gets the full core; each
+> gets a fraction. And the split is nondeterministic — whoever has
+> instructions ready wins the next slot. Run to run, your thread gets a
+> different fraction, and that fraction swings the runtime. Same code, same
+> core, different share every time. That is the twenty-three percent.
+
 ### What's the impact of disabling SMT?
 
 > **SAY:** Here is the cost. Two CPU-bound tasks, same core versus separate
@@ -737,6 +868,19 @@ CI-only, on a dedicated runner.
 >
 > Why that ruins a benchmark: run one boosts. Run twenty is warm and throttles.
 > Same code, different clock, different answer.
+
+### Why DFS breaks benchmarks
+
+**Beat: the mechanism, not just the assertion.**
+
+> **SAY:** And the frequency story is the same shape. The clock is not fixed.
+> A governor picks a frequency based on load and how much thermal headroom the
+> chip has. Turbo pushes above base when the chip is cool. So run one — cool
+> chip, high clock, fast result. Run twenty — warm chip, throttled clock,
+> slower result. Same number of cycles, different wall time. The benchmark is
+> not comparable across runs. Pin to base frequency and every run gets the
+> same clock — the mean gets slower, because no turbo, but the variance drops
+> ten times.
 
 ### What's the impact of disabling DFS?
 
@@ -780,7 +924,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 12 · Detecting Change Over Time — ~3 min
+## 14 · Detecting Change Over Time — ~3 min
 
 ### A/B is the wrong model for CI
 
@@ -811,7 +955,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 13 · Wiring It Into CI — ~3 min
+## 15 · Wiring It Into CI — ~3 min
 
 ### Two patterns
 
@@ -854,7 +998,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 14 · Wire It Up — 4 min
+## 16 · Wire It Up — 4 min
 
 ### Three tools
 

@@ -13,7 +13,7 @@ BENCH_OUTPUT := /tmp/gopherconuk26-bench.txt
 BENCHSTAT    := $(shell go env GOPATH)/bin/benchstat
 BENCHDIFF    := $(shell go env GOPATH)/bin/benchdiff
 
-.PHONY: tools bench bench-dce bench-bloop bench-timer bench-docker cv stat clean help
+.PHONY: tools bench bench-dce bench-bloop bench-timer bench-docker cv stat clean help bench-pprof escape-inline
 
 ## tools: install benchstat and benchdiff
 tools:
@@ -81,6 +81,40 @@ asm-dce:
 	@echo "=== BenchmarkOnesCount_Correct — expect VCNT (a real popcount) ==="
 	@$(ASM_CMD) 2>&1 | grep -A16 'OnesCount_Correct(SB)' \
 		| grep -E 'MOVD.*onesInput|VCNT|UADDLV' | sed -E 's|\(/[^)]*/([^/)]*)\)|(\1)|; s/^[[:space:]]*//' || true
+
+## bench-pprof: capture a CPU profile and `pprof -top` of the B.Loop hash bench
+#
+# Feeds the §05 "Benchmark + pprof" slide. The .prof stays in /tmp; only the
+# -top text is committed under results/ so the evidence is plain text. Long
+# stdlib and module paths are trimmed so the table fits the code-panel width
+# (the panel clips horizontal overflow silently) — same trimming principle as
+# asm-dce, applied to the function-name column only.
+PPROF_PROF := /tmp/gopherconuk26-cpu.prof
+
+bench-pprof:
+	go test -bench=BenchmarkHash_BLoop -benchmem -count=1 -benchtime=2s \
+		-cpuprofile=$(PPROF_PROF) .
+	go tool pprof -top $(PPROF_PROF) \
+		| sed -E 's|crypto/internal/fips140/||g; s|github.com/kakkoyun/gopherconuk-26/||g' \
+		> results/pprof-top.txt
+	@echo "==> results/pprof-top.txt"
+
+## escape-inline: capture `-gcflags='-m -m'` escape + inlining decisions
+#
+# Must be `go test`, not `go build`: the benchmarks live in _test.go files, so
+# `go build` never compiles them and the grep silently matches nothing — the
+# same gotcha documented on asm-dce. -run XXX -bench XXX compiles the test
+# files (so -m sees them) without running anything. The filter keeps only the
+# file:line:col optimization messages, dropping build noise (PASS, ok, etc.).
+# Paths are shortened (./dce_bench_test.go:33:6: -> dce:33:) and the `as:`
+# inlined-body suffix is trimmed from can-inline lines, so the output fits the
+# code-panel width — the panel clips horizontal overflow silently.
+escape-inline:
+	go test -gcflags='-m -m' -run XXX -bench XXX . 2>&1 \
+		| grep -E '\.go:[0-9]+:[0-9]+:' \
+		| sed -E 's|\./([a-z]+)_bench_test\.go:|\1:|g; s/ as: .*//' \
+		> results/gcflags-m-m.txt
+	@echo "==> results/gcflags-m-m.txt"
 
 ## clean: remove captured benchmark output
 clean:
