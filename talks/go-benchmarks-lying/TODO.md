@@ -7,10 +7,14 @@ Companion files: `outline.md` (structure, timing, cut ladder) ·
 `speaker-notes.md` (the spoken script) · `slides/presentation.md` (the deck) ·
 `../../research/go-benchmarks-lying/claims-ledger.md` (every factual claim).
 
-**Delivered at GopherCon UK 2026.** State at delivery: 127 pages, 16 sections,
-fragment floor 60, claims ledger 43 `verified` / 1 `dropped` / 0 `pending`. The
-full `make check` surface passed. Everything below is what survived the talk or
+**Delivered at GopherCon UK 2026** at 127 pages. Now 129 pages, 16 sections,
+fragment floor 63, claims ledger 44 `verified` / 1 `dropped` / 0 `pending`. The
+full `make check` surface passes. Everything below is what survived the talk or
 was created by it.
+
+Two slides were added *after* delivery and have never been presented: the
+observer effect and the `perfgo` pointer, both at the end of §07. Rehearse that
+section before the next outing.
 
 ---
 
@@ -30,30 +34,6 @@ per-part targets in `speaker-notes.md` on that. Until someone does, the cut
 ladder is being applied against a guess.
 
 If the talk was recorded, the recording is the measurement.
-
-### Add the observer effect
-
-The one genuine content gap found while checking the deck against prior art.
-Teiva Harsanyi's P99 CONF post names four traps leading to inaccurate Go
-benchmarks. The deck covers three of them: timer reset and pause, wrong
-assumptions about microbenchmarks, and compiler optimizations. It does not cover
-the fourth, the observer effect, where the act of measuring changes what is
-measured.
-
-That is this talk's thesis stated one level down, so it belongs in it. Source:
-<https://p99conf.io/2023/08/16/how-to-write-accurate-benchmarks-in-go/>, and the
-longer treatment is in *100 Go Mistakes*.
-
-### perfgo slide
-
-Ledger row 43 is `verified` and ready to use. The framing matters and is not the
-obvious one: `perfgo` is a Go performance-analysis CLI over Linux `perf` and CPU
-PMU counters, covering cache misses, cache-to-cache transfers and possible false
-sharing, and IPC. **It is not a continuous profiler.** Citing it as one
-misattributes the tool in front of its author, who presented it at FOSDEM 2026.
-
-Framed correctly it fits the talk better than a profiling name-check would,
-because it answers *why* a benchmark is slow at the hardware level.
 
 ### Memes
 
@@ -86,13 +66,20 @@ a 1 to 2 percent CV floor for a pinned container on the Mac VM against about
 0.05 percent on bare-metal Linux. That number is not confirmed by anything in
 this repo.
 
-An attempt was made and thrown away, for a reason worth keeping: it ran
+**Attempt 1** was made and thrown away, for a reason worth keeping: it ran
 concurrently with a Marp server and two PDF builds, so the "idle" baseline was
 not idle. It produced idle 3.16 percent, noisy 5.82 percent, pinned 2.42 percent,
 which contradicts both the committed evidence and row 8, and it also showed
 pinning making the mean 2.3x slower. None of that is trustworthy, so
 `demo/results/` still holds the older committed run and the deck still shows
 idle 4.75, noisy 18.88, pinned 5.25.
+
+**Attempt 2 was refused by our own tooling**, which is the useful part. Load
+average was 12.98 / 43.14 / 45.03 with a browser at 42 percent CPU, and `benchenv`
+reported `[warn] load average — close background applications before
+benchmarking`, dropping its summary from `3 ok, 2 warn` to `2 ok, 3 warn`. The
+gate on the closing slides did its job on the person who wrote it. Do not
+override it; wait for a quiet machine.
 
 Consequence: the `5.25% is not a triumph / It is a ceiling` slide rests on a run
 nobody has reproduced. Redo it on a quiet machine with nothing else running,
@@ -154,6 +141,18 @@ them being "fixed" again.
   CPU-simulation instrument does not support Go. The tools-table cell says so
   deliberately. Do not "improve" it into claiming simulated execution for Go.
   Ledger row 42.
+- **`perfgo` is not a continuous profiler, and the slide must not say it is.** It
+  wraps Linux `perf` and CPU PMU counters around a Go benchmark: cache-miss
+  hotspots, cache-to-cache transfers as a false-sharing tell, IPC. Calling it
+  continuous profiling miscredits it in front of its author, who presented it at
+  FOSDEM 2026. It also needs Linux, which the slide and script both say. Ledger
+  row 43. The slide has no logo because no asset exists here; do not invent one.
+- **The observer-effect numbers are Harsanyi's, not ours.** 15073 / 7358 reused
+  against 33547 / 35507 fresh, measured on an Intel i5-7360U. The claim on screen
+  is that the fifty percent gap disappears, *not* that the fresh pair are the
+  function's true timings, because allocating a matrix per iteration is itself
+  being measured. The post also declines to attribute the effect to cache lines
+  or prefetching, so neither does the slide. Ledger row 45.
 - **Ledger row 23 is cleared, and the slide stays generic anyway.** Row 23 moved
   to `verified` as a scope-limited self citation on the row-30 precedent. The
   macro-gate slide was deliberately *not* reverted to the Datadog-specific
