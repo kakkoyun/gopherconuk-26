@@ -530,6 +530,34 @@ about to distrust.**
 > I am telling you this because it is the whole talk in one detail. The thing you
 > trust to keep your benchmark honest is itself code, and it has been wrong.
 
+### The observer effect
+
+`DO` Point at the left column first. Let the 50% land before you kill it.
+
+> **SAY:** One last way to measure nothing. This is Teiva Harsanyi's, from the
+> P99 CONF post and *100 Go Mistakes*.
+>
+> Same function both rows. Sum the first eight columns of a matrix. Only the
+> column count differs, 512 against 513, and we only ever touch eight columns.
+> 513 comes out about fifty percent faster. That should be impossible.
+>
+> It is the matrix. It was built once, outside the loop, and then reused for
+> thousands of iterations. So we are not timing the function on fresh input, we
+> are timing it on input that is already sitting in cache, and the two column
+> counts cache differently.
+>
+> Build the matrix inside each iteration and the gap disappears. Look at the
+> right column: thirty-three and thirty-five. Not identical, but the fifty
+> percent is gone.
+>
+> Note both numbers got *bigger*, because now we are also timing the allocation.
+> That is the honest reading: the gap was the artefact. These are not the
+> function's true timings either.
+>
+> Physics calls this the observer effect. Measuring the thing changed the thing.
+> Which, if you have been listening for the last forty minutes, is the entire
+> talk.
+
 ---
 
 ## 08 · The Regression That Was a Speedup — ~5 min

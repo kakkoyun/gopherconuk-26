@@ -1034,6 +1034,30 @@ The thing protecting your measurement is **also code that can be wrong**.
 
 ---
 
+## The observer effect
+
+<span class="small">summing the first 8 columns of an int64 matrix</span>
+
+<div class="centered-table">
+
+| | reused matrix | fresh matrix |
+| --- | --- | --- |
+| 512 columns | 15073 ns/op | 33547 ns/op |
+| 513 columns | <span class="hl-blue">7358 ns/op</span> | 35507 ns/op |
+
+</div>
+
+<div class="center">
+
+Reuse the input and 513 looks **50% faster**.
+Build it fresh and the gap is **gone**.
+
+<span class="small">Teiva Harsanyi · [P99 CONF](https://p99conf.io/2023/08/16/how-to-write-accurate-benchmarks-in-go/) · *100 Go Mistakes* #91</span>
+
+</div>
+
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
