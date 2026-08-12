@@ -2006,7 +2006,7 @@ fixed with more samples.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 04
+###### CLOSE
 
 # Wire It Up
 
