@@ -1,352 +1,945 @@
-# Speaker notes: Why Your Go Benchmarks Are Lying
+# Script: Why Your Go Benchmarks Are Lying
 
-GopherCon UK 2026 · 60 minutes including Q&A · advanced audience
+GopherCon UK 2026 · 50 minutes + 10 Q&A · 107 slides
 
-Deck: `slides/presentation.md` · 109 pages including progressive-reveal steps
+**How to use this.** `SAY` lines are the words. They are written to be spoken,
+not read — short sentences, one idea each. You do not need them verbatim; learn
+the **beat** (the bold line before each block) and the numbers, and the words
+will come. `DO` lines are delivery, not content.
 
-## Corrections applied after dry run 2
+**Memorise in this order:** the 14 beats → the three questions → the two
+stories → the numbers. Everything else is recoverable on stage.
 
-This file had drifted from the deck. Three things were wrong and are now fixed.
-Recorded here so the same errors do not get reintroduced from an old draft.
+---
 
-| Was | Now | Why |
+## The 14 beats
+
+| # | Section | The one thing |
 | --- | --- | --- |
-| War story described as `BenchmarkStartSpan/1`, 1.62% slower, p=0.000 | `BenchmarkOTLPProtoSize`, **6-9%** slower | The deck and `07-war-stories.md` agree on OTLPProtoSize. The notes were describing a different benchmark. |
-| CV figures quoted as 3.74% / 2.09% / 0.05% | **23.9% → 0.044-0.235%** (SMT), **0.383% → 0.041%** (DFS) | Claims ledger rows 1-3 and `04-ci-continuous.md`. The old numbers matched no source. |
-| Runtime estimated at 66 minutes | **~38-40 minutes measured**, now built to ~50 | Dry run 2 wall clock: 10:13 start, slide 60 at 10:44. |
+| 01 | A Loose Cable | Careful people ship broken measurements |
+| 02 | Why Benchmark? | Speed is a product decision |
+| 03 | Before You Optimize | Pick the target before the tool |
+| 04 | Local and Micro | Trust the laptop first |
+| 05 | Compiler Honest | The compiler deletes your work |
+| 06 | Regression That Was a Speedup | Noise can be directionally wrong |
+| 07 | Statistics | One number is not a measurement |
+| 08 | Local Reproduction | Know your noise ceiling |
+| 09 | CI and Macro | Same questions, hardware answers |
+| 10 | Macrobenchmark Design | Representative is the hard part |
+| 11 | CI Environment | Three sysfs writes buy 100× |
+| 12 | Change Over Time | A/B cannot see drift |
+| 13 | Wiring Into CI | Detect, don't measure |
+| 14 | Wire It Up | Under an hour |
 
-## Timing
+**Checkpoints:** §04 by 14:00 · §09 by 31:00 · §14 by 46:00.
+If §09 has not started by 33:00, start cutting (ladder in `outline.md`).
 
-Target 50 minutes presented, 10 minutes Q&A.
+---
 
-| Part | Target | Cumulative |
-| --- | ---: | ---: |
-| 0 · Cold open and contract | 5:00 | 5:00 |
-| 1 · Who and why | 4:00 | 9:00 |
-| 2 · Before you measure | 5:00 | 14:00 |
-| 3 · Arc 1, local and micro | 17:00 | 31:00 |
-| 4 · Arc 2, CI and macro | 15:00 | 46:00 |
-| 5 · Tools and close | 4:00 | 50:00 |
+## 01 · A Loose Cable — 5 min
 
-Checkpoints: arc 1 by 14:00, arc 2 by 31:00, close by 46:00. Cut ladder is in
-`outline.md`; if arc 2 has not started by 33:00, start applying it.
+### Title slide
 
-## Part 0 — cold open and contract
+> **SAY:** In 2011 a team of physicists announced they had broken the speed of
+> light. They were wrong. I want to tell you why, because the same thing is
+> probably happening in your benchmarks.
 
-### OPERA
+`DO` Do not introduce yourself. Straight into the story.
 
-Open on the story. Do not introduce yourself first. Ninety seconds is enough.
-Three beats: a careful instrument, a surprising result, a connector.
+### September 2011 (headline image)
 
-The two-fault detail is the point worth landing. The fibre connector biased the
-result one way; an oscillator defect pushed the other way and partially masked
-it. A benchmark environment can hold several systematic errors that cancel until
-one of them changes. Do not attach a number to the oscillator (ledger row 9).
+**Beat: a careful team, an extraordinary result.**
 
-The photograph has an arrow on the connector. Let people look at it for a beat
-before speaking.
+> **SAY:** The OPERA collaboration fired neutrinos from CERN to a detector in
+> Italy, 730 kilometres away. The neutrinos arrived early. Faster than light.
+> They did not publish immediately. They spent months rechecking. The maths.
+> The sensors. The calibration. Then they published, and asked the world for
+> help.
 
-### Pivot and contract
+### The cause (connector photo)
 
-Say: "The point is not that particle physicists were careless. The point is that
-a precise system can be wrong in a way that survives expert review."
+**Beat: it was a cable.**
 
-Then the scale contrast, then the three questions. Pause after each question.
+`DO` Let them look at the photo for a beat before you speak.
 
-### Roadmap
+> **SAY:** It was this. A fibre-optic connector, not quite seated, in the GPS
+> timing chain. Seventy-three nanoseconds of bias. That was the whole result.
+>
+> And here is the part I love. There was a *second* fault — an oscillator —
+> pushing the other way. The two errors partially cancelled. The bug was hiding
+> behind another bug.
 
-This slide is new and it is doing real work. State that the same three questions
-get asked twice, at two scales, and that the answers are different each time.
-Name what they leave with. Do not read the bullets verbatim.
+`DO` Do not put a number on the oscillator. Ledger row 9.
 
-## Part 1 — who and why
+### Systematic error hides in plain sight
+
+**Beat: the lesson, stated plainly.**
+
+> **SAY:** The point is not that physicists were careless. They were the
+> opposite. The point is that a precise instrument can be confidently wrong,
+> and stay wrong, through months of expert review.
+
+### Your cables
+
+> **SAY:** OPERA had an international collaboration and fifteen thousand tonnes
+> of detector. You have `testing.B`, a laptop, and thirty Chrome tabs. Your
+> cables are the compiler, the scheduler, and your statistics. Let's go find
+> them.
+
+### Three questions
+
+**Beat: the contract for the next fifty minutes.**
+
+`DO` Pause after each one. This is the spine — they should hear it four times
+today.
+
+> **SAY:** Three questions. Is the benchmark measuring real work? Is my sample
+> stable enough? And is the difference big compared to the noise?
+>
+> If you cannot answer all three, you do not have a measurement. You have a
+> number.
+
+### Two scales, same three questions
+
+> **SAY:** We ask them twice. First half: your laptop, `testing.B`,
+> microbenchmarks. Second half: CI, whole workloads, over time.
+>
+> Same questions, different answers, because they fail differently.
+> Microbenchmarks usually fail on being *representative*. Macrobenchmarks
+> usually fail on being *repeatable*. You will leave with the checks for both,
+> and three small tools that automate them.
 
 ### How I got here
 
-This replaced a credentials list. Deliver it as a story with four reveals, and
-let each one land as a consequence rather than an achievement:
+`DO` Thirty seconds. Consequences, not achievements. No titles, no counts.
 
-- `client_golang` — allocations showed up in somebody's scrape budget
-- Parca — a profiler costing 5% CPU is not deployable
-- Datadog — our SDKs run inside your process
-- the punchline: every one of those jobs punished me for trusting a benchmark
-
-Twenty to thirty seconds. Do not list maintainer titles or contribution counts.
+> **SAY:** Quick word on why I care. I maintained `client_golang` — every
+> allocation I added landed in somebody's scrape budget. Then Parca, where a
+> profiler that costs five percent CPU is a profiler nobody deploys. Now Go
+> instrumentation at Datadog, where our SDKs run inside *your* process.
+>
+> Every one of those jobs punished me for trusting a benchmark I had not
+> questioned.
 
 ### Why Datadog cares
 
-Not a generic company slide. Say: "Every allocation and nanosecond we add comes
-out of someone else's workload budget. That is why continuous benchmarking is
-product correctness for us." PGO's 3.4% production CPU reduction is public.
+> **SAY:** That last one is the sharp version. Our code runs in your process.
+> Every nanosecond we spend comes out of your budget, not ours. So measurement
+> is not an engineering hobby for us, it is product correctness.
+>
+> One public number: profile-guided optimization took three point four percent
+> off production CPU. You only get to claim that if you can measure it.
 
-## Part 2 — before you measure
+---
 
-Move briskly. Latency and throughput are a two-step reveal; the payoff line is
-that an optimization can improve one and damage the other.
+## 02 · Why Benchmark? — 4 min
 
-The Google result is attributed to the search team, not to Marissa Mayer.
+### Latency and throughput (two-step reveal)
 
-**Representative and repeatable** is the frame for everything after it. Micro
-fails the first, macro fails the second. Say it once, clearly, then let the two
-arcs demonstrate it.
+> **SAY:** Two words, quickly, because people use them interchangeably and they
+> are not.
+>
+> *(reveal 1)* Latency is one operation, start to finish. That is what a user
+> feels.
+>
+> *(reveal 2)* Throughput is operations per second. That is your ceiling.
+>
+> They are not the same, and this matters: you can improve one and damage the
+> other. Batching is the classic — throughput up, latency worse.
 
-**Start macro, then drill** is the concrete answer to "what should I actually
-do". Walk the four steps on the left, then the failure mode on the right. This
-slide exists because the previous version of the talk raised macrobenchmarks and
-never told anyone what to do about them.
+### The cost of slowness
 
-The scope statement claiming this was a microbenchmarks-only talk is gone. Do not
+**Beat: this is a product decision, not an engineering one.**
+
+> **SAY:** Rough thresholds. Under two hundred milliseconds, nobody notices.
+> Half a second, it feels a bit slow. Past a second, people notice they are
+> waiting. Past five, they leave.
+>
+> Google measured this directly. Half a second of extra latency cost them
+> twenty percent of search traffic.
+
+`DO` Attribute to "the Google search team". Not Marissa Mayer.
+
+### Lütke quote
+
+`DO` Let them read it. Say one line, then move.
+
+> **SAY:** Not all fast software is world-class. But all world-class software
+> is fast.
+
+---
+
+## 03 · Before You Optimize — 5 min
+
+### Is it actually slow?
+
+> **SAY:** Before you write a single benchmark: check it is actually slow, in
+> production. In-process, that is pprof, or a continuous profiler. Across the
+> whole system, the OpenTelemetry eBPF profiler or Parca, and your p99.
+>
+> Benchmark the path your production evidence says is hot. Not the one that
+> looks interesting.
+
+### Is it worth optimizing? (reveal)
+
+> **SAY:** And decide what done looks like, or you will never stop.
+>
+> An SLO is a target, not a wish. If you are inside your error budget,
+> optimizing is optional — go fix something else. And Amdahl: only the hot path
+> pays. Ten percent off code that runs one percent of the time is nothing.
+
+### Finding what to optimize
+
+> **SAY:** If you want the "what to optimize" half properly, Daniel Martí gave
+> it at GopherCon 2019 and it is still the best talk on it. He covers what to
+> optimize. I am covering whether you can believe the number when you get there.
+
+### Every benchmark needs
+
+**Beat: the frame for the whole talk.**
+
+> **SAY:** Two properties. Representative — it does what production does.
+> Repeatable — run it again, get the same answer.
+>
+> Hold those two words. Almost every failure in this talk is one of them
+> breaking.
+
+### Micro vs macro (two-step reveal)
+
+> **SAY:** *(reveal 1)* Microbenchmarks isolate a function. Nanosecond
+> precision. Very easy for the compiler to cheat. Their risk is being *not
+> representative* — beautifully precise measurement of something that never
+> happens.
+>
+> *(reveal 2)* Macrobenchmarks run the real workflow. Realistic. Their risk is
+> attribution — something moved, good luck finding out what.
+>
+> This talk covers both, because they fail differently and need different
+> checks.
+
+`DO` This replaces the old "this talk is only microbenchmarks" line. Do not
 reintroduce it.
 
-## Part 3 — arc 1, local and micro
+### When to use which
 
-### Arc divider and the plant
+`DO` Do not read the table. Point at two rows.
 
-The divider restates the three questions at micro scale and carries the
-local-first rule: if you cannot trust the number on your own machine, CI only
-industrialises the lie.
+> **SAY:** Comparing two algorithms — micro. Capacity planning — macro.
+> Regression detection needs both.
 
-Then plant #4891. The bot says `BenchmarkOTLPProtoSize` is 6-9% slower than main;
-nothing in the diff touches OTLP encoding. Say "hold that thought" and move on.
-**Do not resolve it here.** The whole point is that the audience needs the
-compiler section before they can solve it.
+### Start macro, then drill
 
-### §1A — making the compiler honest
+**Beat: the concrete answer to "so what do I do".**
 
-The framing slide comes first. Everything in the section exists to stop the
-compiler deleting the work you are timing, and all four techniques are test
-scaffolding. Say that once at the top and the section stops feeling like a
-grab-bag of tricks.
+> **SAY:** Here is the order that works. Macro first: does the workload
+> actually move? Then profile to find which component. Then micro on that
+> component, where you can iterate in seconds. Then macro again to confirm it
+> survived.
+>
+> And the order that wastes a fortnight: make a function forty percent faster,
+> ship it, watch nothing change, and never find out why.
 
-The captured DCE result is the key evidence:
+---
 
-```text
-DCE       0.2532 ns/op   0 B/op   0 allocs/op
-correct  11.14 ns/op  64 B/op   1 allocs/op
-```
+## 04 · Local and Micro — 17 min total
 
-`make([]byte, 64)` has no path that avoids allocating. Zero allocations means the
-call disappeared. Land this slowly: "`ns/op` has a timer floor. `allocs/op` tells
-us whether the allocation happened."
+### The three questions, micro scale
 
-The two-variable sink keeps a local in the loop and publishes once after it, so
-there is no global write per iteration. The slide says test-only; say it out loud
-too, because this was the single most confusing point in the rehearsal.
+> **SAY:** First half. Your laptop.
+>
+> The three questions again, at this scale. Real work — the compiler may have
+> deleted it. Stable sample — one run is a single point. Above the noise — your
+> laptop is not a controlled instrument.
+>
+> And the rule for this half: if you cannot trust the number on your own
+> machine, pushing to CI does not fix it. CI just industrialises the lie.
 
-**Assembly is now two slides.** The first explains how to read the second: `MOVD
-$3` loads a literal, `VCNT`/`VUADDLV` are ARM64 population-count instructions.
-Most of the room is not fluent in ARM64 assembly, so do the primer before the
-side-by-side and keep it to two sentences per column.
+### A benchmark bot comment
 
-Inlining feeds DCE inside a benchmark. `//go:noinline` is a diagnostic, not
-production style.
+**Beat: plant the puzzle. Do not solve it.**
 
-Timer ordering: `ResetTimer` clears elapsed time but does not stop the timer. For
-per-iteration setup, stop before the fixture and restart before the operation.
-The captured output shows the broken version looking 25% faster because it
-excludes the function it claims to measure.
+> **SAY:** Before that, a real one. June this year, dd-trace-go. I restructure a
+> file, push, and the benchmark bot says `BenchmarkOTLPProtoSize` is six to nine
+> percent slower than main.
+>
+> Here is what bothers me. Nothing in my diff goes anywhere near OTLP encoding.
+>
+> Hold that thought. We come back to it once we can read a benchmark properly.
 
-The non-terminating timer case stays, but "We tried it. It hung." is gone. State
-the mechanism only: without a matching `StartTimer`, timed duration never
-accumulates, so the framework keeps doubling `b.N`.
+`DO` Resist solving it. The payoff is §06.
 
-`B.Loop` excludes setup, stops timing after the loop, runs the function once per
-`-count`, and prevents DCE when written literally as `b.Loop()`. Do not read the
-table; point at setup exclusion and DCE prevention.
+---
 
-### §1B — the regression that was a speedup
+## 05 · Making the Compiler Honest — ~10 min
 
-Now pay off the plant. Read the benchmark first: the timed loop is
-`proto.Size(tracesData)` on a struct built before `ResetTimer`, and it never
-touches code the PR changed. Locally, run-to-run variance was under 0.1%.
+### Stop the compiler deleting your work
 
-Then the same-machine A/B: main 883.3 ns, #4891 840.7 ns. The PR was faster. CI
-had inverted the sign. Let that sit.
+> **SAY:** Everything in this section does one job: stop the compiler deleting
+> the work you are trying to time. Four techniques. All four are test
+> scaffolding — none of this belongs in production code. I will say that again
+> when it matters.
 
-Mechanism: restructuring `context.go` moved function addresses, which moved the
-hot loop relative to cache-line and branch-target-buffer boundaries. At ~390 ns
-per iteration that is worth several percent in either direction. Resolution: no
-code change.
+### The compiler is not neutral
 
-Berger's *Performance Matters* establishes that code layout alone moves results
-by ±10%.
+> **SAY:** Your benchmark is just code. The compiler reads it, notices you never
+> use the result, and removes the work. And it is *right* to. The spec allows
+> it. Your loop still runs `b.N` times — it just runs empty.
 
-**Causal profiling is the bridge to arc 2.** A flat profile says `encode` is 30%
-of CPU; causal profiling says making `encode` 20% faster moves end-to-end by 2%.
-Present the numbers as illustrative of the mechanism, not as a measurement
-(ledger row 19). Then the consequence: a component speedup does not imply a
-system speedup, so a microbenchmark cannot tell you whether the work mattered.
-That sentence is the reason the second half of the talk exists.
+### Dead-code elimination (code)
 
-### §1C — statistics
+> **SAY:** `makeBuffer` allocates. The benchmark calls it and throws the result
+> away. Watch what happens.
 
-The 43% swing is two runs of the same binary on a deliberately loaded machine.
-`11.32n` is the median. A `~` result means no measurable difference, and that is
-a result rather than an invitation to rerun.
+### `make bench-dce`
 
-Benchstat compares distributions; it does not tell you whether the machine is
-trustworthy. CV is that check. Ten runs is the floor, twenty is better, and the
-run count is set before looking at results.
+**Beat: the killer number.**
 
-### §1D — local reproduction
+> **SAY:** Quarter of a nanosecond, versus eleven. Looks like a forty-fold
+> speedup. But look at the right-hand column. Zero allocations.
+>
+> `make([]byte, 64)` has no path that avoids allocating. There is no branch, no
+> cache. Zero allocations means the call is gone.
 
-"So we measured it" is gone; the slide states the gap and moves on.
+### `ns/op` can lie, `allocs/op` cannot
 
-The Docker table is committed captured output. **State the platform explicitly,
-because this was asked directly in the rehearsal:** Apple M4 Max, darwin/arm64,
-16 logical CPUs; the container is linux/arm64 under Docker Desktop's Apple
-Virtualization.framework VM. No QEMU, no cross-architecture emulation, guest ISA
-matches host.
+`DO` Land this slowly. It is the most reusable line in the talk.
 
-Loaded was 3× slower and 4× noisier. Pinning restored the idle noise floor while
-the host stayed saturated. Then the ceiling: 5.25% is useful isolation, not
-publication-quality control. Bare-metal Linux with SMT off reaches ~0.05%.
+> **SAY:** `ns/op` has a floor — a timer costs about a quarter of a nanosecond,
+> so an empty loop and a very fast function look identical. But an allocation
+> either happened or it did not. `allocs/op` cannot be talked into lying.
+>
+> Always pass `-benchmem`.
 
-Do not soften the macOS caveat. Pinning a vCPU inside a VM is not pinning a
-physical core.
+### The two-variable sink
 
-perflock is now framed as the answer to "is there a Go tool that sets this up?"
-because that is exactly how it came up. Then the caveat from source inspection:
-on macOS the mutual-exclusion lock works, frequency pinning does not, and the
-default `-governor 90` errors (ledger row 16).
+> **SAY:** The fix. A package-level variable the compiler cannot prove is never
+> read. Accumulate into a local inside the loop, then publish once after it —
+> that way you are not paying for a global write on every iteration.
+>
+> And to be explicit: this is test-only. Do not put sinks in production code.
 
-Close the arc with the recap slide: all three questions answered at micro scale,
-plus the layout-noise warning.
+### Constant folding
 
-## Part 4 — arc 2, CI and macro
+> **SAY:** Second trick. Every input here is a literal, so the compiler just
+> computes the answer at build time. You are now benchmarking how fast your CPU
+> can load a constant.
 
-### Arc divider and #643
+### Reading the next slide
 
-The divider reframes the same three questions: representative workload, stability
-across days, and hardware as the variable.
+`DO` Two sentences per side. Most of the room does not read ARM64.
 
-Then the second incident. Local overhead run: `multi` 230%, `largeidle` 212%,
-ceiling 150%. Both over. Looks like a serious regression.
+> **SAY:** We are about to look at assembly, so here is all you need. On the
+> left, `MOVD $3` — move the literal three into a register. The answer is
+> already baked into the binary. On the right, `VCNT` and `VUADDLV` — the
+> actual ARM64 population-count instructions. The CPU is doing the work.
+>
+> One is a constant. One is work.
 
-Then the turn: `largeidle` shares zero bumped dependencies with the change. It
-runs independent code and cannot have been affected, yet it moved by the same
-~60%. The machine was the variable — heavy parallel builds had been running all
-session. `benchmark/threshold` is CI-only with no local target, which is why the
-local number was untrustworthy. Resolution: wait for CI.
+### `make asm-dce`
 
-**The mirror-image slide is the payoff of having two stories.** #4891: CI said
-slower, the laptop was right, cause was code layout. #643: the laptop said
-slower, CI was right, cause was machine load. Neither environment is
-authoritative by default, and the tell was the same both times — a benchmark
-moved that could not have moved.
+> **SAY:** And there it is. Left, the literal three. Right, real instructions.
+> Fix is the same shape as before: route your inputs through a package-level
+> variable so the compiler cannot see them.
 
-### §2A — designing a macrobenchmark
+### Inlining feeds DCE
 
-Representative workloads as a three-step reveal, then the archetype table.
+> **SAY:** Inlining is good — in production. In a benchmark it makes things
+> worse, because once your function body is pasted into the loop, the compiler
+> can see the result is unused and delete the whole thing.
+>
+> `-gcflags=-m` tells you what is inlinable. And you need *both* fixes: a
+> non-constant input and a captured result. Either one alone is not enough.
+>
+> `//go:noinline` is a diagnostic tool. Not production style.
 
-The archetype tie-back slide is why the taxonomy is here rather than being
-trivia: `largeidle` is the Idle archetype, `multi` is Enterprise. Two archetypes
-exercising different code moved by the same amount at the same time, which is
-shared environment rather than shared cause.
+### Timer: one-time setup
 
-Macro gates compare against a budget, not against a parent commit. An overhead
-ceiling answers a product question: how much of the customer's machine may we
-consume.
+> **SAY:** Now timers. `ResetTimer` after your setup zeroes the elapsed clock.
+> Note what it does *not* do — it does not stop the timer.
 
-The scale slide is deliberately generic — dedicated hardware, a budget per
-component, several archetypes, gating the release. **Claims ledger row 23 is
-`pending`:** the Datadog-specific version of this slide is not cleared. Do not
-ad-lib internal specifics on stage.
+### Timer: per-iteration setup
 
-Two macro traps: coordinated omission, where a load generator stops recording the
-latency it caused, and non-deterministic inputs.
+> **SAY:** If you must build a fixture every iteration: stop the timer, build
+> it, start the timer, *then* do the work. Get that order wrong and you are
+> timing the fixture instead of the function.
 
-### §2B — controlling the CI environment
+### `make bench-timer`
 
-SMT and DFS each get an explainer before their chart, because the rehearsal used
-both acronyms without defining them.
+> **SAY:** Here is the wrong order. Four sixteen versus five fifty. The broken
+> one looks twenty-five percent faster — because it is timing the fixture and
+> excluding the function it claims to measure.
+>
+> That is the thing about a benchmark measuring the wrong thing. It does not
+> look broken. It looks like good news.
 
-SMT: two hardware threads share one core's execution units. Good for throughput,
-fatal for repeatability, because your runtime now depends on an invisible
-co-tenant. Then the chart: 23.887% CV down to 0.044%, and note it also got twice
-as fast because the core stopped sharing.
+### `StopTimer` with no `StartTimer`
 
-DFS: the CPU changes its own clock. Run 1 boosts, run 20 is warm and throttles.
-The chart shows ~10× less variance with it off — and the mean gets *slower*. Say
-the line on the slide: a benchmark's job is to be comparable, not to post the
-best number you can reach once.
+> **SAY:** One more. Stop the timer and never restart it. The framework waits
+> for enough timed duration. The timer never runs, so duration never
+> accumulates. So it doubles `b.N` and tries again. And again. Forever.
 
-Three sysfs writes buy ~100×. In a VM the hypervisor owns SMT, frequency is
-virtualised, and the write may succeed and be silently ignored.
+`DO` Straight face, then move. Do not editorialise.
 
-### §2C — change over time
+### `b.Loop()` — Go 1.24
 
-Benchstat compares two distributions. CI has a time series with hardware changes
-and dependency bumps in it. Comparing each commit to its parent re-asks the noise
-question every time and misses slow drift.
+> **SAY:** Go 1.24 gave us a much better answer. `b.Loop`. Setup before the loop
+> is excluded automatically. Timing stops at the end automatically. And it
+> prevents dead-code elimination of the loop body.
 
-The ideal-vs-actual pair is the honest version: a step change is obvious in a
-diagram and buried in variance in real data.
+### What `b.Loop` removes
 
-Change-point detection asks where the distribution shifted and stayed shifted.
-ED-PELT, e-divisive means, Apache Otava, Netflix at scale. It needs history, so
-it belongs in nightly trending rather than a PR gate.
+`DO` Do not read the table. Point at two rows.
 
-### §2D — wiring it up
+> **SAY:** Setup exclusion, and DCE prevention — those are the two that matter.
+> One catch: the compiler only does this if you write `b.Loop()` literally in
+> the condition. Assign it to a variable first and you lose it.
 
-PR gate versus nightly suite have opposing requirements. CI detects; it is not
-the primary measurement.
+---
 
-The feedback-loop diagram carries one line: benchmarks have to be locally
-reproducible for a developer to act on them, which is why arc 1 came first.
+## 06 · The Regression That Was a Speedup — ~5 min
 
-The false-positive ledger slide is the institutional-memory point.
-`BenchmarkOTLPProtoSize` fired again eleven days later and took one comment to
-dismiss because the first investigation was written down.
+### Read the benchmark first
 
-Close the arc with its recap slide.
+**Beat: pay off the plant.**
 
-## Part 5 — tools and close
+> **SAY:** Back to our bot comment. First thing I did — read the benchmark.
+> That is the entire timed loop. One call, `proto.Size`, on a struct that was
+> built *before* `ResetTimer`.
+>
+> It does not call `ContextWithSpan`. It does not call `SpanFromContext`. It
+> does not call one line of the code I changed. And locally it was rock solid —
+> under nought point one percent variance.
 
-No terminal. Every output shown is captured from the repository.
+### Same machine, both branches
 
-- `honestbench` — AST analysis, finds discarded results and timer misordering
-  without running anything
-- `benchgate` — runs N times and fails when CV is too high to trust
-- `benchenv` — reports which controls exist on this machine
+> **SAY:** So I built both branches on the same machine and compared them
+> properly. Main: eight eighty-three. My branch: eight forty.
+>
+> My branch was *faster*. CI had not just got the size wrong. It had got the
+> **sign** wrong.
 
-Pause on the punchline. Four `unavailable` lines are the honest answer: macOS
-does not expose Linux sysfs controls, so the output says `unavailable` rather
-than inventing a green check.
+`DO` Let this sit. It is the biggest surprise in the talk.
 
-Then the minimum viable discipline, then the 3×2 recap. The two lines that must
-land: a sub-10% micro delta can be layout noise, and a shared runner cannot be
-fixed with more samples.
+### The mechanism
 
-End with: "Trust your numbers only after the compiler, the sample, and the
-machine have each earned that trust." Leave the questions slide up.
+> **SAY:** What actually happened: restructuring the file moved function
+> addresses across the package. That moved the hot loop relative to cache lines
+> and branch-target-buffer boundaries.
+>
+> At about three hundred and ninety nanoseconds an iteration, that is worth
+> several percent — in either direction. Enough to flip a verdict on a runner
+> that cannot pin its clock.
+>
+> Resolution: no code change. Nothing was wrong.
 
-## Delivery constraints
+### A known phenomenon
 
-- No live or recorded demos. Every output is captured from the repository.
-- If a result is challenged, name its committed result file and the environment.
-  Do not improvise a rerun on stage.
-- Do not treat Docker Desktop on macOS as hardware isolation.
-- Do not claim statistical significance proves practical importance.
-- Do not present ledger row 23 content beyond what is on the slide.
-- Present from the bespoke HTML if you want the reveals to animate. The PDF is a
-  correct handout but shows every fragment at once.
+> **SAY:** This is not folklore. Emery Berger's "Performance Matters" is the
+> canonical talk. Code layout alone — which symbol lands at which address —
+> swings performance by ten percent or more.
 
-## Public references for questions
+### Causal profiling
 
-| Claim | Reference |
+> **SAY:** Berger's other idea is worth stealing. A normal profiler tells you
+> where time is spent. It does not tell you what happens if you make that part
+> faster.
+>
+> Causal profiling answers the second question directly — it applies a *virtual*
+> speedup to one component and measures the effect on the whole program. So
+> instead of "encode is thirty percent of CPU", you get "making encode twenty
+> percent faster moves end-to-end by two".
+
+`DO` Those numbers are illustrative of the mechanism, not measured. Ledger 19.
+
+### A component speedup is not a system speedup
+
+**Beat: the bridge into the second half.**
+
+> **SAY:** And that is the whole reason the second half of this talk exists.
+> Contention, queueing, and dependencies decide how much of a local win
+> survives to the top.
+>
+> A microbenchmark measures the component. Only a macrobenchmark tells you
+> whether it mattered.
+
+### A noisy result can be directionally wrong
+
+> **SAY:** So the lesson from this story is not "CI is bad". It is that a noisy
+> result is not merely imprecise. It can point the wrong way. It can block a
+> good change, and wave a real regression straight through.
+
+---
+
+## 07 · Statistical Interpretation — ~5 min
+
+### One number is a point sample
+
+> **SAY:** Same binary. Same machine. Eight runs apart. Thirty-nine
+> nanoseconds, and twenty-seven. A forty-three percent swing, and nothing
+> changed but time.
+>
+> Run it once, file the PR, and you can be forty-three percent wrong in either
+> direction.
+
+### `benchstat`
+
+> **SAY:** The tool is `benchstat`, from `x/perf`. Run with `-count`, pipe it in,
+> and it compares distributions instead of numbers.
+
+### Read the output (reveal)
+
+> **SAY:** Four things. The number is the *median*, not the mean. The plus-minus
+> is spread. `p` tells you whether it is distinguishable from noise.
+>
+> And a tilde means no measurable difference — which is a *result*. It is not an
+> invitation to run it again until you get a delta.
+
+### What benchstat won't tell you
+
+> **SAY:** But there is a question benchstat deliberately does not answer. It
+> tells you whether A differs from B. It does not tell you whether this machine
+> is a trustworthy place to be asking.
+>
+> That is coefficient of variation — standard deviation over mean. One number
+> for how noisy your environment is. Twenty lines of awk, and it is the check
+> most people skip.
+
+### Rules of thumb
+
+> **SAY:** Ten runs is the floor, twenty is better. Above about five percent CV,
+> stop comparing and go fix your machine — more samples will not save you. And
+> significant and *large* are different questions.
+
+### The p-hacking trap
+
+> **SAY:** Last thing. Do not rerun until you like the answer. Every rerun is a
+> fresh draw from the same distribution, and with enough draws any noise looks
+> like signal.
+>
+> Pick your run count before you look at results. Write it down if you have to.
+
+---
+
+## 08 · Local Reproduction — ~5 min
+
+### What does isolation actually buy?
+
+> **SAY:** "Run it in a container" is standard advice. Almost nobody publishes
+> what it actually buys you, so we measured it.
+>
+> Idle laptop, CV under five percent. Now sixteen background spinners: three
+> times slower, four times noisier. Now the same load, but the benchmark pinned
+> in a container: back to the idle noise floor, while the host is still fully
+> saturated.
+
+`DO` If asked about the platform — and you were asked last time — it is on the
+slide: Apple M4 Max, arm64 host, arm64 guest, Apple Virtualization.framework.
+No QEMU, no cross-architecture emulation.
+
+### 5.25% is not a triumph / It is a ceiling
+
+> **SAY:** But be honest about what that is. Five percent is not a good number.
+> It is the *best* number this machine can give you. Bare-metal Linux with SMT
+> off reaches nought point nought five. A hundred times tighter.
+
+### The macOS caveat
+
+`DO` Do not soften this.
+
+> **SAY:** And on macOS, Docker runs inside a Linux VM. So `--cpuset-cpus=0`
+> pins a *virtual* CPU inside that VM. The VM can still move it across physical
+> cores. Nothing inside that container can disable host SMT or pin the clock.
+>
+> What you get is isolation from your other processes — that is real, and worth
+> having. What you do not get is controlled hardware.
+
+### The Linux toolbox
+
+> **SAY:** On Linux you have actual controls. Affinity, core isolation,
+> priority, and a frequency lock. Different tools for different noise sources.
+
+### "Is there a Go tool for this?"
+
+> **SAY:** Somebody asked me exactly this last time, so: yes. `perflock`, by
+> Austin Clements from the Go team. It serialises benchmark runs so two never
+> overlap, and it pins CPU frequency.
+>
+> One caveat I only found by reading the source: on macOS the mutual-exclusion
+> lock works, but frequency pinning does not — the default governor flag reads
+> Linux sysfs and errors out. Pass `-governor=none` and you get serialisation
+> and nothing else.
+
+### The inner loop
+
+> **SAY:** Day to day, this is the loop. `benchdiff` stashes your change, runs
+> the base, restores, runs again, pipes both into benchstat. Make a change, run
+> it, read the interval, decide.
+>
+> And the free wins: close your indexer, go into airplane mode, let the machine
+> reach thermal steady state. Zero setup, real variance reduction.
+
+### Local and micro, answered
+
+> **SAY:** So, first half. Real work: sink, `-benchmem`, watch `allocs/op`,
+> prefer `b.Loop`. Stable sample: at least ten runs, read the p-value, check CV.
+> Above the noise: pin it, and know your ceiling.
+>
+> And the one to remember: a delta under ten percent might just be code layout.
+
+---
+
+## 09 · CI and Macro — 15 min total
+
+### The three questions, macro scale
+
+> **SAY:** Second half. Now it is CI, whole workloads, and time.
+>
+> Same three questions, different shape. Real work becomes: is the *workload*
+> representative? Stable sample becomes: stable across *days*, not runs. And
+> above the noise — now the hardware itself is the variable.
+
+### A second bot comment
+
+**Beat: mirror the first story.**
+
+> **SAY:** Second real one. July, OpenTelemetry Go compile-time
+> instrumentation. I land a dependency-pinning fix, run the overhead benchmark
+> locally, and: `multi` at two hundred and thirty percent overhead against a
+> ceiling of one fifty. `largeidle` at two twelve.
+>
+> Both blown. Looks like I have broken something badly.
+
+### `largeidle` shares zero changed dependencies
+
+> **SAY:** Except. My change touched dependency pinning in `multi`. `largeidle`
+> shares *none* of those dependencies. It runs independent code. It cannot have
+> regressed.
+>
+> And yet it moved by the same sixty percent.
+>
+> When something that cannot have changed changes anyway, the common factor is
+> not your code. It is the machine. I had been running parallel builds and
+> integration tests all afternoon. I was benchmarking my own build.
+
+`DO` The fix was to wait for CI. There is no local target for that job — it is
+CI-only, on a dedicated runner.
+
+### The mirror image
+
+**Beat: this is why there are two stories.**
+
+> **SAY:** Put the two side by side. First story: CI said slower, the laptop was
+> right, and the cause was code layout. Second story: the laptop said slower, CI
+> was right, and the cause was machine load.
+>
+> Neither environment is authoritative by default.
+>
+> And the tell was identical both times: a benchmark moved that could not have
+> moved. That is the single most useful instinct I can give you today.
+
+---
+
+## 10 · Designing a Macrobenchmark — ~5 min
+
+### What does your app actually do? (reveal)
+
+> **SAY:** Representative is the hard part, so start here. Is your workload CPU
+> bound, I/O bound, or — like almost everything real — mixed?
+>
+> Your benchmark workload should look like your production workload. Obvious,
+> and almost nobody does it.
+
+### Workload archetypes
+
+> **SAY:** We use four archetypes. Idle — background workers, barely any load.
+> Latency — microservices, high request rate, little CPU each. Throughput —
+> queues and batch jobs. Enterprise — business apps with databases and API
+> calls, mixed.
+
+### Why `largeidle` falsified `multi`
+
+> **SAY:** And now the earlier story gets sharper. `largeidle` is the Idle
+> archetype. `multi` is Enterprise. Completely different code, completely
+> different shape.
+>
+> They moved by the same amount, in the same direction, at the same time. That
+> is not a shared cause. That is a shared *environment*.
+
+### A macro gate is a budget
+
+> **SAY:** Macro gates work differently from micro gates. Micro compares two
+> commits. Macro compares against a *budget* — a ceiling you are not allowed to
+> cross.
+>
+> That is a product question, not a statistical one: how much of the customer's
+> machine are we allowed to take?
+
+### What a macro gate needs at scale (reveal)
+
+> **SAY:** To gate a release on it, you need dedicated hardware, a budget per
+> component, several archetypes rather than one workload, and gating on the
+> release rather than just the PR.
+>
+> Worth it when your code runs inside someone else's process — then an overhead
+> regression is not an internal metric, it is a customer-visible defect. That is
+> every SDK, every agent, every sidecar in this room.
+
+`DO` Keep this generic. Ledger row 23 — do not ad-lib Datadog internals.
+
+### Two macro traps
+
+> **SAY:** Two traps worth naming. Coordinated omission: your system falls
+> behind, your load generator stops issuing requests, and therefore stops
+> recording the latency it caused. Your p99 improves because you measured less.
+>
+> And non-deterministic inputs. Random fixtures, live dependencies. If the input
+> moved too, you cannot attribute the delta to your code.
+
+---
+
+## 11 · Controlling the CI Environment — ~5 min
+
+### Why shared runners lie
+
+> **SAY:** Shared runners: competing workloads, variable frequency, shared
+> last-level cache. A real ten percent regression vanishes into the noise. A
+> phantom ten percent appears out of it.
+>
+> That is an environment problem. You cannot fix it with statistics.
+
+### What SMT actually is
+
+> **SAY:** Two acronyms, because I used them last time without explaining them.
+>
+> SMT — simultaneous multithreading, Hyper-Threading on Intel. Two hardware
+> threads share one physical core's execution units. The bet is that most code
+> stalls on memory, so a second thread can use the idle slots. Great for
+> throughput.
+>
+> Terrible for benchmarking. Two CPU-bound threads on one core fight for the
+> same units, so your runtime now depends on what some other process is doing.
+> A co-tenant you cannot see and did not schedule.
+
+### What's the impact of disabling SMT?
+
+> **SAY:** Here is the cost. Two CPU-bound tasks, same core versus separate
+> cores.
+>
+> *(next slide)* Twenty-four percent CV sharing a core. Nought point nought four
+> when they are not. About a hundred times less variance. And notice it is also
+> twice as fast, because the core stopped being shared.
+
+### What DFS is
+
+> **SAY:** Second one. Dynamic frequency scaling — the CPU changing its own
+> clock. Turbo when there is thermal headroom, throttle when there is not, with
+> the kernel picking a governor.
+>
+> Why that ruins a benchmark: run one boosts. Run twenty is warm and throttles.
+> Same code, different clock, different answer.
+
+### What's the impact of disabling DFS?
+
+> **SAY:** Ten times less variance with it off. And look — the mean got
+> *slower*. Turbo is fast and inconsistent.
+>
+> Which is the point. A benchmark's job is to be comparable, not to post the
+> best number you can hit once.
+
+### Three sysfs writes
+
+> **SAY:** All of that is three writes to sysfs. Disable SMT, pin the governor,
+> kill boost. On bare metal that takes you from twenty-three percent CV to about
+> nought point nought five.
+>
+> In a VM, none of it works. The hypervisor owns SMT, frequency is virtualised,
+> and the write may succeed and be silently ignored — which is worse than
+> failing.
+
+---
+
+## 12 · Detecting Change Over Time — ~3 min
+
+### A/B is the wrong model for CI
+
+> **SAY:** One more thing CI gets wrong. `benchstat` compares two
+> distributions. But CI does not have two distributions — it has a time series.
+> One measurement per commit, for months, with hardware changes and dependency
+> bumps in the middle.
+>
+> Compare each commit to its parent and you re-ask the noise question every
+> single time, and you miss slow drift completely.
+
+### What regressions look like
+
+> **SAY:** This is what we draw when we explain regressions. And this is what
+> the data actually looks like. A step change is obvious in a diagram and buried
+> in variance in real life.
+
+### Change-point detection
+
+> **SAY:** The right question is not "is this commit slower than its parent". It
+> is "where in this history did the distribution shift, and stay shifted".
+>
+> That is change-point detection. It handles non-normal data, finds multiple
+> change points, and ignores one-off spikes. ED-PELT, e-divisive means — Apache
+> Otava implements it, Netflix documented doing this at scale.
+>
+> It needs history, so it belongs in nightly trending, not a PR gate.
+
+---
+
+## 13 · Wiring It Into CI — ~3 min
+
+### Two patterns
+
+> **SAY:** Two patterns, and they want opposite things. A PR gate is fast and
+> strict — a curated set of benchmarks that have regressed before, same-machine
+> A/B, tight threshold. A nightly suite is complete and slow — pinned runner,
+> every control applied, rolling window, change-point detection.
+>
+> Either way: CI *detects*. It is not your primary measurement. That is still
+> your laptop.
+
+### The feedback loop
+
+> **SAY:** And this is why the first half came first. A benchmark has to be
+> locally reproducible for a developer to actually act on it. A red check
+> nobody can reproduce just gets ignored.
+
+### Existing tools
+
+> **SAY:** You do not have to build this. bencher.dev if you want hosted and
+> Go-native. github-action-benchmark for a simple first gate. Apache Otava if
+> you want real change-point detection. Full survey is in the repo.
+
+### Keep a ledger of false positives
+
+> **SAY:** Last one, and it is the cheapest thing here. That same benchmark
+> fired again eleven days later on an unrelated PR. That time it took one
+> comment to dismiss — because the first investigation was written down.
+>
+> Without that note, the next person re-runs the whole investigation. Or worse,
+> "fixes" it. Documented noise is benchmark hygiene.
+
+### CI and macro, answered
+
+> **SAY:** Second half. Real work: match the archetype, pin the inputs. Stable
+> sample: think in time series, use change points. Above the noise: bare metal,
+> SMT off, governor pinned.
+>
+> And the one to remember: a shared runner cannot be fixed with more samples.
+
+---
+
+## 14 · Wire It Up — 4 min
+
+### Three tools
+
+> **SAY:** I built three small things so you do not have to remember all of
+> this. Stdlib only, and they are in the repo.
+
+### `honestbench`
+
+> **SAY:** Static analysis over your benchmark source. It finds discarded
+> results, timer ordering mistakes, `b.N` loops that should be `b.Loop`. Nothing
+> has to run — it reads the AST. Seventeen findings across twelve functions in
+> our demo package.
+
+### `benchgate`
+
+> **SAY:** Runs your benchmark N times and fails if the variance is too high to
+> trust. Same benchmark, two thresholds — fails at five percent, passes at
+> eight.
+>
+> The point is not that eight is a good default. The point is that the policy is
+> explicit and a machine enforces it, instead of living in your head.
+
+### `benchenv`
+
+> **SAY:** And this one just tells you what your machine can and cannot do. Run
+> it before a serious session.
+
+### Four *unavailable* lines
+
+`DO` Pause here. This is the closing idea.
+
+> **SAY:** Look at what it says on my laptop. Four `unavailable`. No SMT
+> control. No frequency control. No turbo control.
+>
+> That is the honest answer. macOS does not expose those, so it says so, instead
+> of printing a green tick I would have believed.
+>
+> Knowing what you cannot control is worth as much as controlling it.
+
+### The minimum viable discipline
+
+> **SAY:** If you take one slide home, take this one. Add a sink. Run enough
+> samples. Compare with benchstat. Check the environment before you believe the
+> comparison.
+>
+> That is under an hour of work, and every benchmark you write after today will
+> tell you the truth.
+
+### Three questions, two scales
+
+`DO` The final recap. Say the two bold lines slowly.
+
+> **SAY:** So. Three questions, two scales. Real work, stable sample, above the
+> noise — asked once on your laptop, once in CI.
+>
+> A sub-ten-percent micro delta can be layout noise.
+> A shared runner cannot be fixed with more samples.
+
+### Take it with you
+
+> **SAY:** Everything is in the repo — the three tools, every captured output,
+> both decks. QR is there.
+
+### Close
+
+> **SAY:** Trust your numbers only after the compiler, the sample, and the
+> machine have each earned it.
+>
+> Thank you.
+
+`DO` Stop. Leave the questions slide up.
+
+---
+
+## Numbers to memorise
+
+| Number | What |
 | --- | --- |
-| OPERA connector fault | Cartlidge, *Science* 335(6072):1027, doi:10.1126/science.335.6072.1027 |
-| Google 500 ms result | Claims ledger row 10 |
-| Daniel Martí's talk | <https://www.youtube.com/watch?v=oE_vm7KeV_E> |
-| Go `B.Loop` behaviour | <https://pkg.go.dev/testing#B.Loop> |
-| Benchstat | <https://pkg.go.dev/golang.org/x/perf/cmd/benchstat> |
-| Causal profiling | <https://arxiv.org/abs/1608.03676> |
-| Performance Matters | <https://www.youtube.com/watch?v=r-TLSBdHe1A> |
-| ED-PELT | <https://aakinshin.net/posts/edpelt/> |
-| Apache Otava | <https://github.com/nyrkio/nyrkio> |
-| Netflix change-point detection | <https://netflixtechblog.com/fixing-performance-regressions-before-they-happen-eab2602b86fe> |
-| Datadog PGO result | <https://www.datadoghq.com/blog/datadog-pgo-go/> |
-| dd-trace-go #4891 | `research/go-benchmarks-lying/07-war-stories.md` story 1 |
-| otel-go-compile-instrumentation #643 | `research/go-benchmarks-lying/07-war-stories.md` story 2 |
-| Prior FOSDEM version | <https://youtu.be/8211fNI_nc4> |
+| **~73 ns** | OPERA connector bias |
+| **500 ms → −20%** | Google search traffic |
+| **−3.4%** | Datadog production CPU, from PGO |
+| **0.25 vs 11 ns · 0 vs 1 allocs** | DCE demo |
+| **416 vs 551 ns** | timer-order demo, broken looks faster |
+| **883 → 841 ns** | #4891, main vs branch |
+| **43%** | swing, same binary |
+| **4.75 / 18.88 / 5.25** | CV: idle / loaded / pinned |
+| **~0.05%** | bare metal, SMT off |
+| **230% / 212% vs 150%** | #643 overhead vs ceiling |
+| **23.9% → 0.044%** | SMT on → off (~100×) |
+| **0.383% → 0.041%** | DFS on → off (~10×) |
+
+## Things to never say
+
+- Do not attribute the Google number to Marissa Mayer — "the Google search team".
+- Do not put a figure on the OPERA oscillator fault.
+- Do not call Docker Desktop on macOS hardware isolation.
+- Do not claim statistical significance proves practical importance.
+- Do not describe Datadog's internal benchmarking setup — ledger row 23 is unresolved.
+- Do not present causal profiling's 30%/2% as measured results.
+
+## If challenged
+
+Name the committed result file and the environment. Do not improvise a rerun on
+stage. Every number above traces to `claims-ledger.md` or `demo/results/`.
+
+## Setup
+
+Present from the **bespoke HTML** if you want the reveals to animate:
+`make serve/go-benchmarks-lying` → `localhost:8000/presentation.html`.
+The PDF is a correct handout but shows every fragment at once.
