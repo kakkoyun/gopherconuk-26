@@ -228,6 +228,13 @@ to them — do not let the §02 bio bleed into it.
 > cables are the compiler, the scheduler, and your statistics. Let's go find
 > them.
 
+### systematic error survives expert review
+
+`DO` Meme. Say the one line, let them laugh, move. **Ten seconds, not thirty.**
+If you start explaining the joke you have lost the time you just bought.
+
+> **SAY:** Which brings us to the only rule that matters today.
+
 ### Three questions
 
 **Beat: the contract for the next fifty minutes.**
@@ -422,6 +429,13 @@ about to distrust.**
 >
 > Always pass `-benchmem`.
 
+### the compiler deleted your benchmark
+
+`DO` Meme, and it is the payoff for the two slides before it. **Ten seconds.**
+The numbers on the dog are the ones they just saw from `make bench-dce`.
+
+> **SAY:** Those are the real numbers from two slides ago.
+
 ### The two-variable sink
 
 > **SAY:** The fix. A package-level variable the compiler cannot prove is never
@@ -461,15 +475,6 @@ about to distrust.**
 > non-constant input and a captured result. Either one alone is not enough.
 >
 > `//go:noinline` is a diagnostic tool. Not production style.
-
-### Inlining decisions
-
-> **SAY:** `-m -m` also reports inlining costs. `makeBuffer` has cost three —
-> under the budget, so the compiler pastes the body in. That is what lets DCE
-> see the unused result and delete it. A bigger function goes over budget and
-> stays a call. `//go:noinline` does not fix anything — it forces the
-> over-budget case so you can see whether inlining is the problem. It is a
-> diagnostic, not a tool you ship.
 
 ### Timer: one-time setup
 
@@ -695,6 +700,13 @@ about to distrust.**
 > like signal.
 >
 > Pick your run count before you look at results. Write it down if you have to.
+
+### more samples will not fix a noisy machine
+
+`DO` Meme, and it is the bridge into §10. **Ten seconds.** The right-hand button
+is the one everybody presses; the next section is about the left one.
+
+> **SAY:** Only one of these buttons works.
 
 ---
 
@@ -1047,18 +1059,6 @@ into a disk array. Do not over-explain it.
 >
 > Either way: CI *detects*. It is not your primary measurement. That is still
 > your laptop.
-
-### The feedback loop
-
-> **SAY:** And this is why the first half came first. A benchmark has to be
-> locally reproducible for a developer to actually act on it. A red check
-> nobody can reproduce just gets ignored.
-
-### Upstream splits it the same way
-
-> **SAY:** That split is the one upstream already uses. Presubmit is opt-in per
-> change, and it is the cheap pairwise comparison. Postsubmit runs on every
-> commit against the latest release, and the baseline moves every time Go ships.
 
 ### Why not just add more runners?
 

@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 63. `*` is the ONLY list marker allowed on slides. Every list
+# fragment-floor: 60. `*` is the ONLY list marker allowed on slides. Every list
 # is an intentional Marp reveal; a `-` bullet here is a bug. `make check/fragments`
 # guards the count against formatters that rewrite markers.
 math: mathjax
@@ -379,6 +379,14 @@ It survives expert review.
 compiler · scheduler · statistics
 
 </div>
+
+---
+
+<!-- _class: meme -->
+
+![bg contain](../assets/meme-trust-nobody.png)
+
+systematic error survives expert review
 
 ---
 
@@ -776,6 +784,14 @@ Always `-benchmem`.
 
 ---
 
+<!-- _class: meme -->
+
+![bg contain](../assets/meme-this-is-fine.png)
+
+the compiler deleted your benchmark
+
+---
+
 ## The two-variable sink
 
 ###### dce_bench_test.go
@@ -880,21 +896,6 @@ Either alone is not enough.
 </div>
 
 <span class="chip caution">TEST-ONLY</span> `//go:noinline` is a diagnostic.
-
----
-
-## Inlining decisions
-
-###### gcflags-m-m.txt
-
-```text
-dce:33:6: can inline makeBuffer with cost 3
-dce:56:6: can inline BenchmarkMakeBuffer_Correct with cost 18
-```
-
-* `can inline` with a cost under the budget → body is pasted in
-* over budget → `cannot inline ... exceeds budget 80`
-* `//go:noinline` forces the second case: a diagnostic, not a fix
 
 ---
 
@@ -1343,6 +1344,14 @@ With enough draws, noise looks like signal.
 **Set your run count before you look.**
 
 </div>
+
+---
+
+<!-- _class: meme -->
+
+![bg contain](../assets/meme-two-buttons.png)
+
+more samples will not fix a noisy machine
 
 ---
 
@@ -2115,43 +2124,6 @@ All controls applied.
 
 CI **detects**. It is not your primary measurement.
 
-</div>
-
----
-
-## The feedback loop
-
-<div class="center">
-
-![width:880](../assets/bp-feedback-flow.png)
-
-</div>
-
----
-
-## Upstream splits it the same way
-
-<div class="cols">
-<div class="card">
-
-### Presubmit
-
-`perf_vs_parent`
-`perf_vs_tip`
-
-Opt-in per change, via a SlowBot.
-
-</div>
-<div class="card measure">
-
-### Postsubmit
-
-`perf_vs_release`
-
-Every commit. The baseline shifts
-on every minor release.
-
-</div>
 </div>
 
 ---

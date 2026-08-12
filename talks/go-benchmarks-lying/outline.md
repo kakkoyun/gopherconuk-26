@@ -1,7 +1,7 @@
 # Talk outline: Why Your Go Benchmarks Are Lying
 
 > **Format:** 60 minutes presented, Q&A opportunistic · advanced Go audience
-> **Deck:** `slides/presentation.md` (127 pages, including progressive-reveal steps)
+> **Deck:** `slides/presentation.md` (129 pages, including progressive-reveal steps)
 > **Demonstrations:** no live demos; every command and captured result stays in the repository
 
 ## Thesis
@@ -61,13 +61,16 @@ now spend several pages on one idea. Budget by section.
 (§11) by 39:30 · close (§16) by 55:30 · finish by 59:30. If arc 2 has not
 started by 40:00, apply the cut ladder live.
 
-> **The slack is gone.** Five slides were added after the restructure: the
-> `b.Loop` keepalive mechanism, and four on what the Go project does upstream.
-> At the measured ~2 slides per minute that is about +2:30, which puts the
-> construction at 59:30 against a 60-minute slot. There is no longer room to
-> absorb a slow start, so treat the cut ladder as expected rather than
-> contingency, and cut the first two rungs *before* walking on if the day is
-> already running late.
+> **The slack is gone, and delivery was too dense.** The first delivery ran at
+> 127 pages and the feedback was that it was hard to digest. The response was a
+> deliberate trade rather than more content: three memes in, three slides out.
+> The memes are ten-second beats with a `DO` cue saying so; the slides they
+> replaced were a minute each, so the deck is page-neutral at 129 and about two
+> minutes *cheaper* than before, with three places for the room to breathe.
+>
+> The cut ladder below is still expected rather than contingency. Do not spend
+> the memes to buy time back: they are the pacing, and cutting them recreates the
+> problem they were added to fix.
 
 ## Narrative order
 
@@ -123,28 +126,32 @@ noise, and a shared runner cannot be fixed with more samples.
 
 Apply in this order if the timed read-through runs long.
 
-1. "Upstream splits it the same way" (−0:45) — §15's "Two patterns" already
-   makes the presubmit/postsubmit distinction; this only adds that Go agrees.
-2. The "what a macro gate needs at scale" slide (−1:00)
-3. "Go runs this on Go", keeping "Why a baseline, not a pair" (−0:45) — the
+Rungs 1, 4 and 10 of the previous ladder have already been spent: "Upstream
+splits it the same way", the feedback-loop diagram, and the "Inlining decisions"
+`-m -m` slide were removed to pay for the memes. What is left:
+
+1. The "what a macro gate needs at scale" slide (−1:00)
+2. "Go runs this on Go", keeping "Why a baseline, not a pair" (−0:45) — the
    quote is the load-bearing half; the dashboard screenshot is corroboration.
-4. The feedback-loop diagram (−1:00)
-5. "Seeing the hardware" (−0:30) — a pointer to `perfgo`, not an argument the
+3. "Seeing the hardware" (−0:30) — a pointer to `perfgo`, not an argument the
    talk depends on; the observer-effect slide before it already makes the point
    that `ns/op` cannot see a cache miss.
-6. "How the keepalive works" (−1:00) — the `b.Loop` table already carries the
+4. "How the keepalive works" (−1:00) — the `b.Loop` table already carries the
    actionable advice; this slide is the why-it-works footnote.
-7. Coordinated omission and deterministic inputs, folded to one line (−1:30)
-8. The SMT and DFS *mechanism* explainer slides, keeping the impact data (−1:30)
-9. The benchmarking-basics "Reading the output" slide, keeping the rest of §05 (−1:00)
-10. Assembly back to one slide, dropping the `-m -m` escape/inlining slides (−2:00)
+5. Coordinated omission and deterministic inputs, folded to one line (−1:30)
+6. The SMT and DFS *mechanism* explainer slides, keeping the impact data (−1:30)
+7. The benchmarking-basics "Reading the output" slide, keeping the rest of §05
+   (−1:00) — last resort. Removing an explanation does not fix density, and
+   §07 leans on `ns/op` and `allocs/op` being already defined.
 
 **Never cut without review:** either opening incident, the DCE captured
 evidence, the local CV experiment, the macOS caveat, the SMT and DFS impact
 data, the 3×2 recap, the Datadog rationale, "Why not just add more runners?"
-(it answers the objection the CI half always draws, in upstream's own words), or
-the observer effect (it generalises §07 from "the compiler is not neutral" to
-"your harness is not neutral either", which is what earns the second half).
+(it answers the objection the CI half always draws, in upstream's own words), the
+observer effect (it generalises §07 from "the compiler is not neutral" to "your
+harness is not neutral either", which is what earns the second half), or **any of
+the three memes** (they are the fix for the density complaint from delivery one,
+and they cost ten seconds each).
 
 ## Public results and sources to preserve
 
