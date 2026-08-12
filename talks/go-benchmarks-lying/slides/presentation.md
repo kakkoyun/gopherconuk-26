@@ -12,11 +12,9 @@ footer: " "
 style: |
   .columns { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
   .columns3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
-  .big    { font-size: 1.4em; }
   .medium { font-size: 1.0em; }
   .small  { font-size: 0.8em; }
   .tiny   { font-size: 0.6em; }
-  .center { text-align: center; }
   /* The theme sets `img { display: block }`, so text-align cannot centre an
      image. Block elements need auto margins. */
   .center img { margin-left: auto; margin-right: auto; }
