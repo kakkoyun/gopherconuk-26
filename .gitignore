@@ -50,6 +50,14 @@ themes/gophercon-datadog/.theme-check.pdf
 # Agent runtime artifacts
 .pi-subagents/
 __pycache__/
+# Agent job/session state. Contains high-entropy coordination identifiers
+# (job UUIDs, runner/owner nonces, SHA-256 idempotency keys) that trip secret
+# scanners despite not being credentials. Previously only covered by a personal
+# global gitignore, so a fresh clone was unprotected. `.claude/settings.json`
+# stays tracked deliberately.
+.omc/
+.claude/worktrees/
+.claude/state/
 
 # Compiled CLI binaries
 tools/cli/*/kubectl-obi

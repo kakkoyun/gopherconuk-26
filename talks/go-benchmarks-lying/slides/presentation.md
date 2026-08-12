@@ -1501,9 +1501,10 @@ An overhead ceiling answers a product question, not a statistical one:
 
 ---
 
-## What this looks like at scale
+## What a macro gate needs at scale
 
-Datadog runs macro overhead benchmarking as release infrastructure.
+One scenario on a laptop is a smoke test. A gate you can block a release on
+needs more.
 
 <div class="columns">
 <div>
@@ -1511,21 +1512,22 @@ Datadog runs macro overhead benchmarking as release infrastructure.
 ### Shape
 
 * Dedicated hardware, not shared runners
-* Per-SDK overhead budgets
-* Multiple workload archetypes per SDK
-* Gating on the release, not just the PR
+* A budget per component, not one global number
+* Several archetypes, not one workload
+* Gating the release, not only the PR
 
 </div>
 <div>
 
-### Why
+### Why it is worth it
 
-Our SDKs run **inside**
-customer processes.
+When your code runs **inside**
+someone else's process, an
+overhead regression is a
+customer-visible defect.
 
-An overhead regression is a
-customer-visible defect, not
-an internal metric.
+That is the situation every
+SDK, agent, and sidecar is in.
 
 </div>
 </div>
