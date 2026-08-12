@@ -17,6 +17,9 @@ style: |
   .small  { font-size: 0.8em; }
   .tiny   { font-size: 0.6em; }
   .center { text-align: center; }
+  /* The theme sets `img { display: block }`, so text-align cannot centre an
+     image. Block elements need auto margins. */
+  .center img { margin-left: auto; margin-right: auto; }
   .hidden { visibility: hidden; }
   .hl-blue   { color: #00ADD8; font-weight: 700; }
   .hl-orange { color: #E8833A; font-weight: 700; }
@@ -1620,6 +1623,18 @@ The write may **succeed
 and be ignored**.
 
 </div>
+</div>
+
+---
+
+## Noise goes all the way down
+
+<div class="center">
+
+![width:720](../assets/brendan-gregg-shouting-at-datacenter.png)
+
+**Don't shout in the datacenter.** · [Brendan Gregg](https://www.youtube.com/watch?v=tDacjrSCeq4)
+
 </div>
 
 ---

@@ -756,6 +756,28 @@ CI-only, on a dedicated runner.
 > and the write may succeed and be silently ignored — which is worse than
 > failing.
 
+### Noise goes all the way down
+
+**Beat: the deflating punchline. Earn the laugh, then bank the point.**
+
+`DO` Let the picture land before saying anything. It is Brendan Gregg shouting
+into a disk array. Do not over-explain it.
+
+> **SAY:** And once you have done all of that — pinned the governor, killed
+> turbo, disabled SMT — there is still one more source of noise.
+>
+> That is Brendan Gregg shouting at a disk array. The vibration alone is enough
+> to spike disk latency. Someone filmed it.
+>
+> So: don't shout in the datacenter.
+
+`DO` Beat. Then the real point, quieter:
+
+> **SAY:** Which is only funny until you realise it generalises. There is always
+> another layer of noise underneath the one you just fixed. The job is not to
+> eliminate it — you cannot. The job is to know how much is left, and whether
+> your effect is bigger than that.
+
 ---
 
 ## 12 · Detecting Change Over Time — ~3 min
@@ -937,6 +959,8 @@ the QR goes to the talk repo.
 
 - Do not attribute the Google number to Marissa Mayer — "the Google search team".
 - Do not put a figure on the OPERA oscillator fault.
+- The datacenter demo is Brendan Gregg's; the video lives on Bryan Cantrill's
+  channel. Credit Gregg for the demo, and do not quote a latency number for it.
 - Do not call Docker Desktop on macOS hardware isolation.
 - Do not claim statistical significance proves practical importance.
 - Do not describe Datadog's internal benchmarking setup — ledger row 23 is unresolved.
