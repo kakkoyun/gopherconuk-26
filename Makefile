@@ -15,7 +15,7 @@ MARP := npx marp
 .DEFAULT_GOAL := help
 
 .PHONY: all build/html build/pdf build/html/% build/pdf/% watch/% serve/% clean clean/% \
-	check check/fast check/slides check/css check/theme check/footer check/go check/fragments \
+	check check/fast check/slides check/css check/theme check/footer check/go check/fragments check/code-headers \
 	lint/md lint/md/% fix/md/% format/md format/md/% check/typos check/typos/% fix/typos/% \
 	pre-commit sync/theme hooks install help
 
@@ -44,9 +44,9 @@ clean/%:
 
 check: check/slides check/go
 
-check/fast: check/theme lint/md check/typos check/fragments
+check/fast: check/theme check/code-headers lint/md check/typos check/fragments
 
-check/slides: check/css lint/md check/typos check/fragments build/html check/footer
+check/slides: check/css check/code-headers lint/md check/typos check/fragments build/html check/footer
 
 check/css: check/theme
 
@@ -58,6 +58,14 @@ check/footer: build/pdf
 # prevents that; this target is the tripwire if the ignore is ever bypassed.
 check/fragments:
 	python3 tools/check_slide_fragments.py $(SLIDE_MARKDOWN)
+
+# Every code panel carries its kind at a glance, and every panel that came from
+# somewhere gets a header naming the artifact you would open to re-verify it.
+# Talk decks resolve their headers against the repo; the theme fixture uses
+# invented filenames, so it skips the path check.
+check/code-headers:
+	python3 tools/check_code_headers.py $(SLIDE_MARKDOWN)
+	python3 tools/check_code_headers.py $(THEME_DIR)/deck.md --no-path-check
 
 check/theme:
 	@set -o errexit -o nounset -o pipefail; \
