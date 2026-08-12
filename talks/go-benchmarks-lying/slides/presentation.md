@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 56. `*` is the ONLY list marker allowed on slides. Every list
+# fragment-floor: 60. `*` is the ONLY list marker allowed on slides. Every list
 # is an intentional Marp reveal; a `-` bullet here is a bug. `make check/fragments`
 # guards the count against formatters that rewrite markers.
 math: mathjax
@@ -1017,6 +1017,23 @@ Must be written literally as `b.Loop()`.
 
 ---
 
+## How the keepalive works
+
+<span class="small">cmd/compile/internal/bloop</span>
+
+* Call arguments, results, and assigned variables are kept alive inside the loop
+* **Go 1.24 and 1.25** did that by *suppressing inlining* in the loop body
+* Cost: benchmarks could heap-allocate where production code would not
+* **Go 1.26** keeps the protection and allows inlining again
+
+<div class="center">
+
+The thing protecting your measurement is **also code that can be wrong**.
+
+</div>
+
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
@@ -1982,6 +1999,42 @@ Netflix, at scale
 
 ---
 
+## Go runs this on Go
+
+<div class="center">
+
+![width:940](../assets/golang_perf_dashboard_charts.png)
+
+</div>
+
+<div class="small center">
+
+[perf.golang.org/dashboard](https://perf.golang.org/dashboard/) · every commit · per builder shape · 95% confidence interval
+
+</div>
+
+---
+
+## Why a baseline, not a pair
+
+<div class="small">
+
+> We never report performance numbers in isolation, and only relative to some
+> baseline. […] The state of a machine or VM on one day is likely to be very
+> different than the state of a machine or VM on the next day.
+
+</div>
+
+<div class="center">
+
+That is the Go team, about **their own hardware**.
+
+[go.dev/wiki/PerformanceMonitoring](https://go.dev/wiki/PerformanceMonitoring)
+
+</div>
+
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
@@ -2036,6 +2089,52 @@ CI **detects**. It is not your primary measurement.
 
 ---
 
+## Upstream splits it the same way
+
+<div class="cols">
+<div class="card">
+
+### Presubmit
+
+`perf_vs_parent`
+`perf_vs_tip`
+
+Opt-in per change, via a SlowBot.
+
+</div>
+<div class="card measure">
+
+### Postsubmit
+
+`perf_vs_release`
+
+Every commit. The baseline shifts
+on every minor release.
+
+</div>
+</div>
+
+---
+
+## Why not just add more runners?
+
+<div class="center">
+
+![width:1000](../assets/golang_slowbot_quote.png)
+
+</div>
+
+<div class="center">
+
+Elastic capacity is fine for correctness.
+Performance needs the **scarce** machine.
+
+<span class="small">[go.dev/wiki/SlowBots](https://go.dev/wiki/SlowBots)</span>
+
+</div>
+
+---
+
 ## Existing tools
 
 <div class="centered-table">
@@ -2046,6 +2145,8 @@ CI **detects**. It is not your primary measurement.
 | [**github-action-benchmark**](https://github.com/benchmark-action/github-action-benchmark) | Simple first gate, threshold only |
 | [**Apache Otava**](https://otava.apache.org) | Change-point detection |
 | [**gobenchdata**](https://github.com/bobheadxi/gobenchdata) | GitHub Pages dashboards |
+| [**CodSpeed**](https://codspeed.io/docs/benchmarks/go) | Hosted; Go is walltime-only |
+| [**prombench**](https://github.com/prometheus/test-infra) | Macro E2E on dedicated nodes |
 
 </div>
 
