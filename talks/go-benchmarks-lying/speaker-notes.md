@@ -1,56 +1,146 @@
 # Script: Why Your Go Benchmarks Are Lying
 
-GopherCon UK 2026 · 50 minutes + 10 Q&A · 107 slides
+GopherCon UK 2026 · 50 minutes + 10 Q&A · 110 slides
 
 **How to use this.** `SAY` lines are the words. They are written to be spoken,
 not read — short sentences, one idea each. You do not need them verbatim; learn
 the **beat** (the bold line before each block) and the numbers, and the words
 will come. `DO` lines are delivery, not content.
 
-**Memorise in this order:** the 14 beats → the three questions → the two
+**Memorise in this order:** the 15 beats → the three questions → the two
 stories → the numbers. Everything else is recoverable on stage.
 
 ---
 
-## The 14 beats
+## The 15 beats
 
 | # | Section | The one thing |
 | --- | --- | --- |
-| 01 | A Loose Cable | Careful people ship broken measurements |
-| 02 | Why Benchmark? | Speed is a product decision |
-| 03 | Before You Optimize | Pick the target before the tool |
-| 04 | Local and Micro | Trust the laptop first |
-| 05 | Compiler Honest | The compiler deletes your work |
-| 06 | Regression That Was a Speedup | Noise can be directionally wrong |
-| 07 | Statistics | One number is not a measurement |
-| 08 | Local Reproduction | Know your noise ceiling |
-| 09 | CI and Macro | Same questions, hardware answers |
-| 10 | Macrobenchmark Design | Representative is the hard part |
-| 11 | CI Environment | Three sysfs writes buy 100× |
-| 12 | Change Over Time | A/B cannot see drift |
-| 13 | Wiring Into CI | Detect, don't measure |
-| 14 | Wire It Up | Under an hour |
+| 01 | Why Benchmark? | Speed is a product decision |
+| 02 | Why I Care | Consequences, not credentials |
+| 03 | A Loose Cable | Careful people ship broken measurements |
+| 04 | Before You Measure | Pick the target before the tool |
+| 05 | Local and Micro | Trust the laptop first |
+| 06 | Compiler Honest | The compiler deletes your work |
+| 07 | Regression That Was a Speedup | Noise can be directionally wrong |
+| 08 | Statistics | One number is not a measurement |
+| 09 | Local Reproduction | Know your noise ceiling |
+| 10 | CI and Macro | Same questions, hardware answers |
+| 11 | Macrobenchmark Design | Representative is the hard part |
+| 12 | CI Environment | Three sysfs writes buy 100× |
+| 13 | Change Over Time | A/B cannot see drift |
+| 14 | Wiring Into CI | Detect, don't measure |
+| 15 | Wire It Up | Under an hour |
 
-**Checkpoints:** §04 by 14:00 · §09 by 31:00 · §14 by 46:00.
-If §09 has not started by 33:00, start cutting (ladder in `outline.md`).
+**Checkpoints:** §05 by 14:00 · §10 by 31:00 · §15 by 46:00.
+If §10 has not started by 33:00, start cutting (ladder in `outline.md`).
 
 ---
 
-## 01 · A Loose Cable — 5 min
+## 01 · Why Benchmark? — 4 min
 
 ### Title slide
 
-> **SAY:** In 2011 a team of physicists announced they had broken the speed of
-> light. They were wrong. I want to tell you why, because the same thing is
-> probably happening in your benchmarks.
+> **SAY:** Every benchmark you have ever written is a measurement system, and
+> most of them are lying to you. Not on purpose — by default. I want to give you
+> three questions that turn a number into something you can trust.
 
-`DO` Do not introduce yourself. Straight into the story.
+`DO` Do not introduce yourself yet. The personal context is §02.
+
+### Is it actually slow?
+
+> **SAY:** Before you write a single benchmark: check it is actually slow, in
+> production. In-process, that is pprof, or a continuous profiler. Across the
+> whole system, the OpenTelemetry eBPF profiler or Parca, and your p99.
+>
+> Benchmark the path your production evidence says is hot. Not the one that
+> looks interesting.
+
+### Is it worth optimizing? (reveal)
+
+> **SAY:** And decide what done looks like, or you will never stop.
+>
+> An SLO is a target, not a wish. If you are inside your error budget,
+> optimizing is optional — go fix something else. And Amdahl: only the hot path
+> pays. Ten percent off code that runs one percent of the time is nothing.
+
+### Latency and throughput (two-step reveal)
+
+> **SAY:** Two words, quickly, because people use them interchangeably and they
+> are not.
+>
+> *(reveal 1)* Latency is one operation, start to finish. That is what a user
+> feels.
+>
+> *(reveal 2)* Throughput is operations per second. That is your ceiling.
+>
+> They are not the same, and this matters: you can improve one and damage the
+> other. Batching is the classic — throughput up, latency worse.
+
+### The cost of slowness
+
+**Beat: this is a product decision, not an engineering one.**
+
+> **SAY:** Rough thresholds. Under two hundred milliseconds, nobody notices.
+> Half a second, it feels a bit slow. Past a second, people notice they are
+> waiting. Past five, they leave.
+>
+> Google measured this directly. Half a second of extra latency cost them
+> twenty percent of search traffic.
+
+`DO` Attribute to "the Google search team". Not Marissa Mayer.
+
+### Lütke quote
+
+`DO` Let them read it. Say one line, then move.
+
+> **SAY:** Not all fast software is world-class. But all world-class software
+> is fast.
+
+### Finding what to optimize
+
+> **SAY:** If you want the "what to optimize" half properly, Daniel Martí gave
+> it at GopherCon 2019 and it is still the best talk on it. He covers what to
+> optimize. I am covering whether you can believe the number when you get there.
+
+---
+
+## 02 · Why I Care — 2 min
+
+### How I got here
+
+`DO` Thirty seconds. Consequences, not achievements. No titles, no counts.
+
+> **SAY:** Quick word on why I care. I maintained `client_golang` — every
+> allocation I added landed in somebody's scrape budget. Then Parca, where a
+> profiler that costs five percent CPU is a profiler nobody deploys. Now Go
+> instrumentation at Datadog, where our SDKs run inside *your* process.
+>
+> Every one of those jobs punished me for trusting a benchmark I had not
+> questioned.
+
+### Why Datadog cares
+
+> **SAY:** That last one is the sharp version. Our code runs in your process.
+> Every nanosecond we spend comes out of your budget, not ours. So measurement
+> is not an engineering hobby for us, it is product correctness.
+>
+> One public number: profile-guided optimization took three point four percent
+> off production CPU. You only get to claim that if you can measure it.
+
+---
+
+## 03 · A Loose Cable — 5 min
+
+`DO` This is the story beat. It sets up the three questions, so it stays welded
+to them — do not let the §02 bio bleed into it.
 
 ### September 2011 (headline image)
 
 **Beat: a careful team, an extraordinary result.**
 
-> **SAY:** The OPERA collaboration fired neutrinos from CERN to a detector in
+> **SAY:** In 2011 a team of physicists announced they had broken the speed of
+> light. The OPERA collaboration fired neutrinos from CERN to a detector in
 > Italy, 730 kilometres away. The neutrinos arrived early. Faster than light.
 > They did not publish immediately. They spent months rechecking. The maths.
 > The sensors. The calibration. Then they published, and asked the world for
@@ -109,90 +199,9 @@ today.
 > usually fail on being *repeatable*. You will leave with the checks for both,
 > and three small tools that automate them.
 
-### How I got here
-
-`DO` Thirty seconds. Consequences, not achievements. No titles, no counts.
-
-> **SAY:** Quick word on why I care. I maintained `client_golang` — every
-> allocation I added landed in somebody's scrape budget. Then Parca, where a
-> profiler that costs five percent CPU is a profiler nobody deploys. Now Go
-> instrumentation at Datadog, where our SDKs run inside *your* process.
->
-> Every one of those jobs punished me for trusting a benchmark I had not
-> questioned.
-
-### Why Datadog cares
-
-> **SAY:** That last one is the sharp version. Our code runs in your process.
-> Every nanosecond we spend comes out of your budget, not ours. So measurement
-> is not an engineering hobby for us, it is product correctness.
->
-> One public number: profile-guided optimization took three point four percent
-> off production CPU. You only get to claim that if you can measure it.
-
 ---
 
-## 02 · Why Benchmark? — 4 min
-
-### Latency and throughput (two-step reveal)
-
-> **SAY:** Two words, quickly, because people use them interchangeably and they
-> are not.
->
-> *(reveal 1)* Latency is one operation, start to finish. That is what a user
-> feels.
->
-> *(reveal 2)* Throughput is operations per second. That is your ceiling.
->
-> They are not the same, and this matters: you can improve one and damage the
-> other. Batching is the classic — throughput up, latency worse.
-
-### The cost of slowness
-
-**Beat: this is a product decision, not an engineering one.**
-
-> **SAY:** Rough thresholds. Under two hundred milliseconds, nobody notices.
-> Half a second, it feels a bit slow. Past a second, people notice they are
-> waiting. Past five, they leave.
->
-> Google measured this directly. Half a second of extra latency cost them
-> twenty percent of search traffic.
-
-`DO` Attribute to "the Google search team". Not Marissa Mayer.
-
-### Lütke quote
-
-`DO` Let them read it. Say one line, then move.
-
-> **SAY:** Not all fast software is world-class. But all world-class software
-> is fast.
-
----
-
-## 03 · Before You Optimize — 5 min
-
-### Is it actually slow?
-
-> **SAY:** Before you write a single benchmark: check it is actually slow, in
-> production. In-process, that is pprof, or a continuous profiler. Across the
-> whole system, the OpenTelemetry eBPF profiler or Parca, and your p99.
->
-> Benchmark the path your production evidence says is hot. Not the one that
-> looks interesting.
-
-### Is it worth optimizing? (reveal)
-
-> **SAY:** And decide what done looks like, or you will never stop.
->
-> An SLO is a target, not a wish. If you are inside your error budget,
-> optimizing is optional — go fix something else. And Amdahl: only the hot path
-> pays. Ten percent off code that runs one percent of the time is nothing.
-
-### Finding what to optimize
-
-> **SAY:** If you want the "what to optimize" half properly, Daniel Martí gave
-> it at GopherCon 2019 and it is still the best talk on it. He covers what to
-> optimize. I am covering whether you can believe the number when you get there.
+## 04 · Before You Measure — 4 min
 
 ### Every benchmark needs
 
@@ -241,7 +250,7 @@ reintroduce it.
 
 ---
 
-## 04 · Local and Micro — 17 min total
+## 05 · Local and Micro — 17 min total
 
 ### The three questions, micro scale
 
@@ -266,11 +275,11 @@ reintroduce it.
 >
 > Hold that thought. We come back to it once we can read a benchmark properly.
 
-`DO` Resist solving it. The payoff is §06.
+`DO` Resist solving it. The payoff is §07.
 
 ---
 
-## 05 · Making the Compiler Honest — ~10 min
+## 06 · Making the Compiler Honest — ~10 min
 
 ### Stop the compiler deleting your work
 
@@ -396,7 +405,7 @@ reintroduce it.
 
 ---
 
-## 06 · The Regression That Was a Speedup — ~5 min
+## 07 · The Regression That Was a Speedup — ~5 min
 
 ### Read the benchmark first
 
@@ -470,7 +479,7 @@ reintroduce it.
 
 ---
 
-## 07 · Statistical Interpretation — ~5 min
+## 08 · Statistical Interpretation — ~5 min
 
 ### One number is a point sample
 
@@ -520,7 +529,7 @@ reintroduce it.
 
 ---
 
-## 08 · Local Reproduction — ~5 min
+## 09 · Local Reproduction — ~5 min
 
 ### What does isolation actually buy?
 
@@ -588,7 +597,7 @@ No QEMU, no cross-architecture emulation.
 
 ---
 
-## 09 · CI and Macro — 15 min total
+## 10 · CI and Macro — 15 min total
 
 ### The three questions, macro scale
 
@@ -639,7 +648,7 @@ CI-only, on a dedicated runner.
 
 ---
 
-## 10 · Designing a Macrobenchmark — ~5 min
+## 11 · Designing a Macrobenchmark — ~5 min
 
 ### What does your app actually do? (reveal)
 
@@ -697,7 +706,7 @@ CI-only, on a dedicated runner.
 
 ---
 
-## 11 · Controlling the CI Environment — ~5 min
+## 12 · Controlling the CI Environment — ~5 min
 
 ### Why shared runners lie
 
@@ -780,7 +789,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 12 · Detecting Change Over Time — ~3 min
+## 13 · Detecting Change Over Time — ~3 min
 
 ### A/B is the wrong model for CI
 
@@ -811,7 +820,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 13 · Wiring It Into CI — ~3 min
+## 14 · Wiring It Into CI — ~3 min
 
 ### Two patterns
 
@@ -854,7 +863,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 14 · Wire It Up — 4 min
+## 15 · Wire It Up — 4 min
 
 ### Three tools
 

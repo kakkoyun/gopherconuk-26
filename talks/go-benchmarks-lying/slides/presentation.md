@@ -45,6 +45,198 @@ And How to Stop Them
 
 ###### 01
 
+# Why Benchmark?
+
+---
+
+## Is it actually slow?
+
+<div class="columns">
+<div>
+
+### In-process
+
+`pprof`
+
+Datadog Continuous Profiler
+
+</div>
+<div>
+
+### Whole-system
+
+[OTel eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)
+
+[Parca](https://parca.dev)
+
+p50 / p95 / **p99**
+
+</div>
+</div>
+
+<br>
+
+**Benchmark what production says is hot.**
+
+---
+
+## Is it worth optimizing?
+
+* **SLO** — a target, not a wish
+* **Error budget** — in budget, optimizing is optional
+* **Amdahl** — only the hot path pays
+
+---
+
+## Latency and throughput
+
+<div class="columns">
+<div>
+
+### Latency
+
+One operation.
+
+*Users feel this.*
+
+</div>
+<div class="hidden">
+
+### Throughput
+
+Operations per second.
+
+*Your ceiling.*
+
+</div>
+</div>
+
+---
+
+## Latency and throughput
+
+<div class="columns">
+<div>
+
+### Latency
+
+One operation.
+
+*Users feel this.*
+
+</div>
+<div>
+
+### Throughput
+
+Operations per second.
+
+*Your ceiling.*
+
+</div>
+</div>
+
+<br>
+
+*Improve one, damage the other.*
+
+---
+
+## The cost of slowness
+
+<div class="centered-table">
+
+| Response time | Perception |
+| --- | --- |
+| 100-200 ms | barely noticeable |
+| 300-500 ms | slightly slow |
+| 1-3 s | work is noticeable |
+| 5-10 s+ | user leaves |
+
+</div>
+
+<div class="center big">
+
+500 ms → <span class="hl-blue">−20%</span> Google search traffic
+
+</div>
+
+---
+
+<!-- _class: vcenter -->
+
+> "Not all fast software is world-class,
+> but all world-class software is fast."
+
+Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
+
+---
+
+## Finding what to optimize
+
+[**Optimizing Go Code Without a Blindfold**](https://www.youtube.com/watch?v=oE_vm7KeV_E)
+Daniel Martí · GopherCon 2019
+
+<br>
+
+He covers *what* to optimize.
+
+This talk covers *whether you can trust the number*.
+
+---
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 02
+
+# Why I Care
+
+---
+
+<!-- _class: vcenter -->
+
+## How I got here
+
+* `client_golang` — allocations in someone's scrape budget
+* Parca — a 5% profiler is not deployable
+* Datadog — SDKs inside *your* process
+
+---
+
+<!-- _class: vcenter -->
+
+## Why Datadog cares
+
+<div class="columns">
+<div>
+
+### Our code, your process
+
+Every ns comes out of a
+customer's budget.
+
+</div>
+<div>
+
+### <span class="hl-blue">−3.4%</span> production CPU
+
+from PGO alone.
+
+</div>
+</div>
+
+<br>
+
+### Overhead is product correctness
+
+---
+
+<!-- _class: section -->
+<!-- _paginate: false -->
+
+###### 03
+
 # A Loose Cable
 
 ---
@@ -138,195 +330,12 @@ compiler · scheduler · statistics
 
 ---
 
-<!-- _class: vcenter -->
-
-## How I got here
-
-* `client_golang` — allocations in someone's scrape budget
-* Parca — a 5% profiler is not deployable
-* Datadog — SDKs inside *your* process
-
----
-
-<!-- _class: vcenter -->
-
-## Why Datadog cares
-
-<div class="columns">
-<div>
-
-### Our code, your process
-
-Every ns comes out of a
-customer's budget.
-
-</div>
-<div>
-
-### <span class="hl-blue">−3.4%</span> production CPU
-
-from PGO alone.
-
-</div>
-</div>
-
-<br>
-
-### Overhead is product correctness
-
----
-
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 02
+###### 04
 
-# Why Benchmark?
-
----
-
-## Latency and throughput
-
-<div class="columns">
-<div>
-
-### Latency
-
-One operation.
-
-*Users feel this.*
-
-</div>
-<div class="hidden">
-
-### Throughput
-
-Operations per second.
-
-*Your ceiling.*
-
-</div>
-</div>
-
----
-
-## Latency and throughput
-
-<div class="columns">
-<div>
-
-### Latency
-
-One operation.
-
-*Users feel this.*
-
-</div>
-<div>
-
-### Throughput
-
-Operations per second.
-
-*Your ceiling.*
-
-</div>
-</div>
-
-<br>
-
-*Improve one, damage the other.*
-
----
-
-## The cost of slowness
-
-<div class="centered-table">
-
-| Response time | Perception |
-| --- | --- |
-| 100-200 ms | barely noticeable |
-| 300-500 ms | slightly slow |
-| 1-3 s | work is noticeable |
-| 5-10 s+ | user leaves |
-
-</div>
-
-<div class="center big">
-
-500 ms → <span class="hl-blue">−20%</span> Google search traffic
-
-</div>
-
----
-
-<!-- _class: vcenter -->
-
-> "Not all fast software is world-class,
-> but all world-class software is fast."
-
-Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
-
----
-
-<!-- _class: section -->
-<!-- _paginate: false -->
-
-###### 03
-
-# Before You Optimize
-
----
-
-## Is it actually slow?
-
-<div class="columns">
-<div>
-
-### In-process
-
-`pprof`
-
-Datadog Continuous Profiler
-
-</div>
-<div>
-
-### Whole-system
-
-[OTel eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)
-
-[Parca](https://parca.dev)
-
-p50 / p95 / **p99**
-
-</div>
-</div>
-
-<br>
-
-**Benchmark what production says is hot.**
-
----
-
-## Is it worth optimizing?
-
-* **SLO** — a target, not a wish
-* **Error budget** — in budget, optimizing is optional
-* **Amdahl** — only the hot path pays
-
----
-
-## Finding what to optimize
-
-[**Optimizing Go Code Without a Blindfold**](https://www.youtube.com/watch?v=oE_vm7KeV_E)
-Daniel Martí · GopherCon 2019
-
-<br>
-
-He covers *what* to optimize.
-
-This talk covers *whether you can trust the number*.
+# Before You Measure
 
 ---
 
@@ -450,7 +459,7 @@ Risk: **cause is unclear**
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 04
+###### 05
 
 # Local and Micro
 
@@ -503,7 +512,7 @@ Nothing in the diff touches OTLP encoding.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 05
+###### 06
 
 # Making the Compiler Honest
 
@@ -830,7 +839,7 @@ Must be written literally as `b.Loop()`.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 06
+###### 07
 
 # The Regression That Was a Speedup
 
@@ -979,7 +988,7 @@ It blocks good changes and waves regressions through.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 07
+###### 08
 
 # Statistical Interpretation
 
@@ -1091,7 +1100,7 @@ With enough draws, noise looks like signal.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 08
+###### 09
 
 # Local Reproduction
 
@@ -1228,7 +1237,7 @@ A sub-10% delta can be **layout noise**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 09
+###### 10
 
 # CI and Macro
 
@@ -1331,7 +1340,7 @@ Same tell: **a benchmark moved that could not have moved.**
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 10
+###### 11
 
 # Designing a Macrobenchmark
 
@@ -1463,7 +1472,7 @@ you can't attribute a delta.**
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 11
+###### 12
 
 # Controlling the CI Environment
 
@@ -1659,7 +1668,7 @@ and be ignored**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 12
+###### 13
 
 # Detecting Change Over Time
 
@@ -1748,7 +1757,7 @@ Netflix, at scale
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 13
+###### 14
 
 # Wiring It Into CI
 
@@ -1855,7 +1864,7 @@ A shared runner cannot be fixed with **more samples**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 14
+###### 15
 
 # Wire It Up
 

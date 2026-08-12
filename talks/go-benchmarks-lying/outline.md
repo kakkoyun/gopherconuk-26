@@ -1,7 +1,7 @@
 # Talk outline: Why Your Go Benchmarks Are Lying
 
 > **Format:** 60 minutes including Q&A · advanced Go audience
-> **Deck:** `slides/presentation.md` (109 pages, including progressive-reveal steps)
+> **Deck:** `slides/presentation.md` (110 pages, including progressive-reveal steps)
 > **Target:** 50 minutes presented, 10 minutes Q&A
 > **Demonstrations:** no live demos; every command and captured result stays in the repository
 
@@ -40,33 +40,48 @@ measured pace, not the estimate.
 Physical page count is no longer a good time proxy, because progressive reveals
 now spend several pages on one idea. Budget by section.
 
+> **Note.** The running order changed (WHY first, OPERA third) but no content
+> was added or removed in this pass, so the 50-minute target still holds. The
+> per-section targets below are reordered, not re-measured. A timed read-through
+> is still outstanding — see `TODO.md`.
+
 ## Beat sheet
 
 | Part | Section | Purpose | Target | Cumulative |
 | --- | --- | --- | ---: | ---: |
-| 0 | Cold open | OPERA, the connector, the three questions, the roadmap | 5:00 | 5:00 |
-| 1 | Who and why | How I got here, Datadog's stake, latency/throughput, cost of slowness | 4:00 | 9:00 |
-| 2 | Before you measure | Production evidence, SLOs, Amdahl, representative + repeatable, micro vs macro, start-macro | 5:00 | 14:00 |
-| 3 | **Arc 1 — local and micro** | #4891 plant · compiler honesty · timers and `B.Loop` · code layout and Berger · statistics · local environment · recap | 17:00 | 31:00 |
-| 4 | **Arc 2 — CI and macro** | #643 opener · macro design · SMT and DFS · change-point detection · CI patterns · false-positive ledger · recap | 15:00 | 46:00 |
-| 5 | Tools and close | Three CLIs, punchline, minimum discipline, 3×2 recap, CTA | 4:00 | 50:00 |
+| 1 | **01 Why Benchmark?** | Is it slow, could it go faster, is it worth it; latency/throughput, cost of slowness, Lütke; further watching | 4:00 | 4:00 |
+| 1 | **02 Why I Care** | How I got here, why Datadog cares | 2:00 | 6:00 |
+| 1 | **03 A Loose Cable** | OPERA, the three questions, the two-scales roadmap | 4:00 | 10:00 |
+| 1 | **04 Before You Measure** | Representative + repeatable, micro vs macro, when to use which, start macro | 4:00 | 14:00 |
+| 2 | **05–09 Arc 1 — local and micro** | bot-comment plant · compiler honesty · timers and `B.Loop` · code layout and Berger · statistics · local environment · recap | 17:00 | 31:00 |
+| 3 | **10–14 Arc 2 — CI and macro** | #643 opener · macro design · SMT and DFS · change-point detection · CI patterns · false-positive ledger · recap | 15:00 | 46:00 |
+| 4 | **15 Wire It Up** | Three CLIs, punchline, minimum discipline, 3×2 recap, CTA | 4:00 | 50:00 |
 
-**Rehearsal checkpoints:** arc 1 begins by 14:00 · arc 2 begins by 31:00 · close
-begins by 46:00. If arc 2 has not started by 33:00, apply the cut ladder live.
+**Rehearsal checkpoints:** arc 1 (§05) begins by 14:00 · arc 2 (§10) begins by
+31:00 · close (§15) begins by 46:00. If arc 2 has not started by 33:00, apply
+the cut ladder live.
 
 ## Narrative order
 
-### Cold open
+### Why first, then the story
 
-Start with OPERA, not a biography or an agenda. A careful team, a surprising
-result, and two faults that partially masked each other. Pivot to a laptop
-benchmark only after the connector reveal. Ninety seconds.
+Open on *why benchmark at all* — the user is the metric, not the CPU. Is it
+actually slow? Could it go faster? Is it worth optimizing? Then the vocabulary
+(latency vs throughput, cost of slowness, Lütke) and a pointer to where the
+"what to optimize" half lives (Martí). This front matter is the WHY; it earns
+the right to spend fifty minutes on measurement.
 
-### Contract before credibility
+Only then the speaker context — *why I care* — as a short beat about
+consequences, not credentials. Datadog's stake lands here because the
+"overhead is product correctness" line is the sharp version of the WHY.
 
-Plant the three questions, then the roadmap slide that states both arcs and the
-takeaways, and only then the personal and Datadog context. The bio is a story
-about why measurement started mattering, not a credential list.
+### The story, then the contract
+
+OPERA is beat three, not the cold open. A careful team, a surprising result, and
+two faults that partially masked each other. Pivot to a laptop benchmark only
+after the connector reveal. The three questions and the two-scales roadmap stay
+welded to OPERA — they are the contract that sets up the arcs and must
+immediately precede them.
 
 ### Two arcs, two opening incidents
 
