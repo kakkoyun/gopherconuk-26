@@ -1,0 +1,113 @@
+./bloop_bench_test.go:81:5: github.com/kakkoyun/gopherconuk-26/demo.s will be kept alive
+./bloop_bench_test.go:30:6: can inline BenchmarkHash_BN with cost 72 as: func(*testing.B) { s = <nil>; for loop; _ = s }
+./bloop_bench_test.go:40:6: cannot inline BenchmarkHash_BN_WithSetup_MissingReset: function too complex: cost 81 exceeds budget 80
+./bloop_bench_test.go:53:6: cannot inline BenchmarkHash_BN_WithSetup_Correct: function too complex: cost 140 exceeds budget 80
+./bloop_bench_test.go:74:6: cannot inline BenchmarkHash_BLoop: function too complex: cost 161 exceeds budget 80
+./dce_bench_test.go:33:6: can inline makeBuffer with cost 3 as: func(int) []byte { return make([]byte, n) }
+./dce_bench_test.go:44:6: can inline BenchmarkMakeBuffer_DCE with cost 9 as: func(*testing.B) { for loop }
+./dce_bench_test.go:56:6: can inline BenchmarkMakeBuffer_Correct with cost 18 as: func(*testing.B) { s = <nil>; for loop; sink = s }
+./dce_bench_test.go:91:6: can inline BenchmarkOnesCount_ConstantFolded with cost 15 as: func(*testing.B) { s = <nil>; for loop; sinkInt = s }
+./dce_bench_test.go:103:6: can inline BenchmarkOnesCount_Correct with cost 15 as: func(*testing.B) { s = <nil>; for loop; sinkInt = s }
+./timer_bench_test.go:23:21: can inline processString.func1 with cost 143 as: func(rune) rune { if unicode.IsLetter(r) { return unicode.ToLower(r) }; return rune(-1) }
+./timer_bench_test.go:22:6: can inline processString with cost 77 as: func(string) string { return strings.Map(func literal, s) }
+./timer_bench_test.go:34:6: cannot inline buildFixture: function too complex: cost 122 exceeds budget 80
+./timer_bench_test.go:76:6: cannot inline BenchmarkProcess_TimerOrder_BUG: function too complex: cost 274 exceeds budget 80
+./timer_bench_test.go:95:6: cannot inline BenchmarkProcess_PerIterSetup_Correct: function too complex: cost 274 exceeds budget 80
+./timer_bench_test.go:118:6: cannot inline BenchmarkProcess_OneTimeSetup_MissingReset: function too complex: cost 156 exceeds budget 80
+./timer_bench_test.go:129:6: cannot inline BenchmarkProcess_OneTimeSetup_Correct: function too complex: cost 215 exceeds budget 80
+./bloop_bench_test.go:80:12: inlining call to testing.(*B).Loop
+./dce_bench_test.go:46:13: inlining call to makeBuffer
+./dce_bench_test.go:59:17: inlining call to makeBuffer
+./timer_bench_test.go:24:22: inlining call to unicode.IsLetter
+./timer_bench_test.go:38:14: inlining call to strings.(*Builder).WriteByte
+./timer_bench_test.go:40:17: inlining call to strings.(*Builder).String
+./timer_bench_test.go:38:14: inlining call to strings.(*Builder).copyCheck
+./timer_bench_test.go:38:14: inlining call to abi.NoEscape
+./timer_bench_test.go:81:20: inlining call to processString
+./timer_bench_test.go:101:20: inlining call to processString
+./timer_bench_test.go:123:20: inlining call to processString
+./timer_bench_test.go:134:20: inlining call to processString
+./bloop_bench_test.go:30:23: b does not escape
+./bloop_bench_test.go:40:46: b does not escape
+./bloop_bench_test.go:42:14: make([]byte, 1024) does not escape
+./bloop_bench_test.go:53:41: b does not escape
+./bloop_bench_test.go:54:14: make([]byte, 1024) does not escape
+./bloop_bench_test.go:74:26: parameter b leaks to {heap} for BenchmarkHash_BLoop with derefs=0:
+./bloop_bench_test.go:74:26:   flow: testing.b ← b:
+./bloop_bench_test.go:74:26:     from testing.b := b (assign-pair) at ./bloop_bench_test.go:80:12
+./bloop_bench_test.go:74:26:   flow: {heap} ← testing.b:
+./bloop_bench_test.go:74:26:     from (*testing.B).loopSlowPath(testing.b) (call parameter) at ./bloop_bench_test.go:80:12
+./bloop_bench_test.go:74:26: leaking param: b
+./bloop_bench_test.go:76:14: make([]byte, 1024) does not escape
+./dce_bench_test.go:34:13: make([]byte, n) escapes to heap in makeBuffer:
+./dce_bench_test.go:34:13:   flow: ~r0 ← &{storage for make([]byte, n)}:
+./dce_bench_test.go:34:13:     from make([]byte, n) (spill) at ./dce_bench_test.go:34:13
+./dce_bench_test.go:34:13:     from return make([]byte, n) (return) at ./dce_bench_test.go:34:2
+./dce_bench_test.go:34:13: make([]byte, n) escapes to heap
+./dce_bench_test.go:44:30: b does not escape
+./dce_bench_test.go:46:13: make([]byte, 64) does not escape
+./dce_bench_test.go:59:17: make([]byte, 64) escapes to heap in BenchmarkMakeBuffer_Correct:
+./dce_bench_test.go:59:17:   flow: ~r0 ← &{storage for make([]byte, 64)}:
+./dce_bench_test.go:59:17:     from make([]byte, 64) (spill) at ./dce_bench_test.go:59:17
+./dce_bench_test.go:59:17:     from ~r0 = make([]byte, 64) (assign-pair) at ./dce_bench_test.go:59:17
+./dce_bench_test.go:59:17:   flow: s ← ~r0:
+./dce_bench_test.go:59:17:     from s = ~r0 (assign) at ./dce_bench_test.go:59:5
+./dce_bench_test.go:59:17:   flow: {heap} ← s:
+./dce_bench_test.go:59:17:     from sink = s (assign) at ./dce_bench_test.go:61:7
+./dce_bench_test.go:56:34: b does not escape
+./dce_bench_test.go:59:17: make([]byte, 64) escapes to heap
+./dce_bench_test.go:91:40: b does not escape
+./dce_bench_test.go:103:33: b does not escape
+./timer_bench_test.go:22:20: parameter s leaks to ~r0 for processString with derefs=0:
+./timer_bench_test.go:22:20:   flow: ~r0 ← s:
+./timer_bench_test.go:22:20:     from strings.Map(func literal, s) (call parameter) at ./timer_bench_test.go:23:20
+./timer_bench_test.go:22:20:     from return strings.Map(func literal, s) (return) at ./timer_bench_test.go:23:2
+./timer_bench_test.go:22:20: leaking param: s to result ~r0 level=0
+./timer_bench_test.go:23:21: func literal does not escape
+./timer_bench_test.go:38:14: "strings: illegal use of non-zero Builder copied by value" escapes to heap in buildFixture:
+./timer_bench_test.go:38:14:   flow: {heap} ← &{storage for "strings: illegal use of non-zero Builder copied by value"}:
+./timer_bench_test.go:38:14:     from "strings: illegal use of non-zero Builder copied by value" (spill) at ./timer_bench_test.go:38:14
+./timer_bench_test.go:38:14:     from panic("strings: illegal use of non-zero Builder copied by value") (call parameter) at ./timer_bench_test.go:38:14
+./timer_bench_test.go:38:14: append(strings.b.buf, strings.c) escapes to heap in buildFixture:
+./timer_bench_test.go:38:14:   flow: {heap} ← &{storage for append(strings.b.buf, strings.c)}:
+./timer_bench_test.go:38:14:     from append(strings.b.buf, strings.c) (spill) at ./timer_bench_test.go:38:14
+./timer_bench_test.go:38:14:     from strings.b.buf = append(strings.b.buf, strings.c) (assign) at ./timer_bench_test.go:38:14
+./timer_bench_test.go:38:14: "strings: illegal use of non-zero Builder copied by value" escapes to heap
+./timer_bench_test.go:38:14: append escapes to heap
+./timer_bench_test.go:76:38: b does not escape
+./timer_bench_test.go:81:20: func literal does not escape
+./timer_bench_test.go:95:44: b does not escape
+./timer_bench_test.go:101:20: func literal does not escape
+./timer_bench_test.go:118:49: b does not escape
+./timer_bench_test.go:123:20: func literal does not escape
+./timer_bench_test.go:129:44: b does not escape
+./timer_bench_test.go:134:20: func literal does not escape
+./timer_bench_test.go:24:22: index bounds check elided
+_testmain.go:59:6: can inline init.0 with cost 6 as: func() { testdeps.ModulePath = "github.com/kakkoyun/gopherconuk-26/demo"; testdeps.ImportPath = "github.com/kakkoyun/gopherconuk-26/demo" }
+_testmain.go:65:6: cannot inline main: function too complex: cost 187 exceeds budget 80
+_testmain.go:66:42: testdeps.TestDeps{} escapes to heap in main:
+_testmain.go:66:42:   flow: {heap} ← &{storage for testdeps.TestDeps{}}:
+_testmain.go:66:42:     from testdeps.TestDeps{} (spill) at _testmain.go:66:42
+_testmain.go:66:42:     from testing.MainStart(testdeps.TestDeps{}, tests, benchmarks, fuzzTargets, examples) (call parameter) at _testmain.go:66:24
+_testmain.go:66:42: testdeps.TestDeps{} escapes to heap
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:122:15: parameter reflect.u leaks to {heap} for 5614d73739c4cb953979c5b476501cda147b86386834ff88f636587787e0f1e9.AssignableTo with derefs=0:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:122:15:   flow: {heap} ← reflect.u:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:122:15:     from go.shape.~p0.AssignableTo(reflect.u) (call parameter) at <autogenerated>:1
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:128:16: parameter reflect.u leaks to {heap} for 5614d73739c4cb953979c5b476501cda147b86386834ff88f636587787e0f1e9.ConvertibleTo with derefs=0:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:128:16:   flow: {heap} ← reflect.u:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:128:16:     from go.shape.~p0.ConvertibleTo(reflect.u) (call parameter) at <autogenerated>:1
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:189:15: parameter reflect.index leaks to {heap} for 5614d73739c4cb953979c5b476501cda147b86386834ff88f636587787e0f1e9.FieldByIndex with derefs=0:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:189:15:   flow: {heap} ← reflect.index:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:189:15:     from go.shape.~p0.FieldByIndex(reflect.index) (call parameter) at <autogenerated>:1
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:196:14: parameter reflect.name leaks to {heap} for 5614d73739c4cb953979c5b476501cda147b86386834ff88f636587787e0f1e9.FieldByName with derefs=0:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:196:14:   flow: {heap} ← reflect.name:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:196:14:     from go.shape.~p0.FieldByName(reflect.name) (call parameter) at <autogenerated>:1
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:214:18: parameter reflect.match leaks to {heap} for 5614d73739c4cb953979c5b476501cda147b86386834ff88f636587787e0f1e9.FieldByNameFunc with derefs=0:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:214:18:   flow: {heap} ← reflect.match:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:214:18:     from go.shape.~p0.FieldByNameFunc(reflect.match) (call parameter) at <autogenerated>:1
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:119:13: parameter reflect.u leaks to {heap} for 5614d73739c4cb953979c5b476501cda147b86386834ff88f636587787e0f1e9.Implements with derefs=0:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:119:13:   flow: {heap} ← reflect.u:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:119:13:     from go.shape.~p0.Implements(reflect.u) (call parameter) at <autogenerated>:1
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:84:15: parameter go.shape.~p1 leaks to {heap} for 5614d73739c4cb953979c5b476501cda147b86386834ff88f636587787e0f1e9.MethodByName with derefs=0:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:84:15:   flow: {heap} ← go.shape.~p1:
+/opt/homebrew/Cellar/go/1.26.5/libexec/src/reflect/type.go:84:15:     from go.shape.~p0.MethodByName(go.shape.~p1) (call parameter) at <autogenerated>:1
