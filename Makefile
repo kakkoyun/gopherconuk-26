@@ -15,7 +15,7 @@ MARP := npx marp
 .DEFAULT_GOAL := help
 
 .PHONY: all build/html build/pdf build/html/% build/pdf/% watch/% serve/% clean clean/% \
-	check check/fast check/slides check/css check/theme check/footer check/go \
+	check check/fast check/slides check/css check/theme check/footer check/go check/fragments \
 	lint/md lint/md/% fix/md/% format/md format/md/% check/typos check/typos/% fix/typos/% \
 	pre-commit sync/theme hooks install help
 
@@ -44,14 +44,20 @@ clean/%:
 
 check: check/slides check/go
 
-check/fast: check/theme lint/md check/typos
+check/fast: check/theme lint/md check/typos check/fragments
 
-check/slides: check/css lint/md check/typos build/html check/footer
+check/slides: check/css lint/md check/typos check/fragments build/html check/footer
 
 check/css: check/theme
 
 check/footer: build/pdf
 	python3 tools/check_slide_footer.py $(SLIDE_PDFS)
+
+# Marp turns `*` bullets into progressive-reveal fragments. Prettier's markdown
+# printer rewrites them to `-`, silently destroying every reveal. `.prettierignore`
+# prevents that; this target is the tripwire if the ignore is ever bypassed.
+check/fragments:
+	python3 tools/check_slide_fragments.py $(SLIDE_MARKDOWN)
 
 check/theme:
 	@set -o errexit -o nounset -o pipefail; \
@@ -89,10 +95,14 @@ lint/md/%:
 fix/md/%:
 	npx markdownlint-cli2 --config .markdownlint-cli2.yaml --fix talks/$*/slides/presentation.md
 
+# Slide decks are excluded via .prettierignore because prettier destroys Marp
+# fragment bullets. These targets stay for other markdown; they are a no-op on
+# the decks by design.
 format/md: format/md/go-benchmarks-lying format/md/without-a-single-line
 
 format/md/%:
-	npx prettier --write talks/$*/slides/presentation.md
+	@printf '%s\n' 'talks/$*/slides/presentation.md is prettier-ignored (Marp fragment bullets).'
+	@printf '%s\n' 'Use `make lint/md/$*` and `make fix/md/$*` instead.'
 
 check/typos:
 	typos $(SLIDE_MARKDOWN) $(THEME_MARKDOWN)

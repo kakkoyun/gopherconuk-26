@@ -1,0 +1,12 @@
+# Marp decks use `*` bullets as load-bearing markup: Marp's bespoke template
+# turns them into progressive-reveal fragments. Prettier's markdown printer
+# normalizes top-level unordered list markers to `-`, which silently converts
+# every fragment bullet into a plain bullet and kills every reveal.
+#
+# `make check/fragments` is the tripwire that catches this if the ignore is
+# bypassed. Do not remove either guard.
+talks/**/slides/presentation.md
+
+# Build artifacts
+talks/**/slides/presentation.html
+node_modules/

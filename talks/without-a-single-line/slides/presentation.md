@@ -1,6 +1,8 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
+# fragment-floor: 0 — this deck has no progressive reveals yet. If you add `*`
+# fragment bullets, raise this so `make check/fragments` protects them.
 math: mathjax
 html: true
 paginate: true

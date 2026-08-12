@@ -1,6 +1,8 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
+# fragment-floor: 0 — raised as progressive reveals land. `*` bullets are Marp
+# fragments and are load-bearing; `make check/fragments` guards them.
 math: mathjax
 html: true
 paginate: true
