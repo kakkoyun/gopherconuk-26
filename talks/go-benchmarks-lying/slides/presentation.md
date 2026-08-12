@@ -298,6 +298,8 @@ FOSDEM 2026
 The SMT and DFS data later in this talk
 comes from this earlier version.
 
+<span class="small">simultaneous multithreading · dynamic frequency scaling</span>
+
 </div>
 <div class="center">
 
@@ -1694,6 +1696,8 @@ An **environment** problem, not a statistics problem.
 
 ## What SMT actually is
 
+<span class="small">Simultaneous multithreading</span>
+
 <div class="columns">
 <div>
 
@@ -1780,6 +1784,8 @@ bare metal, DFS disabled
 ---
 
 ## What DFS is
+
+<span class="small">Dynamic frequency scaling</span>
 
 <div class="columns">
 <div>
@@ -2252,4 +2258,8 @@ A shared runner cannot be fixed with more samples.
 
 # Questions?
 
-[Website](https://kakkoyun.me) · [LinkedIn](https://www.linkedin.com/in/kakkoyun/) · [Bluesky](https://bsky.app/profile/kakkoyun.me) · [X](https://x.com/kakkoyun_me) · [GitHub](https://github.com/kakkoyun)
+[kakkoyun.me](https://kakkoyun.me) · [github.com/kakkoyun](https://github.com/kakkoyun)
+
+[linkedin.com/in/kakkoyun](https://www.linkedin.com/in/kakkoyun/) · [bsky.app/profile/kakkoyun.me](https://bsky.app/profile/kakkoyun.me) · [x.com/kakkoyun_me](https://x.com/kakkoyun_me)
+
+<span class="small">Talk repo [github.com/kakkoyun/gopherconuk-26](https://github.com/kakkoyun/gopherconuk-26) · Tools [github.com/kakkoyun/benchlab](https://github.com/kakkoyun/benchlab)</span>
