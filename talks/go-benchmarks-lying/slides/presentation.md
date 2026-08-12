@@ -1,6 +1,6 @@
 ---
 marp: true
-theme: gophercon-datadog
+theme: gophercon-datadog-minimal
 math: mathjax
 html: true
 paginate: true
