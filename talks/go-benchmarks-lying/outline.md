@@ -129,17 +129,22 @@ Apply in this order if the timed read-through runs long.
 3. "Go runs this on Go", keeping "Why a baseline, not a pair" (−0:45) — the
    quote is the load-bearing half; the dashboard screenshot is corroboration.
 4. The feedback-loop diagram (−1:00)
-5. "How the keepalive works" (−1:00) — the `b.Loop` table already carries the
+5. "Seeing the hardware" (−0:30) — a pointer to `perfgo`, not an argument the
+   talk depends on; the observer-effect slide before it already makes the point
+   that `ns/op` cannot see a cache miss.
+6. "How the keepalive works" (−1:00) — the `b.Loop` table already carries the
    actionable advice; this slide is the why-it-works footnote.
-6. Coordinated omission and deterministic inputs, folded to one line (−1:30)
-7. The SMT and DFS *mechanism* explainer slides, keeping the impact data (−1:30)
-8. The benchmarking-basics "Reading the output" slide, keeping the rest of §05 (−1:00)
-9. Assembly back to one slide, dropping the `-m -m` escape/inlining slides (−2:00)
+7. Coordinated omission and deterministic inputs, folded to one line (−1:30)
+8. The SMT and DFS *mechanism* explainer slides, keeping the impact data (−1:30)
+9. The benchmarking-basics "Reading the output" slide, keeping the rest of §05 (−1:00)
+10. Assembly back to one slide, dropping the `-m -m` escape/inlining slides (−2:00)
 
 **Never cut without review:** either opening incident, the DCE captured
 evidence, the local CV experiment, the macOS caveat, the SMT and DFS impact
-data, the 3×2 recap, the Datadog rationale, or "Why not just add more runners?"
-(it answers the objection the CI half always draws, in upstream's own words).
+data, the 3×2 recap, the Datadog rationale, "Why not just add more runners?"
+(it answers the objection the CI half always draws, in upstream's own words), or
+the observer effect (it generalises §07 from "the compiler is not neutral" to
+"your harness is not neutral either", which is what earns the second half).
 
 ## Public results and sources to preserve
 

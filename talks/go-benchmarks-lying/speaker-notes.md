@@ -558,6 +558,20 @@ about to distrust.**
 > Which, if you have been listening for the last forty minutes, is the entire
 > talk.
 
+### Seeing the hardware
+
+`DO` Short. This is a pointer, not a tutorial. Thirty seconds.
+
+> **SAY:** Both of the last two problems were cache problems, and `ns/op` cannot
+> see a cache miss. If you want to look at that layer, `perfgo` wraps Linux
+> `perf` and the CPU's own performance counters around a Go benchmark. It gives
+> you cache-miss hotspots instead of just wall time, and it will flag
+> cache-to-cache line transfers, which is usually how you find false sharing.
+>
+> Linux only, because it needs `perf`.
+>
+> `ns/op` tells you how long. The counters tell you why.
+
 ---
 
 ## 08 · The Regression That Was a Speedup — ~5 min

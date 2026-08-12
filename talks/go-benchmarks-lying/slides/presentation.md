@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 60. `*` is the ONLY list marker allowed on slides. Every list
+# fragment-floor: 63. `*` is the ONLY list marker allowed on slides. Every list
 # is an intentional Marp reveal; a `-` bullet here is a bug. `make check/fragments`
 # guards the count against formatters that rewrite markers.
 math: mathjax
@@ -1053,6 +1053,22 @@ Reuse the input and 513 looks **50% faster**.
 Build it fresh and the gap is **gone**.
 
 <span class="small">Teiva Harsanyi · [P99 CONF](https://p99conf.io/2023/08/16/how-to-write-accurate-benchmarks-in-go/) · *100 Go Mistakes* #91</span>
+
+</div>
+
+---
+
+## Seeing the hardware
+
+<span class="small">[perfgo](https://github.com/perfgo/perfgo) · Linux `perf` + CPU PMU counters</span>
+
+* Runs your Go benchmark while collecting hardware counters
+* Event-based profiles: **cache-miss hotspots**, not just wall time
+* `cache-to-cache` flags line transfers, a false-sharing tell
+
+<div class="center">
+
+`ns/op` tells you *how long*. Counters tell you **why**.
 
 </div>
 
