@@ -1033,9 +1033,9 @@ benchstat old.txt new.txt
 
 ## What `benchstat` won't tell you
 
-Is A different from B? ✅
+✅ Is A different from B?
 
-Is this machine trustworthy? ❌
+❌ Is this machine trustworthy?
 
 <br>
 
