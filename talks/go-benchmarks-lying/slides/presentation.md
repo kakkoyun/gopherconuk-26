@@ -1,8 +1,9 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 27 — `*` bullets are Marp progressive-reveal fragments and are
-# load-bearing; `make check/fragments` guards them against prettier.
+# fragment-floor: 25 — `*` is the ONLY list marker allowed on slides. Every list
+# is an intentional Marp reveal; a `-` bullet here is a bug. `make check/fragments`
+# guards the count against formatters that rewrite markers.
 math: mathjax
 html: true
 paginate: true
@@ -16,14 +17,14 @@ style: |
   .small  { font-size: 0.8em; }
   .tiny   { font-size: 0.6em; }
   .center { text-align: center; }
-  /* Helpers ported from the FOSDEM deck for the arc-2 charts and tables.
-     Kept deck-local rather than in the shared theme so the sibling talk
-     is unaffected. */
   .hidden { visibility: hidden; }
   .hl-blue   { color: #00ADD8; font-weight: 700; }
   .hl-orange { color: #E8833A; font-weight: 700; }
   .centered-table table { margin-left: auto; margin-right: auto; }
   .comment { display: block; opacity: 0.45; font-size: 0.75em; line-height: 1.5; }
+  .badge { display: inline-block; padding: 0.1em 0.6em; border-radius: 4px;
+           background: rgba(232,131,58,0.16); color: #B4561A; font-size: 0.7em;
+           font-weight: 700; letter-spacing: 0.04em; }
 ---
 
 <!-- _class: title gopher-sage -->
@@ -47,21 +48,15 @@ And How to Stop Them
 
 # A Loose Cable
 
-A systematic measurement error can hide in plain sight.
-
 ---
 
 ## September 2011
 
-The OPERA collaboration announces muon neutrinos arriving **faster than light**.
-
 <div class="center">
 
-![width:620](../assets/particles-break-light-speed-headline.png)
+![width:660](../assets/particles-break-light-speed-headline.png)
 
 </div>
-
-Months of rechecking. The maths. The sensors. The calibration.
 
 ---
 
@@ -70,48 +65,51 @@ Months of rechecking. The maths. The sensors. The calibration.
 <div class="columns">
 <div>
 
-An improperly seated **fibre-optic connector** in the GPS timing chain.
+### A loose fibre connector
 
-A **~73 ns** bias made neutrinos appear early.
+**~73 ns** early bias
 
-A second fault, an oscillator defect, pushed the other way and
-*partially masked the first*.
+A second fault pushed back
+and *masked* it
+
+<div class="small">
+
+CERN, 22 Feb 2012 · Cartlidge,
+*Science* 335(6072):1027
+
+</div>
 
 </div>
 <div class="center">
 
-![width:380](../assets/opera-loose-cable.png)
+![width:400](../assets/opera-loose-cable.png)
 
 </div>
-</div>
-
-<div class="small">
-
-CERN press release, 22 Feb 2012 · Cartlidge, *Science* 335(6072):1027
-
 </div>
 
 ---
 
-## The point is not physics
+<!-- _class: vcenter -->
 
-A systematic measurement error can hide in plain sight,
+## Systematic error
 
-look exactly like signal,
-
-and survive review by people far more careful than you.
-
----
-
-## Your setup
-
-OPERA had an international collaboration of particle physicists.
-
-You have `testing.B`, a laptop, and background Chrome tabs.
+## hides in plain sight
 
 <br>
 
-**The cables are your compiler, OS scheduler, and statistics.**
+It looks like signal.
+
+It survives expert review.
+
+---
+
+## Your cables
+
+<div class="big">
+
+compiler · scheduler · statistics
+
+</div>
 
 ---
 
@@ -119,9 +117,9 @@ You have `testing.B`, a laptop, and background Chrome tabs.
 
 <div class="big">
 
-1. Is the benchmark measuring **real work**?
-2. Is my sample **stable enough**?
-3. Is the difference **large relative to the noise**?
+1. **Real work?**
+2. **Stable sample?**
+3. **Above the noise?**
 
 </div>
 
@@ -129,33 +127,15 @@ You have `testing.B`, a laptop, and background Chrome tabs.
 
 ## Two scales, same three questions
 
-<div class="columns">
-<div>
+<div class="centered-table">
 
-### Arc 1 — local and micro
-
-`testing.B` on your laptop.
-
-Compiler behaviour, code layout,
-statistics, machine control.
+| | First half | Second half |
+| --- | --- | --- |
+| **Scope** | local + micro | CI + macro |
+| **Tool** | `testing.B` | whole workload |
+| **Fails on** | representative | repeatable |
 
 </div>
-<div>
-
-### Arc 2 — CI and macro
-
-Whole-workload benchmarks over time.
-
-Workload design, hardware control,
-change detection.
-
-</div>
-</div>
-
-<br>
-
-**You will leave with:** the failure modes at each scale, the checks that catch
-them, and three small tools that automate the checks.
 
 ---
 
@@ -163,12 +143,9 @@ them, and three small tools that automate the checks.
 
 ## How I got here
 
-I did not set out to care about measurement.
-
-* I maintained `client_golang`, and every allocation showed up in someone's scrape budget.
-* I worked on Parca, where a profiler that costs 5% CPU is not a profiler anyone deploys.
-* Now I work on Go instrumentation at Datadog, where our SDKs run inside your process.
-* Every one of those jobs punished me for trusting a benchmark I had not questioned.
+* `client_golang` — allocations in someone's scrape budget
+* Parca — a 5% profiler is not deployable
+* Datadog — SDKs inside *your* process
 
 ---
 
@@ -179,27 +156,24 @@ I did not set out to care about measurement.
 <div class="columns">
 <div>
 
-### Inside customer workloads
+### Our code, your process
 
-Datadog ships SDKs for several languages.
-
-Those SDKs consume part of a customer's CPU, memory, and latency budget.
+Every ns comes out of a
+customer's budget.
 
 </div>
 <div>
 
-### Continuous evidence
+### <span class="hl-blue">−3.4%</span> production CPU
 
-PGO reduced production CPU usage by **3.4%**.
-
-Benchmark gates protect tracer and instrumentation hot paths.
+from PGO alone.
 
 </div>
 </div>
 
 <br>
 
-### Instrumentation overhead is product correctness
+### Overhead is product correctness
 
 ---
 
@@ -210,8 +184,6 @@ Benchmark gates protect tracer and instrumentation hot paths.
 
 # Why Benchmark?
 
-Performance is a feature.
-
 ---
 
 ## Latency and throughput
@@ -221,22 +193,18 @@ Performance is a feature.
 
 ### Latency
 
-Time for a single operation to complete.
+One operation.
 
-Low latency means a fast response.
-
-*Users feel this directly.*
+*Users feel this.*
 
 </div>
 <div class="hidden">
 
 ### Throughput
 
-Operations completed per unit of time.
+Operations per second.
 
-High throughput means more capacity.
-
-*Your system's ceiling.*
+*Your ceiling.*
 
 </div>
 </div>
@@ -250,48 +218,44 @@ High throughput means more capacity.
 
 ### Latency
 
-Time for a single operation to complete.
+One operation.
 
-Low latency means a fast response.
-
-*Users feel this directly.*
+*Users feel this.*
 
 </div>
 <div>
 
 ### Throughput
 
-Operations completed per unit of time.
+Operations per second.
 
-High throughput means more capacity.
-
-*Your system's ceiling.*
+*Your ceiling.*
 
 </div>
 </div>
 
 <br>
 
-*An optimization can improve one and damage the other.*
+*Improve one, damage the other.*
 
 ---
 
 ## The cost of slowness
 
-| Response time | User perception |
+<div class="centered-table">
+
+| Response time | Perception |
 | --- | --- |
-| 100-200 ms | Minimally noticeable |
-| 300-500 ms | Quick but slightly slow |
-| 1-3 s | Amount of work noticeable |
-| 5-10 s+ | User switches away |
+| 100-200 ms | barely noticeable |
+| 300-500 ms | slightly slow |
+| 1-3 s | work is noticeable |
+| 5-10 s+ | user leaves |
 
-<br>
+</div>
 
-A 500 ms delay cost Google 20% of search traffic.
+<div class="center big">
 
-<div class="tiny">
-
-Google search team data, cited by [Coding Horror](https://blog.codinghorror.com/performance-is-a-feature/)
+500 ms → <span class="hl-blue">−20%</span> Google search traffic
 
 </div>
 
@@ -313,136 +277,131 @@ Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
 
 # Before You Optimize
 
-Measure symptoms. Set targets. Pick a scale.
-
 ---
 
 ## Is it actually slow?
 
-Measure in production before writing a benchmark.
-
 <div class="columns">
 <div>
 
-### Inside the process
+### In-process
 
-- `pprof`: CPU, heap, goroutine, block
-- Datadog Continuous Profiler
+`pprof`
+
+Datadog Continuous Profiler
 
 </div>
 <div>
 
-### Across the system
+### Whole-system
 
-- [OpenTelemetry eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)
-- [Parca](https://parca.dev)
-- p50 / p95 / p99 from production
+[OTel eBPF Profiler](https://github.com/open-telemetry/opentelemetry-ebpf-profiler)
+
+[Parca](https://parca.dev)
+
+p50 / p95 / **p99**
 
 </div>
 </div>
 
 <br>
 
-**Benchmark the path your production evidence says is hot.**
+**Benchmark what production says is hot.**
 
 ---
 
 ## Is it worth optimizing?
 
-Define a target before you start. Without one, you never finish.
-
-* **SLOs:** "p99 < 200 ms" is an objective, not a wish
-* **Error budgets:** within budget, optimization is optional
-* **Amdahl's Law:** only the hottest path produces meaningful wins
-
-*Benchmark what your profiler tells you is hot, not what looks interesting.*
+* **SLO** — a target, not a wish
+* **Error budget** — in budget, optimizing is optional
+* **Amdahl** — only the hot path pays
 
 ---
 
-## Further reading: finding what to optimize
+## Finding what to optimize
 
 [**Optimizing Go Code Without a Blindfold**](https://www.youtube.com/watch?v=oE_vm7KeV_E)
 Daniel Martí · GopherCon 2019
 
-pprof, benchmarks, and data-driven optimization in Go.
-Martí covers *how to find what to optimize*;
-this talk covers *how to trust the measurement once you have a target*.
+<br>
+
+He covers *what* to optimize.
+
+This talk covers *whether you can trust the number*.
 
 ---
 
 <!-- _class: vcenter -->
 
-## Every benchmark needs two properties
+## Every benchmark needs
 
 <div class="big center">
 
-**representative** and **repeatable**
+**representative** · **repeatable**
 
 </div>
 
-<br>
-
-Microbenchmarks usually fail the first.
-
-Macrobenchmarks usually fail the second.
-
 ---
 
-## Microbenchmarks vs macrobenchmarks
+## Micro vs macro
 
 <div class="columns">
 <div>
 
-### Microbenchmarks
+### Micro
 
-- Isolated functions or operations
-- Nanosecond-level precision
-- Prone to compiler tricks
-- Risk: **not representative**
+Isolated function
+
+Nanosecond precision
+
+Risk: **not representative**
 
 </div>
 <div class="hidden">
 
-### Macrobenchmarks
+### Macro
 
-- End-to-end workflows
-- Realistic production workloads
-- Higher variance, harder to isolate
-- Risk: **hard to attribute a cause**
+End-to-end workflow
+
+Real workload
+
+Risk: **cause is unclear**
 
 </div>
 </div>
 
 ---
 
-## Microbenchmarks vs macrobenchmarks
+## Micro vs macro
 
 <div class="columns">
 <div>
 
-### Microbenchmarks
+### Micro
 
-- Isolated functions or operations
-- Nanosecond-level precision
-- Prone to compiler tricks
-- Risk: **not representative**
+Isolated function
+
+Nanosecond precision
+
+Risk: **not representative**
 
 </div>
 <div>
 
-### Macrobenchmarks
+### Macro
 
-- End-to-end workflows
-- Realistic production workloads
-- Higher variance, harder to isolate
-- Risk: **hard to attribute a cause**
+End-to-end workflow
+
+Real workload
+
+Risk: **cause is unclear**
 
 </div>
 </div>
 
 <br>
 
-*This talk covers both. They fail differently, so they need different checks.*
+*Both. They fail differently.*
 
 ---
 
@@ -450,13 +409,13 @@ Macrobenchmarks usually fail the second.
 
 <div class="centered-table">
 
-| Use case | Benchmark type |
+| Use case | Type |
 | --- | --- |
 | Comparing algorithms | Micro |
-| Validating a specific optimization | Micro |
+| Validating an optimization | Micro |
 | Regression detection | Both |
 | Capacity planning | Macro |
-| User-facing latency targets | Macro |
+| User-facing latency | Macro |
 
 </div>
 
@@ -464,27 +423,24 @@ Macrobenchmarks usually fail the second.
 
 ## Start macro, then drill
 
-A microbenchmark can only tell you a function got faster.
-It cannot tell you the *system* got faster.
-
 <div class="columns">
 <div>
 
-### The order that works
+### Works
 
-1. Macro: does the workload move?
-2. Profile: which component?
-3. Micro: fix that component
-4. Macro again: did it hold?
+1. Macro — does it move?
+2. Profile — which part?
+3. Micro — fix it
+4. Macro — did it hold?
 
 </div>
 <div>
 
-### The order that wastes weeks
+### Wastes weeks
 
-1. Micro: make a function 40% faster
-2. Ship it
-3. Nothing measurable changes
+1. Micro — 40% faster
+2. Ship
+3. Nothing changes
 4. Nobody knows why
 
 </div>
@@ -495,111 +451,104 @@ It cannot tell you the *system* got faster.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### ARC 1
+###### 04
 
 # Local and Micro
 
-Trust the number on your laptop before you push to CI.
+Trust your laptop before you trust CI.
 
 ---
 
-## Arc 1: the three questions at micro scale
+## The three questions, micro scale
 
-<div class="columns">
-<div>
+<div class="centered-table">
 
-1. **Real work?**
-   The compiler may delete it.
-2. **Stable sample?**
-   One run is a point, not a distribution.
-3. **Above the noise?**
-   Your laptop is not a controlled instrument.
+| | At this scale |
+| --- | --- |
+| **Real work?** | the compiler deletes it |
+| **Stable sample?** | one run is a point |
+| **Above noise?** | your laptop is uncontrolled |
 
 </div>
-<div>
 
-### The local-first rule
+<div class="center">
 
-If you cannot trust the number
-on your own machine,
+*Can't trust it locally → CI industrialises the lie.*
 
-CI will only
-**industrialise the lie**.
-
-</div>
 </div>
 
 ---
 
-## But first: a benchmark bot comment
+## A benchmark bot comment
 
-June 2026. A PR restructures `context.go` in `dd-trace-go`.
+<div class="big center">
 
-The benchmark bot comments:
+`BenchmarkOTLPProtoSize`
 
-<div class="big">
-
-**`BenchmarkOTLPProtoSize` is 6-9% slower than main.**
+**6-9% slower than main**
 
 </div>
 
 <br>
 
+<div class="center">
+
 Nothing in the diff touches OTLP encoding.
 
-**Hold that thought.** We come back to it once we can read a benchmark properly.
+**Hold that thought.**
+
+</div>
 
 ---
 
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 1A
+###### 05
 
 # Making the Compiler Honest
 
-Question 1: is it measuring real work?
+Question 1: real work?
 
 ---
 
-## The basic set of tricks
+<!-- _class: vcenter -->
 
-Everything in this section exists for one reason:
+## Stop the compiler
+
+## deleting your work
+
+<br>
+
+<span class="badge">TEST-ONLY SCAFFOLDING</span>
+
+---
+
+## The compiler is not neutral
+
+It sees the result is unused.
+
+It removes the work — **correctly**.
+
+<br>
 
 <div class="big">
 
-to stop the compiler from deleting the work you are trying to time.
+Your loop still runs `b.N` times.
+
+It just runs empty.
 
 </div>
 
-<br>
-
-Four techniques. Each one is **test scaffolding**, not production style.
-
 ---
 
-## The compiler is not a neutral observer
-
-It reads your benchmark.
-
-It notices the result is unused.
-
-It removes the work **correctly**, according to the language specification.
-
-<br>
-
-Your loop still runs `b.N` times. It just runs empty.
-
----
-
-## Dead-code elimination (DCE)
+## Dead-code elimination
 
 ```go
 func makeBuffer(n int) []byte {
     return make([]byte, n) // heap-escaping allocation
 }
 
-// Result unused → DCE fires.
 func BenchmarkMakeBuffer_DCE(b *testing.B) {
     for range b.N {
         makeBuffer(64) // result discarded → call removed
@@ -609,20 +558,24 @@ func BenchmarkMakeBuffer_DCE(b *testing.B) {
 
 ---
 
-## Captured result: `make bench-dce`
+## `make bench-dce`
 
 ```text
 DCE       0.2532 ns/op   0 B/op   0 allocs/op
-correct  11.14 ns/op  64 B/op   1 allocs/op
+correct  11.14   ns/op  64 B/op   1 allocs/op
 ```
 
-<br>
+<div class="center big">
 
-`make([]byte, 64)` is **unconditional**. There is no path that skips it.
+`make([]byte, 64)` cannot skip allocating.
 
-Yet: **0 allocs/op**.
+Yet: **0 allocs/op**
+
+</div>
 
 ---
+
+<!-- _class: vcenter -->
 
 ## `ns/op` can lie
 
@@ -630,93 +583,74 @@ Yet: **0 allocs/op**.
 
 <br>
 
-A timer has a floor (~0.25 ns). An empty loop and a fast function look alike.
+<div class="center">
 
-An allocation either **happened** or it **did not**.
+Always `-benchmem`.
 
-<br>
-
-**Always `-benchmem`.**
+</div>
 
 ---
 
-## The fix: the two-variable sink
+## The two-variable sink
 
 ```go
-var sink []byte // package-level: compiler can't prove it is never read
+var sink []byte // package-level: can't be proven unread
 
 func BenchmarkMakeBuffer_Correct(b *testing.B) {
     var s []byte
     for range b.N {
         s = makeBuffer(64)
     }
-    sink = s // one global write per run, not per iteration
+    sink = s // one write per run, not per iteration
 }
 ```
 
-<div class="small">
-
-**Test-only.** A package-level sink exists to defeat DCE in a benchmark.
-Do not add sinks to production code.
-
-</div>
+<span class="badge">TEST-ONLY</span> Never ship a sink to production.
 
 ---
 
 ## Constant folding
 
 ```go
-s = bits.OnesCount(0b10110)   // every input is a constant
+s = bits.OnesCount(0b10110)   // every input is constant
 ```
 
-The compiler evaluates it at compile time. You benchmark a **constant load**.
+<div class="big center">
 
-<br>
+Evaluated at compile time.
 
-Both versions time the same on Apple Silicon, near the timer floor.
+You benchmarked a **constant load**.
 
-The assembly tells the truth.
+</div>
 
 ---
 
-## How to read the next slide
-
-Two builds of the same benchmark, dumped with `go test -gcflags=-S`.
+## Reading the next slide
 
 <div class="columns">
 <div>
 
-### What to look for
+### `MOVD $3`
 
-`MOVD $3, R2`
-Load the literal `3`
-into a register.
+Load the literal `3`.
 
-The answer is already
-in the binary.
+**The answer is baked in.**
 
 </div>
 <div>
 
-### Versus
+### `VCNT` / `VUADDLV`
 
-`VCNT`, `VUADDLV`
-ARM64 population-count
-instructions.
+ARM64 popcount.
 
-The CPU is actually
-counting bits.
+**The CPU is counting.**
 
 </div>
 </div>
-
-<br>
-
-**One is a constant. One is work.** That is the whole comparison.
 
 ---
 
-## Assembly check: `make asm-dce`
+## `make asm-dce`
 
 <div class="columns">
 <div>
@@ -726,8 +660,6 @@ counting bits.
 ```asm
 MOVD  $3, R2
 ```
-
-The literal `3`. No popcount.
 
 </div>
 <div>
@@ -740,60 +672,56 @@ VCNT    V0.B8, V0.B8
 VUADDLV V0.B8, V0
 ```
 
-An actual instruction.
-
 </div>
 </div>
 
-<br>
+<div class="center">
 
 Route inputs through a **package-level variable**.
 
+</div>
+
 ---
 
-## Inlining
-
-Inlining is good in production. In a benchmark it *feeds* DCE.
-
-Once the body is inlined into the loop, the compiler can see the unused result
-and eliminate the inlined body.
-
-<br>
+## Inlining feeds DCE
 
 ```bash
-go build -gcflags='-m'   # "can inline X" = candidate
+go build -gcflags='-m'   # "can inline X"
 ```
 
-Fix: non-constant input **and** capture the result. Either alone is not enough.
+<div class="center big">
 
-<div class="small">
+Non-constant input **and** captured result.
 
-**Test-only.** `//go:noinline` is a diagnostic tool. It does not belong on production functions.
+Either alone is not enough.
+
+</div>
+
+<span class="badge">TEST-ONLY</span> `//go:noinline` is a diagnostic.
+
+---
+
+## Timer: one-time setup
+
+```go
+data := make([]byte, 1024)
+copy(data, payload)
+b.ResetTimer()          // exclude setup
+var s [32]byte
+for range b.N {
+    s = sha256.Sum256(data)
+}
+```
+
+<div class="center">
+
+`ResetTimer` zeroes elapsed time. It does **not** stop the timer.
 
 </div>
 
 ---
 
-## Timer traps: one-time setup
-
-```go
-func BenchmarkHash_BN_WithSetup_Correct(b *testing.B) {
-    data := make([]byte, 1024)
-    copy(data, payload)
-    b.ResetTimer()          // exclude setup
-    var s [32]byte
-    for range b.N {
-        s = sha256.Sum256(data)
-    }
-    _ = s
-}
-```
-
-`ResetTimer` zeroes elapsed time. It does **not** stop the timer.
-
----
-
-## Timer traps: per-iteration setup
+## Timer: per-iteration setup
 
 ```go
 for range b.N {
@@ -804,47 +732,44 @@ for range b.N {
 }
 ```
 
-Get the order wrong and you time the fixture, not the function.
-
 ---
 
-## Captured result: `make bench-timer`
+## `make bench-timer`
 
 ```text
 buggy    415.8 ns/op  128 B/op  1 allocs/op
 correct  550.6 ns/op  144 B/op  1 allocs/op
 ```
 
-<br>
+<div class="center big">
 
 The **buggy** one looks 25% faster.
 
-It is timing `buildFixture` and excluding the function under test entirely.
+</div>
 
-<br>
+<div class="center">
 
-<div class="small">
-
-A benchmark that measures the wrong thing does not look broken. It looks like good news.
+A benchmark measuring the wrong thing looks like good news.
 
 </div>
 
 ---
 
-## What if the timer never restarts?
+<!-- _class: vcenter -->
 
-`StopTimer` with **no** matching `StartTimer`.
+## `StopTimer` with no `StartTimer`
 
-<br>
+<div class="center big">
 
-The framework waits for enough timed duration.
-The timer never runs, so duration never accumulates.
+Duration never accumulates.
 
-It doubles `b.N` and tries again. Forever.
+`b.N` doubles. Forever.
+
+</div>
 
 ---
 
-## `testing.B.Loop` in Go 1.24
+## `b.Loop()` — Go 1.24
 
 ```go
 func BenchmarkHash_BLoop(b *testing.B) {
@@ -855,40 +780,44 @@ func BenchmarkHash_BLoop(b *testing.B) {
     for b.Loop() {
         s = sha256.Sum256(data)
     }
-    _ = s
 }
 ```
 
 <div class="small">
 
-Proposal #61515, Austin Clements
+Proposal #61515 · Austin Clements
 
 </div>
 
 ---
 
-## What `B.Loop` removes
+## What `b.Loop` removes
 
-| Behaviour | `for range b.N` | `for b.Loop()` |
+<div class="centered-table">
+
+| | `for range b.N` | `for b.Loop()` |
 | --- | --- | --- |
-| Automatic ResetTimer at loop start | No | **Yes** |
-| Automatic StopTimer at loop end | No | **Yes** |
-| Benchmark fn called per ramp-up | Multiple times | **Once per `-count`** |
-| Setup re-executes on ramp-up | Yes | **No** |
-| DCE of loop body prevented | No | **Yes** |
+| ResetTimer at start | No | **Yes** |
+| StopTimer at end | No | **Yes** |
+| Setup re-runs on ramp-up | Yes | **No** |
+| DCE prevented | No | **Yes** |
 
-The DCE prevention needs the condition written **literally** as `b.Loop()`.
+</div>
+
+<div class="center">
+
+Must be written literally as `b.Loop()`.
+
+</div>
 
 ---
 
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 1B
+###### 06
 
 # The Regression That Was a Speedup
-
-Back to that bot comment.
 
 ---
 
@@ -899,28 +828,32 @@ Back to that bot comment.
 proto.Size(tracesData)
 ```
 
-A protobuf size computation on a struct built **before** `b.ResetTimer()`.
+<div class="center">
 
-It never calls `ContextWithSpan`, `SpanFromContext`, or **any code the PR touched**.
+Struct built **before** `ResetTimer`.
 
-<br>
+Calls **none** of the code the PR touched.
 
-Locally: **<0.1% run-to-run variance.** The 6-9% was specific to CI.
+Locally: **<0.1%** run-to-run variance.
+
+</div>
 
 ---
 
 ## Same machine, both branches
 
+<div class="centered-table">
+
 | Build | 1 span | 10 spans |
 | --- | --- | --- |
-| `main` | 883.3 ns/op | 7115 ns/op |
-| `#4891` | **840.7 ns/op** | **6775 ns/op** |
+| `main` | 883.3 ns | 7115 ns |
+| `#4891` | <span class="hl-blue">840.7 ns</span> | <span class="hl-blue">6775 ns</span> |
 
-<br>
+</div>
 
-<div class="big">
+<div class="center big">
 
-**The PR was faster.** CI had inverted the sign.
+**The PR was faster.** CI inverted the sign.
 
 </div>
 
@@ -928,47 +861,41 @@ Locally: **<0.1% run-to-run variance.** The 6-9% was specific to CI.
 
 ## The mechanism
 
-Restructuring `context.go` shifted **function addresses** across the package.
+<div class="big">
 
-That moved the hot `proto.Size` loop relative to cache-line and
-branch-target-buffer boundaries.
+Function addresses moved.
 
-<br>
+Cache lines and branch targets moved with them.
 
-At ~390 ns per iteration, small alignment shifts produce several-percent swings
-**in either direction**, enough to flip the verdict on a runner that cannot
-lock CPU frequency.
+</div>
 
 <br>
 
-**Resolution: no code change.** The PR shipped as written.
+At ~390 ns/iteration, alignment is worth several percent — **either direction**.
+
+<div class="center">
+
+**Resolution: no code change.**
+
+</div>
 
 ---
 
-## This is a known phenomenon
+## A known phenomenon
 
-[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A), Emery Berger · Strange Loop 2019
-
-Code layout, meaning which symbol lands at which address, can swing
-performance by ±10% or more. Berger demonstrated this by randomising
-object placement and measuring the effect.
+[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A) · Emery Berger · Strange Loop 2019
 
 <br>
 
-**Implication:** micro-benchmark deltas smaller than ~10% need statistical
-confidence before you believe their direction.
+<div class="big center">
+
+Code layout alone swings performance **±10%**.
+
+</div>
 
 ---
 
-## Berger's other point: causal profiling
-
-A profiler tells you where time is spent. It does not tell you what happens
-if you make that part faster.
-
-<br>
-
-**Causal profiling** answers the second question directly: it applies a
-*virtual speedup* to one component and measures the effect on the whole program.
+## Causal profiling
 
 <div class="columns">
 <div>
@@ -982,51 +909,51 @@ if you make that part faster.
 
 ### Causal profiling says
 
-Making `encode` 20% faster
-moves end-to-end by 2%.
+`encode` 20% faster
+→ end-to-end **2%**.
 
 </div>
-</div>
-
----
-
-## Why that matters for benchmarking
-
-<div class="big">
-
-A component speedup does not imply a system speedup.
-
 </div>
 
 <br>
 
-Contention, queueing, and dependencies between components decide how much of a
-local win survives to the top.
+<div class="center">
 
-<br>
-
-A microbenchmark measures the component. Only a macrobenchmark measures whether
-it mattered.
-
-<div class="small">
-
-Which is exactly why the second half of this talk exists.
+Virtual speedup: *what if this part got faster?*
 
 </div>
 
 ---
 
-## The lesson
+<!-- _class: vcenter -->
 
-A noisy result can be **directionally wrong**.
+## A component speedup
+
+## is not a system speedup
 
 <br>
 
-<div class="big">
+<div class="center">
 
-It can block a good change
+Micro measures the component.
 
-and wave a regression through.
+Only macro measures whether it mattered.
+
+</div>
+
+---
+
+<!-- _class: vcenter -->
+
+## A noisy result can be
+
+## **directionally wrong**
+
+<br>
+
+<div class="center">
+
+It blocks good changes and waves regressions through.
 
 </div>
 
@@ -1035,17 +962,15 @@ and wave a regression through.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 1C
+###### 07
 
 # Statistical Interpretation
 
-Question 2: is the sample stable enough?
+Question 2: stable sample?
 
 ---
 
-## A single number is a point sample
-
-Two runs of the **same binary**, eight runs apart, on a loaded machine:
+## One number is a point sample
 
 ```text
 BenchmarkMakeBuffer_Correct-16    41877204    39.39 ns/op
@@ -1053,119 +978,129 @@ BenchmarkMakeBuffer_Correct-16    41877204    39.39 ns/op
 BenchmarkMakeBuffer_Correct-16    52521198    27.54 ns/op
 ```
 
-<br>
+<div class="center big">
 
-**A 43% swing.** Run it once, file the PR, and you can be 43% off in either direction.
+Same binary. **43% swing.**
+
+</div>
 
 ---
 
 ## `benchstat`
 
 ```bash
-go test -bench=. -benchmem -count=20 -benchtime=1s . | tee new.txt
-benchstat old.txt new.txt  # golang.org/x/perf/cmd/benchstat
+go test -bench=. -benchmem -count=20 . | tee new.txt
+benchstat old.txt new.txt
 ```
+
+<div class="centered-table">
 
 | Environment | sec/op | Difference |
 | --- | --- | --- |
 | idle | `11.32n ± 5%` | n/a |
-| noisy | `37.40n ± 25%` | `+230.34% (p=0.000 n=20)` |
+| noisy | `37.40n ± 25%` | `+230.34% (p=0.000)` |
+
+</div>
 
 ---
 
 ## Read the output
 
-* `11.32n`: the **median**, not the mean
-* `± 5%`: spread of the distribution
-* `p=0.000`: distinguishable from noise
-* `~` instead of a delta means **no measurable difference**. That is a result.
+* `11.32n` — the **median**
+* `± 5%` — spread
+* `p=0.000` — distinguishable from noise
+* `~` — **no measurable difference.** That is a result.
 
 ---
 
 ## What `benchstat` won't tell you
 
-It answers: *is A different from B?*
+Is A different from B? ✅
 
-It does not answer: *is this machine a trustworthy place to ask?*
+Is this machine trustworthy? ❌
 
 <br>
-
-Coefficient of Variation (CV):
 
 $$ CV = \frac{\sigma}{\mu} $$
 
-<br>
+<div class="center">
 
-Benchstat deliberately does not report CV. It compares distributions rather than
-characterising the environment producing them.
+Benchstat compares distributions. **CV characterises the machine.**
+
+</div>
 
 ---
 
 ## Rules of thumb
 
+<div class="centered-table">
+
 | Question | Answer |
 | --- | --- |
-| How many runs? | `-count=10` is the floor. 20 is better. |
-| Time or iterations? | `-benchtime=100x` for the most reproducible per-commit numbers |
-| When is CV too high? | **Above ~5%, fix the environment before comparing anything** |
-| Significant but tiny? | Effect size and significance are different questions |
+| How many runs? | `-count=10` floor, 20 better |
+| Most reproducible? | `-benchtime=100x` |
+| CV too high? | **>5% — fix the machine first** |
+| Significant but tiny? | Different question |
+
+</div>
 
 ---
 
+<!-- _class: vcenter -->
+
 ## The p-hacking trap
 
-"Rerun until you get the number you wanted."
+<div class="center big">
+
+Every rerun is a fresh draw.
+
+With enough draws, noise looks like signal.
+
+</div>
 
 <br>
 
-Every rerun is a fresh draw from the distribution.
+<div class="center">
 
-With enough draws, any noise pattern looks like signal.
+**Set your run count before you look.**
 
-<br>
-
-**Set your run count before you look at results.**
+</div>
 
 ---
 
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 1D
+###### 08
 
 # Local Reproduction
 
-Question 3: is the difference above the noise?
+Question 3: above the noise?
 
 ---
 
-## The question nobody measures
+## What does isolation actually buy?
 
-Container isolation is standard benchmarking advice.
+<div class="centered-table">
 
-Almost nobody publishes **what it actually buys you** on a working laptop.
+| Condition | mean ns/op | **CV%** |
+| --- | --- | --- |
+| idle host | 11.46 | **4.75** |
+| + 16 spinners | 34.97 | <span class="hl-blue">**18.88**</span> |
+| pinned container, same load | 16.28 | <span class="hl-orange">**5.25**</span> |
 
----
+</div>
 
-## Isolation experiment: `make bench-docker`
+<div class="small center">
 
-Same benchmark. `-count=20 -benchtime=1s`.
-
-| Condition | mean ns/op | stddev | **CV%** |
-| --- | --- | --- | --- |
-| idle host | 11.46 | 0.54 | **4.75** |
-| host with 16 background spinners | 34.97 | 6.60 | **18.88** |
-| container pinned to core 0, same load | 16.28 | 0.85 | **5.25** |
-
-<div class="small">
-
-Apple M4 Max, **darwin/arm64**, 16 logical CPUs. Container is **linux/arm64** under
-Docker Desktop's Apple Virtualization.framework VM. No QEMU, no cross-architecture
-emulation: the guest matches the host ISA.
+Apple M4 Max · darwin/**arm64** · container linux/**arm64** under
+Apple Virtualization.framework · no QEMU, no emulation
 
 </div>
 
 ---
+
+<!-- _class: vcenter -->
 
 ## 5.25% is not a triumph
 
@@ -1173,53 +1108,60 @@ emulation: the guest matches the host ISA.
 
 <br>
 
-Bare-metal Linux, Simultaneous Multi-Threading (SMT) off: **~0.05%**. A hundred times tighter.
+<div class="center big">
+
+Bare-metal Linux, SMT off: **~0.05%**
+
+</div>
 
 ---
 
 ## The macOS caveat
 
-Docker Desktop on macOS runs containers **inside a Linux VM** (arm64 guest on an
-arm64 host, via Apple's Virtualization.framework).
-
-* `--cpuset-cpus=0` pins **vCPU 0 inside that VM**, not a physical core
-* The VM scheduler can still migrate that vCPU across physical cores
-* Nothing inside the container can disable host SMT or pin the host clock
+* `--cpuset-cpus=0` pins a **vCPU inside a VM**
+* The VM can still migrate it across physical cores
+* Nothing inside can disable host SMT or pin the clock
 
 <br>
 
-**What you get:** isolation from co-running processes. Real, and worth having.
-**What you don't:** controlled hardware.
+<div class="center">
+
+**Get:** isolation from neighbours. **Don't get:** controlled hardware.
+
+</div>
 
 ---
 
 ## The Linux toolbox
 
-| Control | Command | What it buys |
-| --- | --- | --- |
-| CPU affinity | `taskset -c 0` | No scheduler migration, warm cache |
-| Core isolation | `isolcpus`, `cset shield` | Exclusive cores; needs reboot or root |
-| Priority | `nice -n -5`, `chrt -f` | Helps under load; `chrt` can starve your display |
-| Frequency lock | `perflock` | Stable clock for the run |
+<div class="centered-table">
+
+| Control | Command |
+| --- | --- |
+| Affinity | `taskset -c 0` |
+| Core isolation | `isolcpus`, `cset shield` |
+| Priority | `nice -n -5`, `chrt -f` |
+| Frequency lock | `perflock` |
+
+</div>
 
 ---
 
-## "Is there a Go tool that sets this up?"
-
-Yes. `perflock`, by Austin Clements of the Go team.
+## "Is there a Go tool for this?"
 
 ```bash
-perflock go test -bench=. -count=10 -benchtime=2s ./...
+perflock go test -bench=. -count=10 ./...
 ```
 
-* Serialises benchmark runs so two never overlap
-* Writes `scaling_min_freq` / `scaling_max_freq` via **cpufreq sysfs**
+* Serialises runs so two never overlap
+* Writes `scaling_min_freq` / `scaling_max_freq`
 
-<br>
+<div class="center">
 
-**On macOS:** it builds, and the mutual-exclusion lock works. Frequency pinning does not.
-The default `-governor 90` reads Linux sysfs and errors. Pass `-governor=none`
-and you get serialisation between runs. Nothing more.
+**macOS:** the lock works. Frequency pinning does not.
+Default `-governor 90` errors — pass `-governor=none`.
+
+</div>
 
 ---
 
@@ -1229,49 +1171,36 @@ and you get serialisation between runs. Nothing more.
 benchdiff --base-ref=main ./...
 ```
 
-Stash, run on the base ref, restore, run again, pipe both to `benchstat`.
+<div class="center big">
 
-<br>
+change → `benchdiff` → read the interval → decide
 
-Write change → `benchdiff` → read the interval → decide.
+</div>
 
-<br>
+<div class="center">
 
-**Cheap wins:** close the indexer, airplane mode, let the machine reach thermal
-steady state. Free variance reduction, zero setup.
+Free wins: close the indexer, airplane mode, reach thermal steady state.
+
+</div>
 
 ---
 
-## Arc 1 answered
+## Local and micro, answered
 
-<div class="columns">
-<div>
+<div class="centered-table">
 
-### 1 · Real work
-
-Sink pattern. `-benchmem`.
-Check `allocs/op`. Prefer `b.Loop`.
-
-### 2 · Stable sample
-
-`-count=10` minimum.
-Read the p-value. Check CV.
+| | Micro scale |
+| --- | --- |
+| **Real work?** | sink · `-benchmem` · `allocs/op` · `b.Loop` |
+| **Stable sample?** | `-count=10` · p-value · CV |
+| **Above noise?** | pin it · know your ceiling |
 
 </div>
-<div>
 
-### 3 · Above the noise
+<div class="center big">
 
-Pin the container.
-Know your ceiling: ~5% on a
-laptop, ~0.05% on tuned metal.
+A sub-10% delta can be **layout noise**.
 
-### And
-
-A sub-10% micro delta can be
-**layout noise**, not a change.
-
-</div>
 </div>
 
 ---
@@ -1279,82 +1208,60 @@ A sub-10% micro delta can be
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### ARC 2
+###### 09
 
 # CI and Macro
 
-Same three questions. Different failure modes.
+Same questions. Different failures.
 
 ---
 
-## Arc 2: the three questions at macro scale
+## The three questions, macro scale
 
-<div class="columns">
-<div>
+<div class="centered-table">
 
-1. **Real work?**
-   Now: is the *workload* representative?
-2. **Stable sample?**
-   Now: across days, not just runs.
-3. **Above the noise?**
-   Now: the hardware is the variable.
+| | At this scale |
+| --- | --- |
+| **Real work?** | is the *workload* representative? |
+| **Stable sample?** | across days, not runs |
+| **Above noise?** | the *hardware* is the variable |
 
-</div>
-<div>
-
-### What changes
-
-Micro fails on
-**representative**.
-
-Macro fails on
-**repeatable**.
-
-</div>
 </div>
 
 ---
 
-## A second bot comment, a different lesson
+## A second bot comment
 
-July 2026. A dependency-pinning fix in
-`opentelemetry-go-compile-instrumentation`.
-
-The overhead benchmark, run locally:
+<div class="centered-table">
 
 | Scenario | Overhead | Ceiling |
 | --- | --- | --- |
-| `multi` | **230%** | 150% |
-| `largeidle` | **212%** | 150% |
-
-<br>
-
-Both blowing through the threshold. The fix looks like a serious regression.
-
----
-
-## Why that reading was wrong
-
-The PR changed dependency pinning in **`multi`** only.
-
-`largeidle` shares **zero** bumped dependencies with the change. It runs
-independent code. It *cannot* have been affected.
-
-<br>
-
-Yet it showed the same ~60% inflation.
-
-<div class="big">
-
-The common factor was not the code. It was the machine.
+| `multi` | <span class="hl-blue">**230%**</span> | 150% |
+| `largeidle` | <span class="hl-blue">**212%**</span> | 150% |
 
 </div>
 
-<div class="small">
+<div class="center">
 
-Heavy parallel builds and integration tests had been running all session.
-`benchmark/threshold` is a CI-only job on a dedicated runner; there is no local target.
-Resolution: wait for CI.
+The fix looks like a serious regression.
+
+</div>
+
+---
+
+<!-- _class: vcenter -->
+
+## `largeidle` shares
+
+## **zero** changed dependencies
+
+<br>
+
+<div class="center big">
+
+It cannot have regressed.
+
+The common factor was the **machine**.
 
 </div>
 
@@ -1365,46 +1272,46 @@ Resolution: wait for CI.
 <div class="columns">
 <div>
 
-### Arc 1 · `#4891`
+### `#4891`
 
-CI said **slower**.
+CI said slower.
 
 The laptop was right.
 
-Cause: code layout.
+Cause: **code layout**.
 
 </div>
 <div>
 
-### Arc 2 · `#643`
+### `#643`
 
-The laptop said **slower**.
+The laptop said slower.
 
 CI was right.
 
-Cause: machine load.
+Cause: **machine load**.
 
 </div>
 </div>
 
-<br>
-
-<div class="big center">
+<div class="center big">
 
 Neither environment is authoritative by default.
 
 </div>
 
-<br>
+<div class="center">
 
-The tell in both cases was the same: **a benchmark moved that could not have moved.**
+Same tell: **a benchmark moved that could not have moved.**
+
+</div>
 
 ---
 
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 2A
+###### 10
 
 # Designing a Macrobenchmark
 
@@ -1412,17 +1319,17 @@ Representative is the hard part.
 
 ---
 
-## Representative workloads
+## What does your app actually do?
 
-What does your application actually do?
+* **CPU-bound** — crunching, compression, encryption
+* **I/O-bound** — queries, API calls, files
+* **Mixed** — almost everything real
 
-* **CPU-bound:** number crunching, compression, encryption
-* **I/O-bound:** database queries, API calls, file operations
-* **Mixed:** most real-world applications
+<div class="center">
 
-<br>
+*Match your production workload.*
 
-*Your benchmark workload should match your production workload.*
+</div>
 
 ---
 
@@ -1430,62 +1337,49 @@ What does your application actually do?
 
 <div class="centered-table">
 
-| Archetype | Pattern | Characteristics |
+| Archetype | Pattern | Shape |
 | --- | --- | --- |
-| **Idle** | Background workers, minimal load | Low RPS, minimal CPU, few workers |
-| **Latency** | Microservices, APIs | High RPS, low CPU per request |
-| **Throughput** | Queue workers, batch processing | Moderate RPS, high CPU, many clients |
-| **Enterprise** | Business apps with DB/API calls | Moderate RPS, mixed CPU / I/O |
+| **Idle** | background workers | low RPS, low CPU |
+| **Latency** | microservices, APIs | high RPS, low CPU/req |
+| **Throughput** | queues, batch | high CPU, many clients |
+| **Enterprise** | business apps + DB | mixed CPU / I/O |
 
 </div>
 
-<br>
-
-*Pick the archetype that matches your application's behaviour.*
-
 ---
 
-## Which is why `largeidle` falsified `multi`
+## Why `largeidle` falsified `multi`
 
 <div class="columns">
 <div>
 
 ### `largeidle`
 
-The **Idle** archetype.
-
-Background work,
-minimal CPU.
+**Idle** archetype
 
 </div>
 <div>
 
 ### `multi`
 
-The **Enterprise** archetype.
-
-gRPC and Redis,
-mixed CPU and I/O.
+**Enterprise** archetype
 
 </div>
 </div>
 
 <br>
 
-Two archetypes exercising different code, moving by the same amount, in the same
-direction, at the same time.
+<div class="center big">
 
-<div class="big">
+Different code. Same movement. Same moment.
 
-Shared environment, not shared cause.
+**Shared environment, not shared cause.**
 
 </div>
 
 ---
 
-## Expressing a macro gate
-
-Micro gates compare two commits. Macro gates compare against a **budget**.
+## A macro gate is a budget
 
 ```text
 scenario: multi
@@ -1494,42 +1388,25 @@ ceiling:  150% overhead
 result:   230%   → FAIL
 ```
 
-<br>
+<div class="center">
 
-An overhead ceiling answers a product question, not a statistical one:
-*how much of the customer's machine are we allowed to consume?*
+Micro gates compare commits. Macro gates compare against a **budget**.
+
+</div>
 
 ---
 
 ## What a macro gate needs at scale
 
-One scenario on a laptop is a smoke test. A gate you can block a release on
-needs more.
-
-<div class="columns">
-<div>
-
-### Shape
-
 * Dedicated hardware, not shared runners
-* A budget per component, not one global number
+* A budget per component
 * Several archetypes, not one workload
-* Gating the release, not only the PR
+* Gate the release, not only the PR
 
-</div>
-<div>
+<div class="center">
 
-### Why it is worth it
+Code inside someone else's process → overhead is a **customer-visible defect**.
 
-When your code runs **inside**
-someone else's process, an
-overhead regression is a
-customer-visible defect.
-
-That is the situation every
-SDK, agent, and sidecar is in.
-
-</div>
 </div>
 
 ---
@@ -1541,39 +1418,32 @@ SDK, agent, and sidecar is in.
 
 ### Coordinated omission
 
-When the system falls behind, a naive
-load generator stops issuing requests
-and **stops recording the latency it
-caused**.
+The system falls behind.
 
-Your p99 improves because you
-measured less.
+The generator stops issuing.
+
+**p99 improves because you
+measured less.**
 
 </div>
 <div>
 
-### Non-deterministic inputs
+### Non-deterministic input
 
-Random fixtures, live dependencies,
-and unpinned datasets change the
-workload between runs.
+Random fixtures. Live deps.
 
-You cannot attribute a delta to code
-if the input moved too.
+**The input moved too, so
+you can't attribute a delta.**
 
 </div>
 </div>
-
-<br>
-
-*Run long enough to reach steady state. Pin the inputs. Record what you pinned.*
 
 ---
 
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 2B
+###### 11
 
 # Controlling the CI Environment
 
@@ -1581,35 +1451,39 @@ Question 3, at hardware scale.
 
 ---
 
+<!-- _class: vcenter -->
+
 ## Why shared runners lie
 
-Competing workloads. Variable CPU frequency. Non-dedicated last-level cache.
+<div class="center big">
+
+A real 10% regression **vanishes**.
+
+A phantom 10% regression **appears**.
+
+</div>
 
 <br>
 
-A real 10% regression **vanishes** into runner noise.
+<div class="center">
 
-A phantom 10% regression **appears** where there is none.
+An **environment** problem, not a statistics problem.
 
-<br>
-
-This is an **environment** problem, not a statistics problem.
+</div>
 
 ---
 
 ## What SMT actually is
-
-**Simultaneous Multi-Threading** (Intel calls it Hyper-Threading) lets two
-hardware threads share one physical core's execution units.
 
 <div class="columns">
 <div>
 
 ### The bet
 
-Most code stalls on memory.
-A second thread can use the
-idle execution slots.
+Two threads share one core.
+
+Most code stalls on memory,
+so fill the idle slots.
 
 Good for throughput.
 
@@ -1618,18 +1492,14 @@ Good for throughput.
 
 ### The cost
 
-Two CPU-bound threads on one
-core **fight for the same units**.
+Two CPU-bound threads
+**fight for the same units**.
 
-Each one's runtime now depends
-on what the other is doing.
+Your runtime depends on an
+invisible co-tenant.
 
 </div>
 </div>
-
-<br>
-
-For a benchmark, that is a co-tenant you cannot see and did not schedule.
 
 ---
 
@@ -1637,8 +1507,8 @@ For a benchmark, that is a co-tenant you cannot see and did not schedule.
 
 <div class="center">
 
-bare metal, dynamic frequency scaling disabled
-**2 CPU-bound tasks, <span class="hl-blue">same core</span> vs. <span class="hl-orange">separate cores</span>**
+bare metal, DFS disabled
+**2 CPU-bound tasks, <span class="hl-blue">same core</span> vs <span class="hl-orange">separate cores</span>**
 
 ![width:520](../assets/environment-control-smt-experiment.svg)
 
@@ -1658,17 +1528,17 @@ bare metal, dynamic frequency scaling disabled
 
 | Task | mean ± stddev | CV |
 | --- | --- | --- |
-| smt-1 | 1537.64 ± 367.29 ms | <span class="hl-blue">23.887%</span> |
-| smt-2 | 1536.88 ± 366.84 ms | <span class="hl-blue">23.869%</span> |
-| no-smt-1 | 737.37 ± 0.32 ms | <span class="hl-orange">0.044%</span> |
-| no-smt-2 | 737.93 ± 1.74 ms | <span class="hl-orange">0.235%</span> |
+| smt-1 | 1537.64 ± 367.29 | <span class="hl-blue">23.887%</span> |
+| smt-2 | 1536.88 ± 366.84 | <span class="hl-blue">23.869%</span> |
+| no-smt-1 | 737.37 ± 0.32 | <span class="hl-orange">0.044%</span> |
+| no-smt-2 | 737.93 ± 1.74 | <span class="hl-orange">0.235%</span> |
 
 </div>
 </div>
 
-<div class="center">
+<div class="center big">
 
-**~100× less variance.** Also twice as fast, because the core stopped sharing.
+**~100× less variance** — and twice as fast.
 
 </div>
 
@@ -1676,28 +1546,24 @@ bare metal, dynamic frequency scaling disabled
 
 ## What DFS is
 
-**Dynamic Frequency Scaling** lets the CPU change its own clock at runtime:
-turbo when there is thermal headroom, throttle when there is not.
-
 <div class="columns">
 <div>
 
 ### Governors
 
-The kernel picks a frequency
-from a policy: `powersave`,
-`performance`, `schedutil`.
+The kernel picks a clock:
+`powersave`, `performance`,
+`schedutil`.
 
 </div>
 <div>
 
 ### Why it ruins runs
 
-Run 1 boosts. Run 20 is warm
-and throttles.
+Run 1 boosts.
+Run 20 is warm and throttles.
 
-Same code, different clock,
-different answer.
+Same code, different clock.
 
 </div>
 </div>
@@ -1716,21 +1582,15 @@ different answer.
 
 | Configuration | mean ± stddev | CV |
 | --- | --- | --- |
-| DFS on, 1 task | 533.97 ± 2.046 ms | <span class="hl-blue">0.383%</span> |
-| DFS off, 1 task | 738.18 ± 0.306 ms | <span class="hl-orange">0.041%</span> |
+| DFS on | 533.97 ± 2.046 | <span class="hl-blue">0.383%</span> |
+| DFS off | 738.18 ± 0.306 | <span class="hl-orange">0.041%</span> |
 
 </div>
 </div>
 
-<div class="center">
+<div class="center big">
 
-**~10× less variance.** Note the mean got *slower*: turbo is fast and inconsistent.
-
-<div class="small">
-
-A benchmark's job is to be comparable, not to post the best number you can reach once.
-
-</div>
+**~10× less variance** — and the mean got *slower*.
 
 </div>
 
@@ -1739,30 +1599,25 @@ A benchmark's job is to be comparable, not to post the best number you can reach
 ## Three sysfs writes
 
 ```bash
-# Disable SMT
-echo off | sudo tee /sys/devices/system/cpu/smt/control
-# Pin the governor
-echo performance | sudo tee /sys/devices/system/cpu/cpufreq/policy*/scaling_governor
-# Disable boost
-echo 0 | sudo tee /sys/devices/system/cpu/cpufreq/boost
+echo off         | sudo tee /sys/devices/system/cpu/smt/control
+echo performance | sudo tee /sys/.../scaling_governor
+echo 0           | sudo tee /sys/devices/system/cpu/cpufreq/boost
 ```
 
 <div class="columns">
 <div>
 
-### On bare metal
+### Bare metal
 
-CV ~23% → **~0.05%**.
+CV ~23% → **~0.05%**
 
 </div>
 <div>
 
 ### In a VM
 
-The hypervisor owns SMT.
-Frequency is virtualised.
-The write may **succeed and
-be silently ignored**.
+The write may **succeed
+and be ignored**.
 
 </div>
 </div>
@@ -1772,7 +1627,7 @@ be silently ignored**.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 2C
+###### 12
 
 # Detecting Change Over Time
 
@@ -1780,60 +1635,66 @@ Question 2, across days.
 
 ---
 
+<!-- _class: vcenter -->
+
 ## A/B is the wrong model for CI
 
-`benchstat old.txt new.txt` compares **two** distributions.
+<div class="center big">
 
-Continuous benchmarking has a **time series**: one measurement per commit,
-for months, with hardware changes and dependency bumps in the middle.
+Benchstat compares **two** distributions.
+
+CI has a **time series**.
+
+</div>
 
 <br>
 
-Comparing each commit to its parent means you re-ask the noise question every
-single time, and you miss slow drift entirely.
+<div class="center">
+
+Comparing to the parent commit misses slow drift entirely.
+
+</div>
 
 ---
 
-## What regressions actually look like
+## What regressions look like
 
 <div class="columns">
 <div>
 
-### In the slide deck
+### In a slide deck
 
-![width:440](../assets/ideal-performance-regression.png)
+![width:430](../assets/ideal-performance-regression.png)
 
 </div>
 <div>
 
 ### In real data
 
-![width:440](../assets/actual-performance-regression.png)
+![width:430](../assets/actual-performance-regression.png)
 
 </div>
-</div>
-
-<div class="center">
-
-A step change is obvious in a diagram and buried in variance in practice.
-
 </div>
 
 ---
 
 ## Change-point detection
 
-Instead of asking *"is this commit slower than its parent?"*, ask
-*"where in this history did the distribution shift and stay shifted?"*
+<div class="big center">
+
+Not *"slower than its parent?"*
+
+But *"where did it shift and stay shifted?"*
+
+</div>
 
 <div class="columns">
 <div>
 
 ### Properties
 
-* Handles non-normal data
-* Finds multiple change points
-* Adapts to each benchmark's noise
+* Non-normal data
+* Multiple change points
 * Ignores one-off spikes
 
 </div>
@@ -1841,31 +1702,23 @@ Instead of asking *"is this commit slower than its parent?"*, ask
 
 ### Implementations
 
-**ED-PELT** — Andrey Akinshin
+**ED-PELT** · Akinshin
 
-**e-divisive means** — Matteson
-& James, used by **Apache Otava**
-(incubating) and Nyrkiö
+**e-divisive** · Apache Otava, Nyrkiö
 
-Netflix documented this at scale
+Netflix, at scale
 
 </div>
 </div>
-
-<br>
-
-*This is the right model for nightly trending. It needs history to work.*
 
 ---
 
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 2D
+###### 13
 
 # Wiring It Into CI
-
-Two patterns. Opposing requirements.
 
 ---
 
@@ -1878,31 +1731,29 @@ Two patterns. Opposing requirements.
 
 Fast. Strict. Every PR.
 
-The benchmarks that have
-regressed before.
+Benchmarks that regressed before.
 
-`-count=6`, tight threshold,
-same-machine A/B.
+`-count=6`, same-machine A/B
 
 </div>
 <div>
 
-### Nightly suite
+### Nightly
 
 Complete. Pinned runner.
 
-All environment controls
-applied.
+All controls applied.
 
-`-count=20`, rolling window,
-change-point detection.
+`-count=20`, change-point detection
 
 </div>
 </div>
 
-<br>
+<div class="center">
 
-CI is for **detecting** regressions. It is not your primary measurement.
+CI **detects**. It is not your primary measurement.
+
+</div>
 
 ---
 
@@ -1910,14 +1761,7 @@ CI is for **detecting** regressions. It is not your primary measurement.
 
 <div class="center">
 
-![width:900](../assets/bp-feedback-flow.png)
-
-</div>
-
-<div class="small center">
-
-Benchmarks have to be locally reproducible for a developer to act on them.
-That is why arc 1 came first.
+![width:880](../assets/bp-feedback-flow.png)
 
 </div>
 
@@ -1925,80 +1769,53 @@ That is why arc 1 came first.
 
 ## Existing tools
 
+<div class="centered-table">
+
 | Tool | Fit |
 | --- | --- |
-| **bencher.dev** | Hosted, Go-native, PR comments; default recommendation |
-| **github-action-benchmark** | Self-hosted, simple first gate, threshold only |
-| **Apache Otava / Nyrkiö** | Change-point detection over a rolling window |
-| **gobenchdata** | Go-specific GitHub Pages dashboards |
+| [**bencher.dev**](https://bencher.dev) | Hosted, Go-native, PR comments |
+| [**github-action-benchmark**](https://github.com/benchmark-action/github-action-benchmark) | Simple first gate, threshold only |
+| [**Apache Otava**](https://otava.apache.org) | Change-point detection |
+| [**gobenchdata**](https://github.com/bobheadxi/gobenchdata) | GitHub Pages dashboards |
 
-<br>
-
-The talk repository contains the full survey and setup notes.
+</div>
 
 ---
 
-## Keep a ledger of known false positives
-
-`BenchmarkOTLPProtoSize` fired again eleven days later, on an unrelated PR.
-
-That time it took **one comment** to dismiss:
+## Keep a ledger of false positives
 
 <div class="small">
 
 > Known `BenchmarkOTLPProtoSize` false positive — documented for #4891 as a
-> same-package code-layout artifact. The benchmark touches no code I changed;
+> same-package code-layout artifact. Touches no code I changed;
 > local A/B was ~+0.3%. No action.
 
 </div>
 
-<br>
+<div class="center big">
 
-Without that note, the next engineer re-runs the whole investigation, or worse,
-"fixes" it.
-
-<div class="big">
-
-Documented noise is benchmark hygiene.
+Documented noise is **benchmark hygiene**.
 
 </div>
 
 ---
 
-## Arc 2 answered
+## CI and macro, answered
 
-<div class="columns">
-<div>
+<div class="centered-table">
 
-### 1 · Real work
-
-Match the archetype.
-Pin the inputs.
-Avoid coordinated omission.
-
-### 2 · Stable sample
-
-Time series, not pairs.
-Change-point detection
-over a rolling window.
+| | Macro scale |
+| --- | --- |
+| **Real work?** | archetype · pinned inputs |
+| **Stable sample?** | time series · change points |
+| **Above noise?** | bare metal · SMT + DFS off |
 
 </div>
-<div>
 
-### 3 · Above the noise
+<div class="center big">
 
-Bare metal. SMT off.
-Governor pinned. Boost off.
+A shared runner cannot be fixed with **more samples**.
 
-Three sysfs writes buy
-**~100×** on variance.
-
-### And
-
-A shared runner cannot be
-fixed with more samples.
-
-</div>
 </div>
 
 ---
@@ -2006,34 +1823,30 @@ fixed with more samples.
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### CLOSE
+###### 14
 
 # Wire It Up
 
-This Afternoon
+This afternoon.
 
 ---
 
 ## Three tools
 
 ```bash
-honestbench ./...                                    # static analysis
-benchgate   -pkg=./... -count=10 -cv-threshold=5    # CV gate
-benchenv                                             # env diagnosis
+honestbench ./...                                 # static analysis
+benchgate   -pkg=./... -count=10 -cv-threshold=5  # CV gate
+benchenv                                          # env diagnosis
 ```
 
-Ships from [github.com/kakkoyun/benchlab](https://github.com/kakkoyun/benchlab)
-
 ```bash
-go install github.com/kakkoyun/benchlab/cmd/...@latest
-npx skills add kakkoyun/benchlab --all
+go install github.com/kakkoyun/benchlab/cmd/...@latest   # all three
+npx skills add kakkoyun/benchlab --all                    # agent skills
 ```
 
 ---
 
-## `honestbench`: static analysis for benchmarks
-
-Go Abstract Syntax Tree (AST) analysis. No benchmark needs to run. Finds problems before you measure.
+## `honestbench`
 
 ```text
 dce_bench_test.go:46:3: high: discarded-result:
@@ -2041,75 +1854,48 @@ dce_bench_test.go:46:3: high: discarded-result:
     compiler may eliminate this call via DCE
 
 timer_bench_test.go:80:3: high: stoptimer-without-starttimer:
-    b.StartTimer() called after the work under test;
-    measured code runs while the timer is stopped
+    b.StartTimer() called after the work under test
 
 17 findings (2 high, 4 medium, 11 info) across 12 functions
 ```
 
+<div class="center">
+
+AST analysis. **Nothing has to run.**
+
+</div>
+
 ---
 
-## `benchgate`: CV gate
-
-Runs the benchmark N times and fails if variance is too high to trust.
+## `benchgate`
 
 ```text
-# threshold 5%          → FAIL
-benchgate: BenchmarkMakeBuffer_Correct  mean=11.8 ns/op  cv=5.2%  ✗
-VERDICT: FAIL — 1/1 benchmarks exceed CV threshold 5.0%
+# threshold 5%   → FAIL
+BenchmarkMakeBuffer_Correct  mean=11.8 ns/op  cv=5.2%  ✗
 
-# threshold 8%          → PASS
-benchgate: BenchmarkMakeBuffer_Correct  mean=11.1 ns/op  cv=2.2%  ✓
-VERDICT: PASS — all 1 benchmarks within CV threshold 8.0%
+# threshold 8%   → PASS
+BenchmarkMakeBuffer_Correct  mean=11.1 ns/op  cv=2.2%  ✓
 ```
 
-Catches the case where your environment is too noisy before the numbers go into a PR comment.
+<div class="center">
+
+Catches a noisy machine **before** the number reaches a PR comment.
+
+</div>
 
 ---
 
-## `benchenv`: diagnose your environment
-
-No flags needed. Run it before any serious benchmarking session.
-
-<div class="columns">
-<div>
-
-### Hardware and scheduler
-
-- SMT control
-- CPU frequency governor
-- Turbo Boost
-- Load average
-
-</div>
-<div>
-
-### Benchmark toolchain
-
-- `perflock`
-- `benchstat`
-- `benchdiff`
-- `GOMAXPROCS` versus `NumCPU`
-
-</div>
-</div>
-
-Unsupported controls are reported as **unavailable**, not guessed.
-
----
-
-## `benchenv` on this laptop
+## `benchenv`
 
 ```text
-benchenv: benchmarking environment diagnosis (darwin/arm64, 16 CPUs)
+benchenv: environment diagnosis (darwin/arm64, 16 CPUs)
 
-  [unavailable]  SMT control — no sysfs controls on macOS
-  [unavailable]  CPU frequency — not exposed on macOS
+  [unavailable]  SMT control — no sysfs on macOS
+  [unavailable]  CPU frequency — not exposed
   [unavailable]  Turbo Boost — no user-space control
-  [ok]           load average — 1-min load 6.15 ≤ 8.0
+  [ok]           load average 6.15 ≤ 8.0
   [warn]         perflock not installed
   [ok]           benchstat installed
-  [warn]         benchdiff not installed
 
 Summary: 3 ok, 2 warn, 4 unavailable.
 ```
@@ -2126,29 +1912,33 @@ Summary: 3 ok, 2 warn, 4 unavailable.
 ## The minimum viable discipline
 
 ```bash
-# 1. Add a sink. Assign your result to a package-level var.
+# 1. Add a sink.
 # 2. Run enough samples.
 go test -bench=. -benchmem -count=10 | tee new.txt
 benchstat old.txt new.txt
-# 3. Check the environment before you believe the comparison.
+# 3. Check the machine before you believe it.
 benchenv
 ```
 
-<br>
+<div class="center big">
 
-Under an hour. The benchmarks you write after today will tell the truth.
+Under an hour.
+
+</div>
 
 ---
 
 ## Three questions, two scales
 
+<div class="centered-table">
+
 | | Local + micro | CI + macro |
 | --- | --- | --- |
 | **Real work?** | sink · `-benchmem` · `b.Loop` | archetype · pinned inputs |
 | **Stable sample?** | `-count=10` · benchstat · CV | time series · change points |
-| **Above noise?** | pin the container · know the ceiling | bare metal · SMT + DFS off |
+| **Above noise?** | pin it · know the ceiling | bare metal · SMT + DFS off |
 
-<br>
+</div>
 
 <div class="center">
 
@@ -2170,12 +1960,9 @@ A shared runner cannot be fixed with more samples.
 
 [github.com/kakkoyun/benchlab](https://github.com/kakkoyun/benchlab)
 
-- `honestbench`: static benchmark checks
-- `benchgate`: coefficient-of-variation gate
-- `benchenv`: environment diagnosis
-- Agent Skills for all three commands
+`honestbench` · `benchgate` · `benchenv` · Agent Skills
 
-[Talk repo, decks, and captured results](https://github.com/kakkoyun/gopherconuk-26)
+[Talk repo, decks, captured results](https://github.com/kakkoyun/gopherconuk-26)
 
 [Earlier FOSDEM version](https://youtu.be/8211fNI_nc4)
 
