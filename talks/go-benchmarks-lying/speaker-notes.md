@@ -47,6 +47,17 @@ If §10 has not started by 33:00, start cutting (ladder in `outline.md`).
 
 `DO` Do not introduce yourself yet. The personal context is §02.
 
+### Measure customer happiness, not CPU usage
+
+**Beat: the frame for the whole section.**
+
+> **SAY:** One frame before we start. The number you are chasing is not CPU
+> usage, or allocations, or requests per second. It is whether your user is
+> happy. Everything else is a proxy. A benchmark measures the proxy. The point
+> of the proxy is the user.
+
+`DO` Land it, then straight into "is it actually slow".
+
 ### Is it actually slow?
 
 > **SAY:** Before you write a single benchmark: check it is actually slow, in
@@ -55,6 +66,16 @@ If §10 has not started by 33:00, start cutting (ladder in `outline.md`).
 >
 > Benchmark the path your production evidence says is hot. Not the one that
 > looks interesting.
+
+### Could it go faster?
+
+**Beat: slow ≠ improvable.**
+
+> **SAY:** So you found it is slow. Next question: can it actually go faster?
+> Slow does not mean improvable. There is a ceiling — memory bandwidth,
+> instruction latency, the physics of the machine. Headroom is the gap between
+> where you are and that ceiling. No headroom, and the "is it worth it"
+> question is moot — you cannot optimize past the physics.
 
 ### Is it worth optimizing? (reveal)
 
@@ -102,6 +123,16 @@ If §10 has not started by 33:00, start cutting (ladder in `outline.md`).
 > **SAY:** If you want the "what to optimize" half properly, Daniel Martí gave
 > it at GopherCon 2019 and it is still the best talk on it. He covers what to
 > optimize. I am covering whether you can believe the number when you get there.
+
+### Finding what is worth optimizing
+
+**Beat: plant Berger, paid off at the arc bridge.**
+
+> **SAY:** And the talk that pairs with Martí's is Emery Berger's "Performance
+> Matters". Same shelf, different question. Berger's point for us: in a
+> concurrent workflow, the component that looks hot on a profile is not
+> necessarily the one holding the wall time. We come back to that idea at the
+> bridge between the two halves.
 
 ---
 

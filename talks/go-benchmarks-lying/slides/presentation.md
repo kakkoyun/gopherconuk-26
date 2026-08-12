@@ -49,6 +49,14 @@ And How to Stop Them
 
 ---
 
+<!-- _class: vcenter -->
+
+## Measure customer happiness,
+
+## not CPU usage
+
+---
+
 ## Is it actually slow?
 
 <div class="columns">
@@ -77,6 +85,15 @@ p50 / p95 / **p99**
 <br>
 
 **Benchmark what production says is hot.**
+
+---
+
+## Could it go faster?
+
+* Detecting slowness ≠ proving headroom
+* The ceiling is physics: bandwidth, latency, IPC
+* Headroom is the gap between now and that ceiling
+* No headroom → "is it worth it" never comes up
 
 ---
 
@@ -174,14 +191,45 @@ Tobi Lütke · [X, 5 May 2024](https://x.com/tobi/status/1787139157078188180)
 
 ## Finding what to optimize
 
+<div class="columns">
+<div>
+
 [**Optimizing Go Code Without a Blindfold**](https://www.youtube.com/watch?v=oE_vm7KeV_E)
 Daniel Martí · GopherCon 2019
-
-<br>
 
 He covers *what* to optimize.
 
 This talk covers *whether you can trust the number*.
+
+</div>
+<div class="center">
+
+![width:360](../assets/gcuk19_daniel_marti_optimizing_go_code_without_blindfold.png)
+
+</div>
+</div>
+
+---
+
+## Finding what is worth optimizing
+
+<div class="columns">
+<div>
+
+[**Performance Matters**](https://www.youtube.com/watch?v=r-TLSBdHe1A)
+Emery Berger · Strange Loop 2019
+
+The component that *looks* hot
+is not always the one
+holding wall time.
+
+</div>
+<div class="center">
+
+![width:360](../assets/strangeloop19_emery_berger_performance_matters.png)
+
+</div>
+</div>
 
 ---
 
