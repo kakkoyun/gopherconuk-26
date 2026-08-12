@@ -16,10 +16,6 @@ style: |
   .small  { font-size: 0.8em; }
   .tiny   { font-size: 0.6em; }
   .center { text-align: center; }
-  .tag    { display: inline-block; padding: 0.15em 0.6em; border-radius: 4px; font-size: 0.75em; font-weight: bold; }
-  .prod   { background: #1e6845; color: #c3e8d4; }
-  .dev    { background: #1a3a6e; color: #c3d4f0; }
-  .always { background: #5a1e6e; color: #e4c3f0; }
 ---
 
 <!-- _class: title gopher-network -->
@@ -181,9 +177,9 @@ There is no single point where an agent can safely rewrite every function at sta
 
 ## What Go actually has
 
-```go
-// runtime/proc.go
+###### runtime/proc.go
 
+```go
 // gopark should be an internal detail,
 // but widely used packages access it using linkname.
 // Notable members of the hall of shame include:
@@ -262,7 +258,7 @@ Runtime injection is useful, but Go's default static binary leaves less surface 
 
 <br>
 
-<span class="tag prod">v0: breaking changes are still possible</span>
+<span class="chip caution">v0: breaking changes are still possible</span>
 
 ---
 
@@ -600,8 +596,9 @@ Not every Datadog integration has moved to otelc yet.
 
 ## Compile time can reach Go internals
 
+###### gls.orchestrion.yml
+
 ```yaml
-# dd-trace-go/internal/orchestrion/gls.orchestrion.yml
 join-point:
   struct-definition: runtime.g
 advice:
@@ -692,7 +689,7 @@ Originated as Elastic Universal Profiling and joined OpenTelemetry in June 2024.
 
 <br>
 
-<span class="tag always">Profiles: Alpha specification</span>
+<span class="chip note">Profiles: Alpha specification</span>
 
 ---
 
@@ -742,6 +739,8 @@ Native runtimes can publish request context through thread-local storage.
 Go cannot rely on that model: goroutines move between OS threads, and crossing FFI on every event is too costly.
 
 The proposed Go path uses **pprof labels**:
+
+<!-- code-header: none -->
 
 ```yaml
 threadlocal.schema_version: "go_pprof_labels_v1"
