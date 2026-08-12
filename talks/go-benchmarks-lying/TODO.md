@@ -7,113 +7,115 @@ Companion files: `outline.md` (structure, timing, cut ladder) ·
 `speaker-notes.md` (the spoken script) · `slides/presentation.md` (the deck) ·
 `../../research/go-benchmarks-lying/claims-ledger.md` (every factual claim).
 
----
-
-## Blocking — must resolve before the talk
-
-### Clear or cut claims-ledger row 23
-
-**Status:** `pending`. This is the only ledger row not `verified`.
-
-The row describes Datadog's internal macro benchmarking practice — dedicated
-hardware, per-SDK overhead budgets, several archetypes, gating on the release.
-No public source exists for any of it.
-
-The slide ("What a macro gate needs at scale") has already been reframed to be
-generically true, so nothing unverified is currently on screen. Two ways to
-close this:
-
-1. Confirm each line is fine to say publicly → move row 23 to `verified`, cite
-   yourself as the source, and optionally restore the Datadog-specific framing.
-2. Leave the slide generic → mark row 23 `dropped` with a note.
-
-Either is fine. Leaving it `pending` is not, because the ledger's own rule says
-a non-`verified` claim must not appear on a slide.
-
-### Timed read-through
-
-**Now mandatory, not outstanding.** The deck grew from ~110 to ~122 pages and
-from 14 to 16 sections. Every prior timing number in the repo is stale twice
-over — first by the WHY-first restructure, now by ~22 additional slides. The
-checkpoints below are a *construction from section content*, not a
-measurement. Treat them as a hypothesis until this runs.
-
-The sparse-slide pacing risk is unchanged: talking *to* sparse slides runs
-slower than talking *over* dense ones, and this deck got sparser, not denser.
-
-Run it against the checkpoints in `outline.md`:
-
-| Checkpoint | By |
-| --- | --- |
-| §05 Benchmarking, Quickly starts | 17:00 |
-| §06 Local and Micro starts (arc 1) | 22:00 |
-| §11 CI and Macro starts (arc 2) | 39:00 |
-| §16 Wire It Up starts (close) | 53:00 |
-| Finish | 57:00 |
-
-If §11 has not started by 40:00, apply the cut ladder in `outline.md`.
-Update the per-part targets in `speaker-notes.md` with whatever you actually
-measure.
+**Delivered at GopherCon UK 2026.** State at delivery: 127 pages, 16 sections,
+fragment floor 60, claims ledger 43 `verified` / 1 `dropped` / 0 `pending`. The
+full `make check` surface passed. Everything below is what survived the talk or
+was created by it.
 
 ---
 
-## Should do
+## Open
+
+### Record what the talk actually took
+
+The single most valuable missing number in this repo. Every timing figure here
+and in `outline.md` is still a *construction from section content*, never a
+measurement, and it has now been wrong three times running: once before the
+WHY-first restructure, once after it, and once after five slides were added on
+the day-before push.
+
+`outline.md` currently claims 59:30 against a 60-minute slot. Write down what it
+really was, section by section if you have it, and rebase `outline.md` and the
+per-part targets in `speaker-notes.md` on that. Until someone does, the cut
+ladder is being applied against a guess.
+
+If the talk was recorded, the recording is the measurement.
+
+### Add the observer effect
+
+The one genuine content gap found while checking the deck against prior art.
+Teiva Harsanyi's P99 CONF post names four traps leading to inaccurate Go
+benchmarks. The deck covers three of them: timer reset and pause, wrong
+assumptions about microbenchmarks, and compiler optimizations. It does not cover
+the fourth, the observer effect, where the act of measuring changes what is
+measured.
+
+That is this talk's thesis stated one level down, so it belongs in it. Source:
+<https://p99conf.io/2023/08/16/how-to-write-accurate-benchmarks-in-go/>, and the
+longer treatment is in *100 Go Mistakes*.
+
+### perfgo slide
+
+Ledger row 43 is `verified` and ready to use. The framing matters and is not the
+obvious one: `perfgo` is a Go performance-analysis CLI over Linux `perf` and CPU
+PMU counters, covering cache misses, cache-to-cache transfers and possible false
+sharing, and IPC. **It is not a continuous profiler.** Citing it as one
+misattributes the tool in front of its author, who presented it at FOSDEM 2026.
+
+Framed correctly it fits the talk better than a profiling name-check would,
+because it answers *why* a benchmark is slow at the hardware level.
+
+### Memes
+
+Never placed. The theme has a `section.meme` class, and the project's
+`memebo.at` MCP server has usable templates: `this-is-fine`, `two-buttons`,
+`guy-pointing-at-mirror`, `distracted-boyfriend`. Candidate beats that can carry
+a joke without losing the thread: after the OPERA reveal, the macOS caveat, the
+p-hacking trap.
+
+Pure jokes make no factual claim and need no ledger row. Attribution only where
+the source requires it.
 
 ### Fold in Scott's marked-up PDF
 
-He said he would send annotated slides after dry run 2. Not received at the time
-of the restructure. When it lands, diff his notes against what is already
-addressed — most line-level feedback from the session is done, so only genuinely
-new points need action.
-
-### Decide how much of the reveal machinery you actually want
-
-The deck uses Marp fragments (`*` bullets) for 56 reveals. They only animate in
-the bespoke HTML, not the PDF.
-
-Decide before the day: presenting from HTML (`make serve/go-benchmarks-lying`)
-gets the reveals; presenting from PDF is more robust but shows every bullet at
-once. If you choose PDF, the two-step reveal slides (latency/throughput, micro
-vs macro) become redundant duplicate pages and should be collapsed.
-
----
-
-## Nice to have
-
-### perflock PR for Linux/Windows support
-
-Mentioned in dry run 2. The talk cites perflock and documents that its frequency
-pinning is Linux-only (ledger row 16). Upstreaming better platform support would
-let you drop the caveat. Not blocking — the caveat is accurate and useful as-is.
+Still not received. When it lands, diff his notes against what is already
+addressed rather than working through it linearly.
 
 ### Send Scott the podcast link
 
 For marketing to help promote, once published.
 
-### Consider rasterising the DFS chart
+---
 
-`assets/environment-control-dfs-experiment.svg` is 9.5 MB with ~60k `<use>`
-elements (a strip plot, one element per point). It renders fine (~3s, compresses
-well in the PDF) and is marked `-diff` in `.gitattributes`, so this is purely
-about repo weight. Only worth doing if 13 MB of assets starts to annoy.
+## Blocked
+
+### Re-measure the Docker and macOS CV experiment on an idle machine
+
+**This is the last factual soft spot in the deck.** Ledger row 8 claims roughly
+a 1 to 2 percent CV floor for a pinned container on the Mac VM against about
+0.05 percent on bare-metal Linux. That number is not confirmed by anything in
+this repo.
+
+An attempt was made and thrown away, for a reason worth keeping: it ran
+concurrently with a Marp server and two PDF builds, so the "idle" baseline was
+not idle. It produced idle 3.16 percent, noisy 5.82 percent, pinned 2.42 percent,
+which contradicts both the committed evidence and row 8, and it also showed
+pinning making the mean 2.3x slower. None of that is trustworthy, so
+`demo/results/` still holds the older committed run and the deck still shows
+idle 4.75, noisy 18.88, pinned 5.25.
+
+Consequence: the `5.25% is not a triumph / It is a ceiling` slide rests on a run
+nobody has reproduced. Redo it on a quiet machine with nothing else running,
+then either confirm the slide or change both the slide and row 8.
+
+The irony of contaminating a measurement for this particular talk is noted, and
+is the reason it was discarded rather than shipped.
 
 ---
 
 ## Cross-repo
 
-The three CLIs and the agent skills now live in
+The three CLIs and the agent skills live in
 [github.com/kakkoyun/benchlab](https://github.com/kakkoyun/benchlab), not here.
-
-Two consequences worth remembering:
 
 - **Two repos, one QR.** The QR on the closing slide points at the *talk* repo.
   benchlab is a separate link beside it. The script carries a `DO` cue about not
   conflating them on stage.
-- **The captured tool outputs in the deck are now cross-repo evidence.** The
-  `honestbench` / `benchgate` / `benchenv` outputs on slides came from those
-  tools. If benchlab changes their output format, the slides silently go stale
-  and nothing in this repo will catch it. Re-check those three slides against
-  the current binaries before the talk.
+- **The captured tool outputs are cross-repo evidence with no tripwire.** If
+  benchlab changes an output format, the slides go stale and nothing in this repo
+  notices. This bit once already: see the `benchenv` entry below. Re-check all
+  three panels against freshly built binaries before any future delivery, and
+  record the result in ledger row 25.
 
 ---
 
@@ -130,14 +132,46 @@ them being "fixed" again.
   exactly two characters; longer labels overflow and clip.
 - **WHY-first order is deliberate.** The deck used to open on the OPERA cold
   open; `outline.md` even argued for it ("Start with OPERA, not a biography or
-  an agenda"). The restructure reverses that on purpose — WHY → why I care →
-  the OPERA story — so the audience has the frame before the contract the story
-  sets up. Do not "fix" it back to OPERA-first. The craft risk is real (opening
-  on SLO framing is a colder open than opening on a story), but the reversal is
-  recorded here so it does not get quietly undone.
+  an agenda"). The restructure reverses that on purpose: WHY, then why I care,
+  then the OPERA story, so the audience has the frame before the contract the
+  story sets up. Do not "fix" it back to OPERA-first. The craft risk is real
+  (opening on SLO framing is a colder open than opening on a story), but the
+  reversal is recorded here so it does not get quietly undone.
 - **Slides carry mottos, data, visuals, and links only.** Prose belongs in
   `speaker-notes.md`. If you find yourself adding a paragraph to a slide, it
   goes in the script instead.
 - **`*` is the only list marker on slides.** Every list is an intentional Marp
   reveal. A `-` bullet in the deck is a bug. `make check/fragments` guards the
   count; `.prettierignore` stops prettier rewriting the markers.
+- **The `b.Loop` removes-table is correct. Do not "fix" it.** All four rows were
+  checked against the release notes, including `DCE prevented: Yes`, which
+  survives the Go 1.26 change. **Go 1.26 is the fix, not the regression**, and
+  the direction is very easy to get backwards. What 1.26 removed is the *inlining
+  suppression* that 1.24 and 1.25 used to implement keepalive; the keepalive
+  itself remains. Ledger rows 39 to 41 carry the detail, including that the
+  #77654 regression did not reproduce on go1.26.5.
+- **CodSpeed's Go support is walltime-only.** Its interesting low-variance
+  CPU-simulation instrument does not support Go. The tools-table cell says so
+  deliberately. Do not "improve" it into claiming simulated execution for Go.
+  Ledger row 42.
+- **Ledger row 23 is cleared, and the slide stays generic anyway.** Row 23 moved
+  to `verified` as a scope-limited self citation on the row-30 precedent. The
+  macro-gate slide was deliberately *not* reverted to the Datadog-specific
+  framing, because nothing on screen depends on the specifics and there is no
+  reason to spend the risk. Restoring that framing would be a new decision.
+- **The `benchenv` panel was rebuilt against the real binary.** It used to list
+  six checks under a summary that counted nine, which does not add up in front of
+  an audience. It now carries all nine. The per-check explanations are omitted on
+  purpose: they overflow the code panel, which clips horizontally with no
+  warning, and paraphrasing them would misquote the tool.
+- **The two Go wiki screenshots are cropped on purpose.** Full-page browser grabs
+  are unreadable at slide size, and the dashboard grab overflowed the page and
+  pushed the pagination off. `golang_perf_dashboard_charts.png` and
+  `golang_slowbot_quote.png` are the cropped versions actually used; the
+  originals are kept beside them. Do not swap the originals back in.
+- **An editor or agent autofix strips the comma from `## Measure customer
+  happiness,`.** It happened twice in one session. That slide is one sentence
+  split across two headings, so the comma is load-bearing, and the repo sets
+  `MD026: false` precisely to allow it. The project's own `make lint/md` is not
+  the culprit; a formatter that ignores `.markdownlint-cli2.yaml` is. If the
+  comma disappears again, restore it and suspect format-on-save.
