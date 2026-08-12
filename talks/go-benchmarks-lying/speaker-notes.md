@@ -838,6 +838,18 @@ CI-only, on a dedicated runner.
 > same units, so your runtime now depends on what some other process is doing.
 > A co-tenant you cannot see and did not schedule.
 
+### Why SMT breaks benchmarks
+
+**Beat: the mechanism, not just the assertion.**
+
+> **SAY:** So why does sharing a core produce twenty-three percent variance? A
+> core is a fixed bag of execution units — arithmetic, floating point,
+> load and store. Two threads share that bag. Neither gets the full core; each
+> gets a fraction. And the split is nondeterministic — whoever has
+> instructions ready wins the next slot. Run to run, your thread gets a
+> different fraction, and that fraction swings the runtime. Same code, same
+> core, different share every time. That is the twenty-three percent.
+
 ### What's the impact of disabling SMT?
 
 > **SAY:** Here is the cost. Two CPU-bound tasks, same core versus separate
@@ -855,6 +867,19 @@ CI-only, on a dedicated runner.
 >
 > Why that ruins a benchmark: run one boosts. Run twenty is warm and throttles.
 > Same code, different clock, different answer.
+
+### Why DFS breaks benchmarks
+
+**Beat: the mechanism, not just the assertion.**
+
+> **SAY:** And the frequency story is the same shape. The clock is not fixed.
+> A governor picks a frequency based on load and how much thermal headroom the
+> chip has. Turbo pushes above base when the chip is cool. So run one — cool
+> chip, high clock, fast result. Run twenty — warm chip, throttled clock,
+> slower result. Same number of cycles, different wall time. The benchmark is
+> not comparable across runs. Pin to base frequency and every run gets the
+> same clock — the mean gets slower, because no turbo, but the variance drops
+> ten times.
 
 ### What's the impact of disabling DFS?
 

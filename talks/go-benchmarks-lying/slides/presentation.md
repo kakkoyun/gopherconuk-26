@@ -1713,6 +1713,22 @@ invisible co-tenant.
 
 ---
 
+## Why SMT breaks benchmarks
+
+* A core has fixed execution units: ALUs, FPUs, load/store
+* Two threads share them — neither gets the full core
+* The split is **nondeterministic**: whoever has instructions ready wins the slot
+* Run-to-run, your thread gets a different fraction of the units
+* That fraction swings the runtime — hence the 23% CV
+
+<div class="center">
+
+Same code. Same core. Different **share** each run.
+
+</div>
+
+---
+
 ## What's the impact of disabling SMT?
 
 <div class="center">
@@ -1776,6 +1792,22 @@ Run 20 is warm and throttles.
 Same code, different clock.
 
 </div>
+</div>
+
+---
+
+## Why DFS breaks benchmarks
+
+* The clock is not fixed — a governor picks frequency from load and thermals
+* Turbo boosts above base when the chip is cool
+* Run 1: cool chip, high clock, fast result
+* Run 20: warm chip, throttled clock, slower result
+* Same cycles, different wall time — the benchmark is **not comparable**
+
+<div class="center">
+
+Pin to base frequency → every run at the same clock.
+
 </div>
 
 ---
