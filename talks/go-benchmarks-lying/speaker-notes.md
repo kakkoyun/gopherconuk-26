@@ -159,6 +159,21 @@ If §10 has not started by 33:00, start cutting (ladder in `outline.md`).
 > One public number: profile-guided optimization took three point four percent
 > off production CPU. You only get to claim that if you can measure it.
 
+`DO` The SpeedLab logo is on screen as proof of investment. Say the name once
+and the framing line — that Datadog invests in performance testing internally
+and this talk is the spillover — then move. Do NOT ad-lib hardware, budgets,
+archetypes, gating, or scale. Ledger row 30 is scope-limited to name and
+existence; row 23 (internal macro practice) stays `pending` and out of scope.
+
+### This talk builds on
+
+**Beat: tie the bio to the data that comes later.**
+
+> **SAY:** One more piece of context. An earlier version of this material —
+> the FOSDEM talk Augusto and I gave — is where the SMT and DFS numbers you
+> will see later actually come from. So when those charts show up, they are
+> not new; they are the foundation this talk builds on.
+
 ---
 
 ## 03 · A Loose Cable — 5 min

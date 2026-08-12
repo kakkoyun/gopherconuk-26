@@ -274,9 +274,37 @@ from PGO alone.
 </div>
 </div>
 
-<br>
+<div class="center">
+
+![width:110](../assets/dd_speedlab_logo.png)
+
+<span class="small">Datadog invests in performance testing internally — this talk is the spillover.</span>
+
+</div>
 
 ### Overhead is product correctness
+
+---
+
+## This talk builds on
+
+<div class="columns">
+<div>
+
+[**How to Reliably Measure Software Performance**](https://youtu.be/8211fNI_nc4)
+Kemal Akkoyun & Augusto de Oliveira
+FOSDEM 2026
+
+The SMT and DFS data later in this talk
+comes from this earlier version.
+
+</div>
+<div class="center">
+
+![width:360](../assets/fosdem26_ka_how_to_reliabliy_measure_performance.png)
+
+</div>
+</div>
 
 ---
 
