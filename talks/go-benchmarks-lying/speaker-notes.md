@@ -499,7 +499,7 @@ about to distrust.**
 
 `DO` Straight face, then move. Do not editorialise.
 
-### `b.Loop()` — Go 1.24
+### `b.Loop()` · Go 1.24
 
 > **SAY:** Go 1.24 gave us a much better answer. `b.Loop`. Setup before the loop
 > is excluded automatically. Timing stops at the end automatically. And it
@@ -512,6 +512,23 @@ about to distrust.**
 > **SAY:** Setup exclusion, and DCE prevention — those are the two that matter.
 > One catch: the compiler only does this if you write `b.Loop()` literally in
 > the condition. Assign it to a variable first and you lose it.
+
+### How the keepalive works
+
+`DO` Slow down. This is the honest footnote and it pays off the whole thesis.
+
+> **SAY:** So how does it actually stop the compiler? It keeps your call
+> arguments, your results, and your assigned variables alive inside the loop.
+>
+> In 1.24 and 1.25 it did that by refusing to inline anything in the loop body.
+> That worked. It also meant your benchmark could allocate on the heap where the
+> same code in production would not. The tool protecting your measurement was
+> quietly changing it.
+>
+> Go 1.26 keeps the protection and allows inlining again.
+>
+> I am telling you this because it is the whole talk in one detail. The thing you
+> trust to keep your benchmark honest is itself code, and it has been wrong.
 
 ---
 
@@ -924,7 +941,7 @@ into a disk array. Do not over-explain it.
 
 ---
 
-## 14 · Detecting Change Over Time — ~3 min
+## 14 · Detecting Change Over Time — ~5 min
 
 ### A/B is the wrong model for CI
 
@@ -953,9 +970,31 @@ into a disk array. Do not over-explain it.
 >
 > It needs history, so it belongs in nightly trending, not a PR gate.
 
+### Go runs this on Go
+
+`DO` Let them look for a beat before you say anything.
+
+> **SAY:** You do not have to take my word for any of this. This is the Go
+> project's own performance dashboard. Every commit into the main repository, per
+> builder shape, with a confidence interval on each series.
+>
+> That is a time series. Not a pair of runs.
+
+### Why a baseline, not a pair
+
+`DO` Read the quote aloud. It is the strongest line in the talk and it is not mine.
+
+> **SAY:** And here is why, in their words. They never report a number in
+> isolation, only relative to a baseline. Because the state of a machine or VM on
+> one day is likely to be very different from the state of that machine the next
+> day.
+>
+> That is the Go team, about their own hardware. If it is true for them, it is
+> true for your CI runner.
+
 ---
 
-## 15 · Wiring It Into CI — ~3 min
+## 15 · Wiring It Into CI — ~5 min
 
 ### Two patterns
 
@@ -972,6 +1011,26 @@ into a disk array. Do not over-explain it.
 > **SAY:** And this is why the first half came first. A benchmark has to be
 > locally reproducible for a developer to actually act on it. A red check
 > nobody can reproduce just gets ignored.
+
+### Upstream splits it the same way
+
+> **SAY:** That split is the one upstream already uses. Presubmit is opt-in per
+> change, and it is the cheap pairwise comparison. Postsubmit runs on every
+> commit against the latest release, and the baseline moves every time Go ships.
+
+### Why not just add more runners?
+
+`DO` Point at the second paragraph, not the first.
+
+> **SAY:** One last thing, because this is the objection I always get: why not
+> just throw more runners at it?
+>
+> Read what the Go project says about its own infrastructure. The normal test
+> bots get tons of capacity and spin up VMs at will. The performance builders get
+> one physical machine, often backlogged with work.
+>
+> Elastic capacity is the right answer for correctness. It is the wrong answer
+> for performance, and the people who maintain Go know it.
 
 ### Existing tools
 

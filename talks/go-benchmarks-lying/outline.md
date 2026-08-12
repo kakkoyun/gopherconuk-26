@@ -1,7 +1,7 @@
 # Talk outline: Why Your Go Benchmarks Are Lying
 
 > **Format:** 60 minutes presented, Q&A opportunistic · advanced Go audience
-> **Deck:** `slides/presentation.md` (118 pages, including progressive-reveal steps)
+> **Deck:** `slides/presentation.md` (127 pages, including progressive-reveal steps)
 > **Demonstrations:** no live demos; every command and captured result stays in the repository
 
 ## Thesis
@@ -53,13 +53,21 @@ now spend several pages on one idea. Budget by section.
 | 1 | **03 A Loose Cable** | OPERA, the three questions, the two-scales roadmap | 4:00 | 13:00 |
 | 1 | **04 Before You Measure** | Representative + repeatable, micro vs macro, when to use which, start macro | 4:00 | 17:00 |
 | 1 | **05 Benchmarking, Quickly** | Write, run, read, profile, read compiler output — shared vocabulary | 5:00 | 22:00 |
-| 2 | **06–10 Arc 1 — local and micro** | bot-comment plant · compiler honesty · timers and `B.Loop` · code layout and Berger · statistics · local environment · recap | 17:00 | 39:00 |
-| 3 | **11–15 Arc 2 — CI and macro** | #643 opener · macro design · SMT and DFS · change-point detection · CI patterns · false-positive ledger · recap | 14:00 | 53:00 |
-| 4 | **16 Wire It Up** | Three CLIs, punchline, minimum discipline, 3×2 recap, CTA | 4:00 | 57:00 |
+| 2 | **06–10 Arc 1 — local and micro** | bot-comment plant · compiler honesty · timers and `B.Loop` · keepalive mechanism · code layout and Berger · statistics · local environment · recap | 17:30 | 39:30 |
+| 3 | **11–15 Arc 2 — CI and macro** | #643 opener · macro design · SMT and DFS · change-point detection · upstream Go dashboard and baseline · CI patterns · presubmit/postsubmit · SlowBots · false-positive ledger · recap | 16:00 | 55:30 |
+| 4 | **16 Wire It Up** | Three CLIs, punchline, minimum discipline, 3×2 recap, CTA | 4:00 | 59:30 |
 
 **Rehearsal checkpoints:** §05 by 17:00 · arc 1 (§06) by 22:00 · arc 2
-(§11) by 39:00 · close (§16) by 53:00 · finish by 57:00. If arc 2 has not
+(§11) by 39:30 · close (§16) by 55:30 · finish by 59:30. If arc 2 has not
 started by 40:00, apply the cut ladder live.
+
+> **The slack is gone.** Five slides were added after the restructure: the
+> `b.Loop` keepalive mechanism, and four on what the Go project does upstream.
+> At the measured ~2 slides per minute that is about +2:30, which puts the
+> construction at 59:30 against a 60-minute slot. There is no longer room to
+> absorb a slow start, so treat the cut ladder as expected rather than
+> contingency, and cut the first two rungs *before* walking on if the day is
+> already running late.
 
 ## Narrative order
 
@@ -115,16 +123,23 @@ noise, and a shared runner cannot be fixed with more samples.
 
 Apply in this order if the timed read-through runs long.
 
-1. The "what a macro gate needs at scale" slide (−1:00)
-2. The feedback-loop diagram (−1:00)
-3. Coordinated omission and deterministic inputs, folded to one line (−1:30)
-4. The SMT and DFS *mechanism* explainer slides, keeping the impact data (−1:30)
-5. The benchmarking-basics "Reading the output" slide, keeping the rest of §05 (−1:00)
-6. Assembly back to one slide, dropping the `-m -m` escape/inlining slides (−2:00)
+1. "Upstream splits it the same way" (−0:45) — §15's "Two patterns" already
+   makes the presubmit/postsubmit distinction; this only adds that Go agrees.
+2. The "what a macro gate needs at scale" slide (−1:00)
+3. "Go runs this on Go", keeping "Why a baseline, not a pair" (−0:45) — the
+   quote is the load-bearing half; the dashboard screenshot is corroboration.
+4. The feedback-loop diagram (−1:00)
+5. "How the keepalive works" (−1:00) — the `b.Loop` table already carries the
+   actionable advice; this slide is the why-it-works footnote.
+6. Coordinated omission and deterministic inputs, folded to one line (−1:30)
+7. The SMT and DFS *mechanism* explainer slides, keeping the impact data (−1:30)
+8. The benchmarking-basics "Reading the output" slide, keeping the rest of §05 (−1:00)
+9. Assembly back to one slide, dropping the `-m -m` escape/inlining slides (−2:00)
 
 **Never cut without review:** either opening incident, the DCE captured
 evidence, the local CV experiment, the macOS caveat, the SMT and DFS impact
-data, the 3×2 recap, or the Datadog rationale.
+data, the 3×2 recap, the Datadog rationale, or "Why not just add more runners?"
+(it answers the objection the CI half always draws, in upstream's own words).
 
 ## Public results and sources to preserve
 
