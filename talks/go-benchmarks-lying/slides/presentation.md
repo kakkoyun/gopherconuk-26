@@ -1033,9 +1033,10 @@ benchstat old.txt new.txt
 
 ## What `benchstat` won't tell you
 
-✅ Is A different from B?
-
-❌ Is this machine trustworthy?
+<div class="columns" style="grid-template-columns: auto 1fr; gap: 0.8rem 1rem; align-items: baseline; font-size: 30px;">
+<div>✅</div><div>Is A different from B?</div>
+<div>❌</div><div>Is this machine trustworthy?</div>
+</div>
 
 <br>
 
