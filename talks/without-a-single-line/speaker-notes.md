@@ -51,10 +51,17 @@ Transition: "Before I show the workarounds, you should know why I care about thi
 
 ### Slide 6: personal context
 
-Twenty seconds. Do not read the list. Say:
+Twenty seconds. Consequences, not achievements. The slide now carries the
+consequences, so you can say them rather than translate a credentials list.
 
-"I spend most of my time where Go meets observability: Prometheus, OpenTelemetry compile-time instrumentation, and, previously, Parca's eBPF profiler. I have also given earlier versions of both talks at FOSDEM."
+"I maintained `client_golang`, which means I wrapped handlers by hand for years.
+Then Parca, where the whole point was a profiler nobody has to install. Now
+OpenTelemetry compile-time instrumentation, which ships inside your binary."
 
+"Every one of those jobs taught me the same thing: hand-written instrumentation
+decays. That is what this talk is about."
+
+The standing line is small print at the bottom deliberately. Do not read it out.
 Do not mention contribution counts. Do not imply work on OBI.
 
 ### Slide 7: Datadog context

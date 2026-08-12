@@ -86,28 +86,17 @@ The fiftieth inherits gaps.
 
 <!-- _class: vcenter -->
 
-## Why listen to me
+## How I got here
 
-<div class="columns">
-<div>
+- `client_golang`: I wrapped handlers by hand, for years
+- Parca: a profiler nobody has to install
+- `otelc`: instrumentation that ships inside *your* binary
 
-**Go and observability**
+<br>
 
-Prometheus Steering Committee
+### Each job taught the same thing: hand-written instrumentation decays
 
-Maintainer of `client_golang`, `promu`, and OpenTelemetry Go compile-time instrumentation
-
-</div>
-<div>
-
-**Built across the stack**
-
-Former maintainer of Thanos, Parca, and parca-agent
-
-Talks on Go tooling, instrumentation, benchmarking, and profiling at GopherCon, FOSDEM, KubeCon, and PromCon
-
-</div>
-</div>
+<span class="small">Prometheus Steering Committee · maintainer of `client_golang` and OpenTelemetry Go compile-time instrumentation</span>
 
 ---
 
