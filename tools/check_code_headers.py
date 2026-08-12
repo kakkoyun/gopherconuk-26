@@ -93,7 +93,7 @@ EXTERNAL_SOURCES = {
 }
 
 # Directories and suffixes excluded from the basename path check.
-PATH_EXCLUDE_DIRS = {"node_modules", ".git", ".worktrees", "assets", "fonts"}
+PATH_EXCLUDE_DIRS = {"node_modules", ".git", ".worktrees", ".claude", "assets", "fonts"}
 PATH_EXCLUDE_SUFFIXES = {".html", ".pdf"}
 
 
