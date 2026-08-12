@@ -4,9 +4,12 @@
  * Blueprint — a Marp theme for GopherCon UK talks, with a quiet Datadog signature.
  *
  * Colour rule:  Go blue is the frame.  Datadog purple is the measurement.
+ *               Amber is the caution.
  *               Blue draws structure (rails, ticks, section blocks, keywords).
  *               Purple only ever marks a reading — a chart series, an improved
  *               number, a delta, a shell prompt, a live-demo marker.
+ *               Amber only ever marks "do not ship this" — a test-only
+ *               scaffold, a v0 caveat. It never marks structure or measurement.
  *
  * Fonts    Space Grotesk + JetBrains Mono, both SIL OFL, self-hosted in ./fonts.
  * Gophers  CC0, from github.com/egonelbre/gophers, in ./assets/gophers.
@@ -131,6 +134,9 @@
 	--purple: #632ca6; /* Datadog — measurement */
 	--purple-lift: #a78be8; /* purple that survives a dark background */
 	--purple-deep: #2a1c43;
+	--amber: #e8833a; /* caution — "do not ship this". Never structure or measurement */
+	--amber-deep: #b4561a;
+	--amber-lift: #f0a968; /* amber that survives a dark background */
 	--ink: #0b0f14;
 	--paper: #f6f7f8;
 	--night: #0b1116;
@@ -441,6 +447,16 @@ pre {
 	background: var(--panel);
 	color: #e6edf3;
 	box-shadow: 0 2px 8px rgba(11, 15, 20, 0.28);
+	position: relative;
+	/* kind: a code panel gets a coloured left rail that names its kind at a
+	   glance. --kind-accent defaults to blue (source); --kind-rail defaults to
+	   0 so a bare text diagram renders with no rail. Each kind below sets both
+	   tokens, and the header sets its own copy because a custom property
+	   cannot reach a preceding sibling. */
+	--kind-accent: var(--blue);
+	--kind-rail: 0px;
+	border-left: var(--kind-rail) solid var(--kind-accent);
+	padding-left: calc(30px - var(--kind-rail));
 }
 pre code {
 	display: block;
@@ -451,6 +467,82 @@ pre code {
 	line-height: 1.62;
 }
 
+/* kind: source — the file you would open. Blue rail.
+   go, yaml, yml, s, and the data-kind equivalents a plugin might emit. */
+pre:has(> code.language-go),
+pre:has(> code.language-yaml),
+pre:has(> code.language-yml),
+pre:has(> code.language-s),
+h6:has(+ pre > code.language-go),
+h6:has(+ pre > code.language-yaml),
+h6:has(+ pre > code.language-yml),
+h6:has(+ pre > code.language-s),
+pre[data-kind="go"],
+pre[data-kind="yaml"],
+pre[data-kind="yml"],
+pre[data-kind="s"],
+h6[data-kind="go"],
+h6[data-kind="yaml"],
+h6[data-kind="yml"],
+h6[data-kind="s"] {
+	--kind-accent: var(--blue);
+	--kind-rail: 4px;
+}
+
+/* kind: reading — a disassembly, a shell command, a transcript. Purple rail. */
+pre:has(> code.language-asm),
+pre:has(> code.language-bash),
+pre:has(> code.language-sh),
+pre:has(> code.language-shell),
+pre:has(> code.language-zsh),
+pre:has(> code.language-console),
+h6:has(+ pre > code.language-asm),
+h6:has(+ pre > code.language-bash),
+h6:has(+ pre > code.language-sh),
+h6:has(+ pre > code.language-shell),
+h6:has(+ pre > code.language-zsh),
+h6:has(+ pre > code.language-console),
+pre[data-kind="asm"],
+pre[data-kind="bash"],
+pre[data-kind="sh"],
+pre[data-kind="shell"],
+pre[data-kind="zsh"],
+pre[data-kind="console"],
+h6[data-kind="asm"],
+h6[data-kind="bash"],
+h6[data-kind="sh"],
+h6[data-kind="shell"],
+h6[data-kind="zsh"],
+h6[data-kind="console"] {
+	--kind-accent: var(--purple-lift);
+	--kind-rail: 4px;
+}
+
+/* A headered text panel is captured output — a reading, so purple. A bare text
+   panel (an ASCII diagram) keeps the default: no rail. The opt-in header is the
+   discriminator, which keeps every diagram byte-identical to today. */
+h6:has(+ pre > code.language-text),
+h6:has(+ pre > code.language-text) + pre {
+	--kind-accent: var(--purple-lift);
+	--kind-rail: 4px;
+}
+
+/* corner prompt: a shell panel without a header shows $ top-right. Absolute, so
+   zero reflow; pre already clips. Suppressed on headered panels — the $ moves
+   into the header below. */
+pre:has(> code.language-bash):not(h6 + pre)::before,
+pre:has(> code.language-sh):not(h6 + pre)::before,
+pre:has(> code.language-shell):not(h6 + pre)::before,
+pre:has(> code.language-zsh):not(h6 + pre)::before {
+	content: "$";
+	position: absolute;
+	top: 10px;
+	right: 14px;
+	font: 700 16px / 1 var(--mono);
+	opacity: 0.55;
+	color: var(--kind-accent);
+}
+
 /* h6 immediately before a fence becomes the editor tab */
 h6 + pre {
 	margin-top: 0;
@@ -458,11 +550,28 @@ h6 + pre {
 h6:has(+ pre) {
 	display: block;
 	padding: 15px 26px;
+	padding-left: calc(26px - var(--kind-rail));
 	background: var(--panel-tab);
-	color: var(--blue-lift);
-	border-top: 3px solid var(--blue);
+	color: rgba(230, 237, 243, 0.72);
+	border-top: 3px solid var(--kind-accent);
+	border-left: var(--kind-rail) solid var(--kind-accent);
+	font: 500 21px / 1 var(--mono);
+	--kind-accent: var(--blue);
+	--kind-rail: 4px;
+}
+/* $ prefix in the header for shell and output (captured) kinds */
+h6:has(+ pre > code.language-text)::before,
+h6:has(+ pre > code.language-bash)::before,
+h6:has(+ pre > code.language-sh)::before,
+h6:has(+ pre > code.language-shell)::before,
+h6:has(+ pre > code.language-zsh)::before,
+h6:has(+ pre > code.language-console)::before {
+	content: "$";
+	margin-right: 0.7em;
+	color: var(--kind-accent);
 }
 h6:has(+ pre) + pre {
+	padding-block: 22px;
 	box-shadow: 0 2px 8px rgba(11, 15, 20, 0.28);
 }
 
@@ -839,6 +948,8 @@ section.terminal h1::before {
 }
 section.terminal pre {
 	padding: 34px 32px;
+	border-left: var(--kind-rail) solid var(--kind-accent);
+	padding-left: calc(32px - var(--kind-rail));
 }
 section.terminal pre code {
 	font-size: 25px;
@@ -1257,6 +1368,48 @@ section.stat .measure {
 }
 .center {
 	text-align: center;
+}
+
+/* chip — a small kind label inline. note is structural (blue), measure is a
+   reading (purple), caution is "do not ship this" (amber). Amber never marks
+   structure or measurement; see the colour rule at the top of the file. */
+.chip {
+	display: inline-block;
+	padding: 0.1em 0.6em;
+	border-radius: 4px;
+	font: 700 0.7em / 1 var(--mono);
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+.chip.note {
+	background: rgba(0, 173, 216, 0.14);
+	color: var(--blue-deep);
+}
+.chip.measure {
+	background: rgba(99, 44, 166, 0.14);
+	color: var(--purple);
+}
+.chip.caution {
+	background: rgba(232, 131, 58, 0.16);
+	color: var(--amber-deep);
+}
+section.dark .chip.note,
+section.section .chip.note,
+section.stat .chip.note,
+section.meme .chip.note {
+	color: var(--blue-lift);
+}
+section.dark .chip.measure,
+section.section .chip.measure,
+section.stat .chip.measure,
+section.meme .chip.measure {
+	color: var(--purple-lift);
+}
+section.dark .chip.caution,
+section.section .chip.caution,
+section.stat .chip.caution,
+section.meme .chip.caution {
+	color: var(--amber-lift);
 }
 
 /* print / PDF: Marp handles page geometry; just keep the paint */

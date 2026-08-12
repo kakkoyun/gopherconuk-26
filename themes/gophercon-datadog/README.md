@@ -72,7 +72,7 @@ repository's Makefile stages them before each build; those directories are ignor
 
 ## The colour rule
 
-**Go blue is the frame. Datadog purple is the measurement.**
+**Go blue is the frame. Datadog purple is the measurement. Amber is the caution.**
 
 Blue draws structure — the tick strip, the progress bar, section blocks, code
 keywords, list markers. Purple only ever marks a reading: a chart series you're
@@ -80,8 +80,13 @@ pointing at, an improved number, a delta chip, a shell prompt, the live-demo dot
 It never becomes a background. On dark slides it lifts from `#632CA6` to `#A78BE8`
 so it survives the projector.
 
-If you want more or less of it, change `--purple` in `:root` — nothing else needs
-to move.
+Amber only ever marks **"do not ship this"** — a test-only scaffold, a v0 caveat,
+a diagnostic you reach for in a benchmark but never in production. It never marks
+structure or measurement; a blue or purple caution would lose the warning. On
+dark slides it lifts from `#E8833A` to `#F0A968`.
+
+If you want more or less of any of them, change `--purple` / `--amber` in `:root`
+— nothing else needs to move.
 
 ## Slide classes
 
@@ -123,6 +128,30 @@ here", and the theme decides what based on context:
 - immediately before a code fence → the filename tab on the editor panel
 - on a `section` slide → the big blue number
 - on a `compare` slide → the delta chip between the panels
+
+**A code header names the artifact you would open to reproduce or re-verify the
+panel.** A source fence names its own file; a captured-output fence names the file
+whose code produced the numbers (or the upstream repo); a fence with no such
+artifact gets no header. The panel then carries its kind at a glance:
+
+| Fence language | Header | Rail | Corner `$` |
+| --- | --- | --- | --- |
+| `go`, `yaml`, `yml`, `s` | the file | blue | no |
+| `asm` | the file that was disassembled | purple | no |
+| `text` **with** header | the file or repo the bytes came from | purple | no |
+| `text` **without** header | — | none | no |
+| `bash`, `sh`, `shell`, `zsh` | usually none; the body *is* the command | purple | yes |
+| `console` | none; a transcript has its own prompts | purple | no |
+
+Test-ness rides on the filename — `dce_bench_test.go` ends in `_test.go`, which
+is unmissable and costs nothing to author. The header is a tab above the panel,
+not a bar inset into it. Opt out with `<!-- code-header: none -->` before the
+fence (Marp renders a non-directive HTML comment as a speaker note, so nothing
+appears on the slide).
+
+The `.chip` inline label comes in three kinds that mirror the colour rule:
+`.chip.note` (blue, a structural aside), `.chip.measure` (purple, a reading),
+`.chip.caution` (amber, do not ship this).
 
 **Emoji get a hanging indent.** List items use `text-indent: -1.9em` with matching
 padding, so a leading emoji sits in the margin and wrapped lines align under the

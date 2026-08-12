@@ -48,6 +48,53 @@ func (p *Profiler) Collect(ctx context.Context) error {
 
 ---
 
+# Disassemble the hot path
+
+###### profiler/collect.go
+
+```asm
+TEXT ·Collect(SB), NOSPLIT, $0-8
+    MOVD  buf+0(FP), R0
+    CALL  runtime·pprofStartCPUProfile(SB)
+```
+
+A reading, not source — the header names the file that was disassembled.
+
+---
+
+# Captured output
+
+###### collect.bench
+
+```text
+BenchmarkCollect-10   14322   81.4 ns/op   0 B/op
+```
+
+The header names the artifact the bytes came from; the `$` marks it as command
+output.
+
+---
+
+# A shell command
+
+```bash
+go test -bench=Collect -benchmem -count=10
+```
+
+The body *is* the command, so no header — just the purple rail and a corner `$`.
+
+---
+
+# Three labels
+
+<span class="chip note">structural aside</span>
+
+<span class="chip measure">a reading</span>
+
+<span class="chip caution">do not ship this</span>
+
+---
+
 <!-- _class: emoji -->
 
 # Four things we tried first
