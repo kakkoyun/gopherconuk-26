@@ -118,8 +118,9 @@ Apply in this order if the timed read-through runs long.
 1. The "what a macro gate needs at scale" slide (−1:00)
 2. The feedback-loop diagram (−1:00)
 3. Coordinated omission and deterministic inputs, folded to one line (−1:30)
-4. The second Berger slide, keeping causal profiling only (−1:00)
-5. Assembly back to one slide, dropping the "how to read this" primer (−1:30)
+4. The SMT and DFS *mechanism* explainer slides, keeping the impact data (−1:30)
+5. The benchmarking-basics "Reading the output" slide, keeping the rest of §05 (−1:00)
+6. Assembly back to one slide, dropping the `-m -m` escape/inlining slides (−2:00)
 
 **Never cut without review:** either opening incident, the DCE captured
 evidence, the local CV experiment, the macOS caveat, the SMT and DFS impact

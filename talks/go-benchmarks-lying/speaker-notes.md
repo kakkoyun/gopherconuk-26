@@ -33,8 +33,9 @@ stories → the numbers. Everything else is recoverable on stage.
 | 15 | Wiring Into CI | Detect, don't measure |
 | 16 | Wire It Up | Under an hour |
 
-**Checkpoints:** §06 by 14:00 · §11 by 31:00 · §16 by 46:00.
-If §11 has not started by 33:00, start cutting (ladder in `outline.md`).
+**Checkpoints:** §05 by 17:00 · §06 by 22:00 · §11 by 39:00 · §16
+by 53:00 · finish by 57:00.
+If §11 has not started by 40:00, start cutting (ladder in `outline.md`).
 
 > **Note.** Section numbers reflect the 16-section deck; the per-section timing
 > is provisional pending the timed read-through (see `TODO.md`) and is rebased
@@ -42,7 +43,7 @@ If §11 has not started by 33:00, start cutting (ladder in `outline.md`).
 
 ---
 
-## 01 · Why Benchmark? — 4 min
+## 01 · Why Benchmark? — 6 min
 
 ### Title slide
 
@@ -141,7 +142,7 @@ If §11 has not started by 33:00, start cutting (ladder in `outline.md`).
 
 ---
 
-## 02 · Why I Care — 2 min
+## 02 · Why I Care — 3 min
 
 ### How I got here
 
@@ -181,7 +182,7 @@ existence; row 23 (internal macro practice) stays `pending` and out of scope.
 
 ---
 
-## 03 · A Loose Cable — 5 min
+## 03 · A Loose Cable — 4 min
 
 `DO` This is the story beat. It sets up the three questions, so it stays welded
 to them — do not let the §02 bio bleed into it.
@@ -706,7 +707,7 @@ No QEMU, no cross-architecture emulation.
 
 ---
 
-## 11 · CI and Macro — 15 min total
+## 11 · CI and Macro — 14 min total
 
 ### The three questions, macro scale
 

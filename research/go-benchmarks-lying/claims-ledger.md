@@ -9,7 +9,7 @@ Every factual claim that will appear in slides or blog posts lives here with a p
 ---
 
 | # | Claim | Source | URL | Status | Notes |
-|---|-------|--------|-----|--------|-------|
+| --- | ------- | -------- | ----- | -------- | ------- |
 | 1 | SMT enabled → CV ~23% on CPU-bound benchmark on AWS m5.metal (DFS disabled) | FOSDEM 2026 experiments | <https://github.com/igoragoli/fosdem-2026-software-performance> | verified | Reproduced in experiments; table in FOSDEM blog post |
 | 2 | SMT disabled → CV drops to ~0.044–0.235% (~100x reduction) | FOSDEM 2026 experiments | <https://github.com/igoragoli/fosdem-2026-software-performance> | verified | Same source |
 | 3 | DFS enabled 1-task → CV ~0.383%; DFS disabled → CV ~0.041% (~10x reduction) | FOSDEM 2026 experiments | <https://github.com/igoragoli/fosdem-2026-software-performance> | verified | Same source |
