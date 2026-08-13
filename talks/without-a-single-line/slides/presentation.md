@@ -427,6 +427,27 @@ Go runtime and library layout changes can invalidate offsets. Go 1.26 required a
 
 ---
 
+## Usama Saqib — pitfalls of production eBPF
+
+<div class="columns">
+<div class="center">
+
+![width:480](../assets/usama_saqib_fosdem_2026.png)
+
+</div>
+<div>
+
+He covers the pitfalls found building production eBPF at Datadog — kprobe performance across kernel versions, a fentry kernel bug, and the pain of scaling uprobes.
+
+Twenty-eight minutes, public, and it goes deeper than this section can.
+
+[Performance and reliability pitfalls of eBPF — FOSDEM 2026](https://fosdem.org/2026/schedule/event/H3LM7G-performance_and_reliability_pitfalls_of_ebpf/)
+
+</div>
+</div>
+
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
