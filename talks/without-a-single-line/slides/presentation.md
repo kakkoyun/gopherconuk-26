@@ -34,19 +34,12 @@ How to Instrument Go Without Changing a Single Line of Code
 
 <!-- _paginate: false -->
 
-## Quick question
+## The bug you cannot reproduce locally
 
 <br>
 
-### Who has wrapped every HTTP client, database call, and framework handler by hand?
-
-<br>
-
-<div class="big center">
-
-Raise your hand.
-
-</div>
+- Added a log line. Redeployed.
+- Wrong place. Did it again.
 
 ---
 
@@ -62,6 +55,8 @@ Raise your hand.
 # Every new dependency creates another place to forget
 
 <br>
+
+You wrapped every HTTP client and database call by hand.
 
 The first service gets careful instrumentation.
 
