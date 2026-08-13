@@ -19,6 +19,47 @@ This file was written straight after delivering *Why Your Go Benchmarks Are
 Lying*. The second half is the transferable recipe from that talk; the first half
 is what that recipe says to do here, in priority order.
 
+
+# TODO
+
+- [ ] Starting with why observability matters.
+  - [ ] And what blocks us to get more observability signals
+  - [ ] Instrumentation? (this presentation will show you how to make it easy)
+  - [ ] Cost? (you can always use open-source observability backend and keep them for shorter time in your local environment, agents low these signals)
+- [ ] Storytelling is the key! This needs to flow. This is a keynote!
+- [ ] Do the research and give more information in the speaker notes for me to grok and narrate on the stage
+  - [ ] Scripting style should flow. Check the other talk script.
+  - [ ] Less text on the slides. Only the key points and reminders for me. Raw data. Graphs.
+- [ ] joke: somehow it works (all these dark magic, internal tempering and somehow it works) GIF? Meme?
+- [ ] We are exploring three major strategies and available tools for gathering observability signals (metrics, traces and logs) here
+  - [ ] Compile-Time Instrumentation
+  - [ ] eBPF
+  - [ ] Injector
+  - [ ] We need to keep these trio thorughout the talk
+  - [ ] Additionally, we introduce the fourth signal: profiling as a dedicated path
+    - [ ] This one uses eBPF
+    - [ ] also we also enable pprof endpoints using compile-time instrumentation
+    - [ ] you need something to scrape package and send those to an observability backend
+    - [ ] AFAIK, only datadog continuous profiler does this
+- [ ] We can use mermaid graphs instead of ASCII ones. Or I'm open to suggestions for more appealing graph visuals.
+- [ ] We need to make slides more appealing when it comes to emphasis., gradual reveal, marp has these. We did this on the other slides.
+  - [ ] Use color markers for key data on the charts/tables!
+- [ ] Use newly added visuals for Usama talk references (it is a screenshot)
+- [ ] Move all the tooling suggestions in the end. Take home kit for audience to try!
+- [ ] We need to make sure it is clear that USDT work is experimental! It is food for thought for the future
+  - [ ] It could both work eBPF-based systems and injectors
+- [ ] We don't want to shill datadog live debugger as a product. This is a brain teaser for what actually possible in the future.
+- [ ] "Combine the layers" slide suppose to be key takeaways, mental model
+  - [ ] When to reach for what, what are the trade-offs!
+  - [ ] Let's put this before the tooling and cal-to-action
+  - [ ] Like a summary on what is available today and what could open the doors.
+- [ ] Add a call to action after tool suggestion. Get involved in the SIGs
+  - [ ] https://github.com/open-telemetry/community (you can find all the links here)
+  - [ ] GoLang: Compile-Time Instrumentation (otelc)
+  - [ ] eBPF Instrumentation (OBI)
+  - [ ] Injector
+- [ ] Add more memes, GIFs, visuals, jokes
+
 ---
 
 ## Blocking
