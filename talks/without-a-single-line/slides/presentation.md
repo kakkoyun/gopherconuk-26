@@ -791,7 +791,7 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 
 ---
 
-## Start with the first hard constraint
+## When to reach for what
 
 | Constraint | Prefer |
 | --- | --- |
@@ -817,6 +817,8 @@ Linux cluster
 ```
 
 Start with the constraint you cannot change. Add the other layer when its signal earns the cost.
+
+**20% adoption growth** is evidence that Go users want the build-time path too.
 
 ---
 
@@ -871,50 +873,6 @@ Logpoints expire automatically.
 
 </div>
 </div>
-
----
-
-## Combine the layers
-
-<div class="columns3">
-<div class="center">
-
-### OBI
-
-No rebuild
-
-Traces + metrics
-
-Log correlation
-
-</div>
-<div class="center">
-
-### otelc
-
-Portable build path
-
-Rich Go semantics
-
-Four-signal SDK stack
-
-</div>
-<div class="center">
-
-### Profiler
-
-No app changes
-
-Whole-node CPU
-
-Request correlation
-
-</div>
-</div>
-
-<br>
-
-**20% adoption growth** is evidence that Go users want the build-time path too.
 
 ---
 
