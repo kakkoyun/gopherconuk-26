@@ -680,7 +680,9 @@ DD_TRACE_DEBUG=1 \
 <!-- _class: punchline dark -->
 <!-- _paginate: false -->
 
-# No rebuild. No source change. No kernel version gate.
+## No rebuild.
+## No source change.
+## No kernel version gate.
 
 ### *One line.*
 
@@ -698,9 +700,9 @@ DD_TRACE_DEBUG=1 \
 <!-- _class: punchline dark -->
 <!-- _paginate: false -->
 
-# Traces tell you which request was slow
+## Traces tell you which request was slow
 
-# Profiles tell you where the *CPU* went
+## Profiles tell you where the *CPU* went
 
 ---
 
@@ -799,7 +801,7 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 <!-- _class: punchline dark -->
 <!-- _paginate: false -->
 
-# Compile time sets context. eBPF reads *evidence*.
+### Compile time sets context. eBPF reads *evidence*.
 
 ### Together, request context reaches profiles
 
@@ -913,8 +915,14 @@ Same move as the opening joke, except now the agent has the *framework*.
 
 # Takeaways
 
-### Start from the *constraint* you cannot change.
-### Add a layer only when its *signal* pays for its *operational cost*.
+---
+
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
+## Start from the *constraint* you cannot change.
+
+## Add a layer only when its *signal* pays for its *operational cost*.
 
 ---
 
