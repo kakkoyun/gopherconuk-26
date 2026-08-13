@@ -76,9 +76,9 @@
 
 ### [C-013] OBI current release: v0.10.0 (2026-06-30), Development status (breaking changes expected)
 
-- **Verdict:** CONFIRMED (at time of research, 2026-07-22)
+- **Verdict:** CONFIRMED (re-verified 2026-08-13)
 - **Source(s):** S-OBI-03 (pkg.go.dev), S-OBI-04 (README)
-- **Notes:** README: "OBI is currently in Development. Users should expect breaking changes between minor releases while the project remains in v0." No v1.x release exists. Re-verify before talk/blog.
+- **Notes:** README: "OBI is currently in Development. Users should expect breaking changes between minor releases while the project remains in v0." No v1.x release exists. Still latest as of 2026-08-13. On-screen pin OBI v0.10.0 holds.
 
 ### [C-014] "Zero code changes" holds for HTTP/gRPC RED metrics and 13 Go library spans; does NOT hold for custom spans, business-logic events, SQL query details
 
@@ -95,8 +95,10 @@
 ### [C-016] Uprobe instrumentation has infrastructure, BPF-program, and compatibility costs even though recent kernels improved hot-path scalability
 
 - **Verdict:** CONFIRMED
-- **Source(s):** S-UP-01, S-UP-02, S-UP-03
+- **Source(s):** S-UP-01, S-UP-02, S-UP-03, S-UP-04 (OBI PR #1851), S-UP-05 (static-PIE incident)
 - **Notes:** Attached uprobes cross into the kernel. RCU-protected lookup and consumer traversal removed major scalability bottlenecks in newer kernels. A BPF program can still serialize a concurrent path through shared state. Go 1.26's removal of `pcHeader.textStart` required OBI to change symbol resolution; that issue is fixed and should be presented as maintenance evidence, not a current defect.
+
+  **Static-PIE incident (script depth, not a slide):** `aws-load-balancer-controller` v3.2.0 changed one build flag to static-PIE. No application code changed. On nodes running OBI its pods exited 139, `kubectl logs --previous` empty, `GOTRACEBACK=crash` silent because the SIGSEGV beat the Go runtime's signal handler. Static-PIE is `ET_DYN` with no `PT_INTERP`; the external linker restructured segments, `runtimeText` from `.gopclntab` stopped matching `prog.Vaddr`, and the computed offset put the uprobe in the wrong place. Fixed by PR #1851, deriving `runtime.text` from `runtime.moduledata` after Go 1.26 removed `pcHeader.textStart`. Trap: fixed, maintenance cost, never a live defect; the team changed build flags, not application code. Not Kemal's incident.
 
 ---
 
@@ -116,15 +118,15 @@
 
 ### [C-021b] DataDog/orchestrion (CLI: `orchestrion`) and OTel SIG's otelc (CLI: `otelc`) are two distinct tools using the same -toolexec + AST rewriting mechanism
 
-- **Verdict:** CONFIRMED
+- **Verdict:** CONFIRMED (re-verified 2026-08-13)
 - **Source(s):** S-O-01, S-O-03, S-O-04, S-O-05
-- **Notes:** orchestrion: GA v1.11.0 (2026-06-25), defaults to dd-trace-go/v2 but vendor-agnostic. otelc: stable v1.0.1 (2026-07-14), defaults to OTel SDK. Both intercept go tool compile via -toolexec.
+- **Notes:** orchestrion: GA v1.12.0, defaults to dd-trace-go/v2 but vendor-agnostic. otelc: stable v1.0.1 (2026-07-14), defaults to OTel SDK. Both intercept go tool compile via -toolexec. On no slide; ledger only.
 
 ### [C-022] otelc current release version: v1.0.1 (2026-07-14), first stable non-retracted release
 
-- **Verdict:** CONFIRMED (at time of research, 2026-07-22)
+- **Verdict:** CONFIRMED (re-verified 2026-08-13)
 - **Source(s):** S-O-04 (OTel blog), S-O-05 (repo)
-- **Notes:** Context lead said v0.5.0 — this was outdated. v1.0.1 shipped 2026-07-14 (barely a week before this research). Re-verify at talk/blog publish time. orchestrion is separately at v1.11.0 (2026-06-25).
+- **Notes:** v1.0.1 shipped 2026-07-14. v1.0.0 was retracted over a bad `otelc pin` module path; v1.0.1 is the first stable non-retracted release. Still latest as of 2026-08-13. On-screen pin otelc v1.0.1 holds.
 
 ### [C-023] otelc is a production-capable, cross-platform build-time path rather than a local-development-only tool
 
@@ -186,9 +188,9 @@
 
 ### [C-035] Current version is v0.0.202627 (calendar-week tags, no formal numbered releases)
 
-- **Verdict:** CONFIRMED (at time of research, 2026-07-22)
+- **Verdict:** CONFIRMED (re-verified 2026-08-13)
 - **Source(s):** S-P-05 (GitHub repo tags)
-- **Notes:** Versioning scheme is ISO week-based (e.g. v0.0.202627 = week 27, 2026). Re-verify at time of publication.
+- **Notes:** Versioning scheme is ISO week-based. Now at v0.0.202633 (2026-08-11). On no slide; ledger only.
 
 ### [C-036] Profiles are OpenTelemetry's fourth observability signal; the Profiles specification remains Alpha
 
@@ -226,6 +228,34 @@
 
 ### [C-043] golang/go#67120 is the runtime/metrics recommended set proposal (OPEN, Incoming)
 
-- **Verdict:** PLAUSIBLE — consistent with research but not directly confirmed against issue page
+- **Verdict:** RESOLVED by non-use
 - **Source(s):** S-RF-04
-- **Notes:** Research summary mentions it as "still incoming." Verify exact title and current status from <https://github.com/golang/go/issues/67120> before citing.
+- **Notes:** Title confirmed verbatim. Cited nowhere in the deck or script. No action needed.
+
+---
+
+## Speaker-attested claims (keynote restructure, 2026-08-13)
+
+### [C-050] Datadog Live Debugger adds logpoints and variable snapshots to running Go services without a redeploy
+
+- **Verdict:** CONFIRMED by the speaker and approved for public use
+- **Source(s):** S-DD-02 (speaker attestation)
+- **Notes:** Scope: what the slide and script say, nothing more. Uses eBPF through Datadog's `system-probe`; Go support requires Linux 5.17+. Logpoints expire automatically. Bits Live Debugger is in preview. Do not shill the product; this is a brain teaser for what is possible.
+
+### [C-051] A Go injector hook exists in development (not released), loaded via LD_PRELOAD at process start
+
+- **Verdict:** CONFIRMED by the speaker, in development, not released
+- **Source(s):** S-DD-03 (speaker attestation)
+- **Notes:** The most important note in the ledger: the mechanism is deliberately undisclosed. Never add linking model, entry path, or binary-compatibility detail to any slide or script line. If asked, defer to next year's talk. The invocation shows `LD_PRELOAD=./libdd_go_hook.so` with `DD_SERVICE` and `DD_TRACE_DEBUG=1`; `DD_TRACE_DEBUG=1` shows span creation and trace-id extraction on stderr. No `make go-hook.so` on the slide: a build the room cannot reproduce reads as a tease. Amber `in development` chip.
+
+### [C-052] OBI roadmap: v0.11.0 targeted mid-August, proposed path to v1.0.0 by late October
+
+- **Verdict:** PLAUSIBLE (SIG proposal, not a commitment)
+- **Source(s):** S-OBI-05 (OBI SIG notes, Aug 12 2026, public, linked from open-telemetry/community)
+- **Notes:** v0.11.0 targeted 18 August, gated on Config v2. A proposed path: v0.12 (Sep 22), rc1 (Oct 5), v1.0.0 target 26 Oct, before KubeCon NA. Channel: `#otel-ebpf-instrumentation`. Proposed, not committed. Script only. Never state the October date as a plan of record.
+
+### [C-053] Usama Saqib's FOSDEM 2026 talk covers production eBPF pitfalls at Datadog
+
+- **Verdict:** CONFIRMED
+- **Source(s):** S-UP-06 (FOSDEM 2026 public page)
+- **Notes:** Title, speaker, and abstract scope as cited on the slide. The talk covers kprobe performance across kernel versions, a fentry kernel bug, and the pain of scaling uprobes. Twenty-eight minutes, public. URL: <https://fosdem.org/2026/schedule/event/H3LM7G-performance_and_reliability_pitfalls_of_ebpf/>
