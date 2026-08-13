@@ -894,6 +894,19 @@ Catalog lookups are offline and read-only. `kubectl-obi` and `kubectl-profiler` 
 
 ---
 
+## Get involved in the SIGs
+
+[github.com/open-telemetry/community](https://github.com/open-telemetry/community) is the index for every SIG's calendar and notes.
+
+- Go Compile-Time Instrumentation (`otelc`)
+- eBPF Instrumentation (OBI)
+- Injector
+- Profiling
+
+The confirmed channel is **`#otel-ebpf-instrumentation`**.
+
+---
+
 <!-- _class: dark -->
 
 # Take it with you
