@@ -135,6 +135,20 @@ We build Go instrumentation at all three layers. Each layer solves a different c
 
 ---
 
+<!-- _paginate: false -->
+<!-- _header: "" -->
+
+![bg contain](../assets/cc_opening_joke_1.png)
+
+---
+
+<!-- _paginate: false -->
+<!-- _header: "" -->
+
+![bg contain](../assets/cc_opening_joke_2.png)
+
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
