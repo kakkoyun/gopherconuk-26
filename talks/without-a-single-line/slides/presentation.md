@@ -865,6 +865,35 @@ Same move as the opening joke, except now the agent has the framework.
 
 ---
 
+<!-- _class: vcenter -->
+
+## Takeaways
+
+<br>
+
+Start from the constraint you cannot change.
+
+Add a layer only when its signal pays for its operational cost.
+
+---
+
+<!-- _class: terminal -->
+
+# Take it home
+
+```bash
+go install github.com/kakkoyun/zeroins/cmd/...@latest
+obi-integration net/http     # offline OBI v0.10.0 catalog
+otelc-aspect    net/http     # offline otelc v1.0.1 catalog
+npx skills add kakkoyun/zeroins --all
+```
+
+<br>
+
+Catalog lookups are offline and read-only. `kubectl-obi` and `kubectl-profiler` are experimental privileged wrappers needing an explicit OTLP endpoint.
+
+---
+
 <!-- _class: dark -->
 
 # Take it with you
