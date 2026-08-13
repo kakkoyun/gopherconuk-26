@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 23. Six lists use `*` fragment bullets for selective
+# fragment-floor: 20. Five lists use `*` fragment bullets for selective
 # progressive reveal. Lists inside .columns are excluded on purpose. MD004 is
 # disabled, so a mixed `*`/`-` deck lints clean. Reveals animate only in
 # bespoke HTML; the PDF handout shows everything at once.
@@ -31,6 +31,18 @@ style: |
 How to Instrument Go Without Changing a Single Line of Code
 
 ### Kemal Akkoyun · Datadog
+
+---
+
+<!-- _paginate: false -->
+
+## Why observability matters
+
+<br>
+
+You cannot fix what you cannot *see*.
+
+Traces, metrics, logs, profiles: the four signals that tell you what your code is doing in production.
 
 ---
 
@@ -81,72 +93,39 @@ The fiftieth inherits gaps.
 
 ---
 
-## A short convergence timeline
-
-| Date | Milestone |
-| --- | --- |
-| Jun 2024 | Elastic's profiler joins OpenTelemetry |
-| Jan 2025 | Alibaba, Datadog, and Quesma form the Go compile-time SIG |
-| 2025 | Beyla becomes OpenTelemetry eBPF Instrumentation |
-| Jul 2026 | `otelc` v1 becomes stable |
-
-The projects did not collapse into one agent. They learned to compose.
-
----
-
 <!-- _class: vcenter -->
 
-## How I got here
-
-* `client_golang`: I wrapped handlers by hand, for years
-* Parca: a profiler nobody has to install
-* `otelc`: instrumentation that ships inside *your* binary
-
-<br>
-
-### Each job taught the same thing: hand-written instrumentation decays
-
-<span class="small">Prometheus Steering Committee · maintainer of `client_golang` and OpenTelemetry Go compile-time instrumentation</span>
-
----
-
-<!-- _class: vcenter -->
-
-## Why Datadog cares
+## Why we care
 
 <div class="columns3">
 <div class="center">
 
 ### Build time
 
-Orchestrion
-
-OpenTelemetry `otelc`
+`otelc`
 
 </div>
 <div class="center">
 
 ### Process start
 
-Language agents
-
-Single-Step Instrumentation
+Injector
 
 </div>
 <div class="center">
 
 ### Runtime + kernel
 
-eBPF instrumentation
-
-Continuous profiling
+eBPF + profiling
 
 </div>
 </div>
 
 <br>
 
-We build Go instrumentation at all three layers. Each layer solves a different constraint.
+I wrapped handlers by hand for years. Every job taught me the same thing: hand-written instrumentation *decays*.
+
+Datadog builds at all three layers. Each solves a different constraint.
 
 ---
 
@@ -235,6 +214,19 @@ flowchart LR
 <br>
 
 Runtime injection is useful, but Go's default static binary leaves less surface to attach to.
+
+---
+
+## A short convergence timeline
+
+| Date | Milestone |
+| --- | --- |
+| Jun 2024 | Elastic's profiler joins OpenTelemetry |
+| Jan 2025 | Alibaba, Datadog, and Quesma form the Go compile-time SIG |
+| 2025 | Beyla becomes OpenTelemetry eBPF Instrumentation |
+| Jul 2026 | `otelc` v1 becomes stable |
+
+The projects did not collapse into one agent. They learned to compose.
 
 ---
 
