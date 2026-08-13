@@ -853,6 +853,14 @@ Start with the constraint you cannot change. Add the other layer when its signal
 
 USDT probes put stable, named hook points in the binary instead of forcing tools to chase function addresses.
 
+<div class="columns">
+<div>
+
+![width:480](../assets/github_kakkoyun_usdt_poc.png)
+
+</div>
+<div>
+
 ```bash
 # Proof of concept: github.com/kakkoyun/go/tree/poc_usdt
 go tool usdt list ./...
@@ -862,6 +870,9 @@ go tool usdt list ./...
 ```
 
 Go ships no built-in USDT probes today. The proof of concept shows what a stable contract could look like.
+
+</div>
+</div>
 
 ---
 
@@ -910,6 +921,8 @@ npx skills add kakkoyun/zeroins --all
 
 Catalog lookups are offline and read-only. `kubectl-obi` and `kubectl-profiler` are experimental privileged wrappers needing an explicit OTLP endpoint.
 
+For more agent skills for instrumenting Go applications, see [github.com/ollygarden/opentelemetry-agent-skills](https://github.com/ollygarden/opentelemetry-agent-skills).
+
 ---
 
 ## Get involved in the SIGs
@@ -944,6 +957,10 @@ Both decks · research · [earlier FOSDEM version](https://youtu.be/0TvrSebuDPk)
 
 `obi-integration` · `otelc-aspect`<br>
 `kubectl-obi` · `kubectl-profiler`
+
+### agent skills
+
+[github.com/ollygarden/opentelemetry-agent-skills](https://github.com/ollygarden/opentelemetry-agent-skills)
 
 </div>
 <div class="center">
