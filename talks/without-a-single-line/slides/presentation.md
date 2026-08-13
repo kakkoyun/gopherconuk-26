@@ -192,10 +192,12 @@ The Go team calls this access pattern a "hall of shame," not an instrumentation 
 
 ## Choose where to intervene
 
-```text
-source -> build -> link -> process start -> runtime -> kernel
-            ^              ^                    ^
-          otelc         injector             eBPF
+```mermaid
+flowchart LR
+    A[source] --> B[build] --> C[link] --> D[process start] --> E[runtime] --> F[kernel]
+    B -.- |otelc| B
+    D -.- |injector| D
+    F -.- |eBPF| F
 ```
 
 | Layer | Trade-off |
@@ -245,20 +247,11 @@ Runtime injection is useful, but Go's default static binary leaves less surface 
 
 ## How OBI works
 
-```text
-Go service
-    |
-    |  uprobes + network probes
-    v
-Linux kernel
-    |
-    |  events + context
-    v
-OBI DaemonSet
-    |
-    |  OTLP traces + metrics
-    v
-OpenTelemetry Collector
+```mermaid
+flowchart TD
+    A[Go service] -->|uprobes + network probes| B[Linux kernel]
+    B -->|events + context| C[OBI DaemonSet]
+    C -->|OTLP traces + metrics| D[OpenTelemetry Collector]
 ```
 
 ---
@@ -470,10 +463,12 @@ somehow, it works
 
 ## Three organizations converged upstream
 
-```text
-Datadog Orchestrion ----\
-Alibaba rules engine ----+--> OpenTelemetry Go compile-time SIG --> otelc
-Quesma instrgen --------/
+```mermaid
+flowchart LR
+    A[Datadog Orchestrion] --> D[OpenTelemetry Go compile-time SIG]
+    B[Alibaba rules engine] --> D
+    C[Quesma instrgen] --> D
+    D --> E[otelc]
 ```
 
 `otelc` is a vendor-neutral tool built by the SIG.
@@ -499,20 +494,13 @@ The projects did not collapse into one agent. They learned to compose.
 
 ## `-toolexec` puts otelc before the compiler
 
-```text
-go build ./...  ->  -toolexec otelc
-                         |
-                         v
-                 parse and rewrite .go
-                         |
-                         v
-                 go tool compile
-                         |
-                         v
-              binary with instrumentation
+```mermaid
+flowchart TD
+    A[go build ./...] --> B[-toolexec otelc]
+    B --> C[parse and rewrite .go]
+    C --> D[go tool compile]
+    D --> E[binary with instrumentation]
 ```
-
-It covers your code, dependencies, and supported standard-library paths.
 
 ---
 
@@ -735,16 +723,10 @@ Originated as Elastic Universal Profiling and joined OpenTelemetry in June 2024.
 
 ## Go stacks survive stripped binaries
 
-```text
-Go binary
-    |
-    |  .gopclntab
-    v
-OpenTelemetry eBPF Profiler
-    |
-    |  unwind + symbolize
-    v
-Named Go function stacks
+```mermaid
+flowchart TD
+    A[Go binary] -->|.gopclntab| B[OpenTelemetry eBPF Profiler]
+    B -->|unwind + symbolize| C[Named Go function stacks]
 ```
 
 `.gopclntab` remains in fully static, stripped executables because the Go runtime needs it too.
@@ -827,13 +809,15 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 
 ## A practical production combination
 
-```text
-Build pipeline
-  otelc / Orchestrion -> semantic spans, metrics, logs, pprof labels
-
-Linux cluster
-  OBI                 -> boundaries, mixed-language coverage
-  eBPF Profiler       -> whole-node CPU profiles
+```mermaid
+flowchart TD
+    subgraph Build pipeline
+        A[otelc / Orchestrion] -->|semantic spans, metrics, logs, pprof labels|
+    end
+    subgraph Linux cluster
+        B[OBI] -->|boundaries, mixed-language coverage|
+        C[eBPF Profiler] -->|whole-node CPU profiles|
+    end
 ```
 
 Start with the constraint you cannot change. Add the other layer when its signal earns the cost.
