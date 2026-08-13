@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 0 — this deck has no progressive reveals yet. If you add `*`
+# fragment-floor: 0. This deck has no progressive reveals yet. If you add `*`
 # fragment bullets, raise this so `make check/fragments` protects them.
 math: mathjax
 html: true
@@ -427,7 +427,7 @@ Go runtime and library layout changes can invalidate offsets. Go 1.26 required a
 
 ---
 
-## Usama Saqib — pitfalls of production eBPF
+## Usama Saqib: pitfalls of production eBPF
 
 <div class="columns">
 <div class="center">
@@ -437,11 +437,11 @@ Go runtime and library layout changes can invalidate offsets. Go 1.26 required a
 </div>
 <div>
 
-He covers the pitfalls found building production eBPF at Datadog — kprobe performance across kernel versions, a fentry kernel bug, and the pain of scaling uprobes.
+He covers the pitfalls found building production eBPF at Datadog: kprobe performance across kernel versions, a fentry kernel bug, and the pain of scaling uprobes.
 
 Twenty-eight minutes, public, and it goes deeper than this section can.
 
-[Performance and reliability pitfalls of eBPF — FOSDEM 2026](https://fosdem.org/2026/schedule/event/H3LM7G-performance_and_reliability_pitfalls_of_ebpf/)
+[Performance and reliability pitfalls of eBPF, FOSDEM 2026](https://fosdem.org/2026/schedule/event/H3LM7G-performance_and_reliability_pitfalls_of_ebpf/)
 
 </div>
 </div>
@@ -847,32 +847,21 @@ Go ships no built-in USDT probes today. The proof of concept shows what a stable
 
 ---
 
-## Live Debugger applies eBPF to debugging
+<!-- _class: vcenter -->
 
-<div class="columns">
-<div>
+## The loop, without the redeploy
 
-### Datadog Live Debugger
+<br>
 
-Adds logpoints and variable snapshots to running Go services.
+Describe the bug in words. The agent places the probe and reads production evidence.
 
-No source edit, restart, or redeploy.
+No source edit. No restart. No redeploy.
 
-Uses eBPF through Datadog's `system-probe`; Go support requires Linux 5.17+.
+<br>
 
-</div>
-<div>
+Bits Live Debugger does this today, in preview.
 
-### Bits Live Debugger (Preview)
-
-Describe the bug in natural language.
-
-The agent places logpoints, reads production snapshots, forms hypotheses, and suggests fixes.
-
-Logpoints expire automatically.
-
-</div>
-</div>
+Same move as the opening joke, except now the agent has the framework.
 
 ---
 
