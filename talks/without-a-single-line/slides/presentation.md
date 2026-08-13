@@ -1,8 +1,10 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 0. This deck has no progressive reveals yet. If you add `*`
-# fragment bullets, raise this so `make check/fragments` protects them.
+# fragment-floor: 23. Six lists use `*` fragment bullets for selective
+# progressive reveal. Lists inside .columns are excluded on purpose. MD004 is
+# disabled, so a mixed `*`/`-` deck lints clean. Reveals animate only in
+# bespoke HTML; the PDF handout shows everything at once.
 math: mathjax
 html: true
 paginate: true
@@ -83,9 +85,9 @@ The fiftieth inherits gaps.
 
 ## How I got here
 
-- `client_golang`: I wrapped handlers by hand, for years
-- Parca: a profiler nobody has to install
-- `otelc`: instrumentation that ships inside *your* binary
+* `client_golang`: I wrapped handlers by hand, for years
+* Parca: a profiler nobody has to install
+* `otelc`: instrumentation that ships inside *your* binary
 
 <br>
 
@@ -160,10 +162,10 @@ We build Go instrumentation at all three layers. Each layer solves a different c
 
 ## What makes Go different
 
-- The compiler emits native machine code.
-- The internal linker produces static binaries by default.
-- There is no classloader or general runtime hook API.
-- Goroutines move between OS threads and use movable stacks.
+* The compiler emits native machine code.
+* The internal linker produces static binaries by default.
+* There is no classloader or general runtime hook API.
+* Goroutines move between OS threads and use movable stacks.
 
 <br>
 
@@ -206,10 +208,10 @@ source -> build -> link -> process start -> runtime -> kernel
 
 ## Runtime injection is a narrower route
 
-- Dynatrace OneAgent supports eligible dynamically linked Go binaries.
-- The OpenTelemetry host injector ships Java, .NET, Node.js, and Python agents. It does not inject Go.
-- The OpenTelemetry Operator has a separate, feature-gated Go eBPF sidecar.
-- Datadog is working on a Go path for Single-Step Instrumentation.
+* Dynatrace OneAgent supports eligible dynamically linked Go binaries.
+* The OpenTelemetry host injector ships Java, .NET, Node.js, and Python agents. It does not inject Go.
+* The OpenTelemetry Operator has a separate, feature-gated Go eBPF sidecar.
+* Datadog is working on a Go path for Single-Step Instrumentation.
 
 <br>
 
@@ -230,10 +232,10 @@ Runtime injection is useful, but Go's default static binary leaves less surface 
 
 **OBI** is the upstream successor to Grafana Beyla, donated to OpenTelemetry in 2025.
 
-- No application rebuild.
-- One DaemonSet can observe a mixed-language node.
-- Network protocols provide broad coverage.
-- Go-specific uprobes add library-level detail.
+* No application rebuild.
+* One DaemonSet can observe a mixed-language node.
+* Network protocols provide broad coverage.
+* Go-specific uprobes add library-level detail.
 
 <br>
 
@@ -633,10 +635,10 @@ the linker picks by symbol loading order
 
 ## The build path has boundaries too
 
-- Requires control of the Go build pipeline.
-- Requires Go 1.25 or newer for current otelc.
-- Coverage stops at the supported integration set.
-- Toolchain internals such as `-toolexec` and `go:linkname` can change.
+* Requires control of the Go build pipeline.
+* Requires Go 1.25 or newer for current otelc.
+* Coverage stops at the supported integration set.
+* Toolchain internals such as `-toolexec` and `go:linkname` can change.
 
 <br>
 
@@ -720,10 +722,10 @@ No rebuild. No source change. No kernel version gate. One line.
 
 Originated as Elastic Universal Profiling and joined OpenTelemetry in June 2024.
 
-- Samples CPU from the kernel.
-- Profiles every process on a node.
-- Requires no application rebuild or injected library.
-- Emits the OpenTelemetry Profiles signal.
+* Samples CPU from the kernel.
+* Profiles every process on a node.
+* Requires no application rebuild or injected library.
+* Emits the OpenTelemetry Profiles signal.
 
 <br>
 
