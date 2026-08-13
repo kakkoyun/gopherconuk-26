@@ -260,11 +260,7 @@ flowchart TD
 <!-- _class: punchline dark -->
 <!-- _paginate: false -->
 
-# No source change
-
-# No rebuild
-
-# No application rollout
+# No source change. No rebuild. No *rollout*.
 
 ---
 
@@ -505,24 +501,14 @@ flowchart TD
 
 ---
 
+<!-- _class: vcenter -->
+
 ## Production evidence
 
-<div class="columns">
-<div class="center">
-
-<div class="big" style="color: var(--purple);">v1</div>
-
-Stable upstream tool
-
-</div>
-<div class="center">
-
-<div class="big" style="color: var(--purple);">20%</div>
-
-Growth in customers adopting Orchestrion-based auto-instrumentation
-
-</div>
-</div>
+| | |
+| ---: | --- |
+| <span style="font-size: 2.5em; color: var(--purple); font-weight: 700;">v1</span> | <span style="font-size: 2.5em; color: var(--purple); font-weight: 700;">20%</span> |
+| Stable upstream tool | Growth in customers adopting auto-instrumentation |
 
 <br>
 
@@ -694,8 +680,6 @@ DD_TRACE_DEBUG=1 \
 <!-- _class: punchline dark -->
 <!-- _paginate: false -->
 
-## What it means
-
 # No rebuild. No source change. No kernel version gate.
 
 ### *One line.*
@@ -714,9 +698,7 @@ DD_TRACE_DEBUG=1 \
 <!-- _class: punchline dark -->
 <!-- _paginate: false -->
 
-## Traces tell you which request was slow
-
-<br>
+# Traces tell you which request was slow
 
 # Profiles tell you where the *CPU* went
 
@@ -815,6 +797,7 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 ---
 
 <!-- _class: punchline dark -->
+<!-- _paginate: false -->
 
 # Compile time sets context. eBPF reads *evidence*.
 
@@ -928,13 +911,10 @@ Same move as the opening joke, except now the agent has the *framework*.
 <!-- _class: punchline dark -->
 <!-- _paginate: false -->
 
-## Takeaways
+# Takeaways
 
-<br>
-
-Start from the *constraint* you cannot change.
-
-Add a layer only when its *signal* pays for its *operational cost*.
+### Start from the *constraint* you cannot change.
+### Add a layer only when its *signal* pays for its *operational cost*.
 
 ---
 
