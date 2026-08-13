@@ -188,23 +188,6 @@ The Go team calls this access pattern a "hall of shame," not an instrumentation 
 
 ---
 
-## `LD_PRELOAD` reaches only some Go binaries
-
-```bash
-LD_PRELOAD=./tracer.so ./python-app
-LD_PRELOAD=./tracer.so ./go-app
-
-go build -ldflags="-linkmode=external"
-```
-
-| Build | Result |
-| --- | --- |
-| Dynamically linked process | Injection can work |
-| Default internally linked Go binary | No dynamic-loader hook |
-| Static cgo or pure-Go PIE | No compatible library-injection path |
-
----
-
 ## Choose where to intervene
 
 ```text
@@ -444,24 +427,6 @@ Go runtime and library layout changes can invalidate offsets. Go 1.26 required a
 
 ---
 
-<!-- _class: terminal -->
-
-# Inspect support before attaching
-
-```bash
-# Offline OBI v0.10.0 support catalog.
-go run github.com/kakkoyun/zeroins/cmd/obi-integration@latest net/http
-
-# Install the decision workflow for your coding agent.
-npx skills add kakkoyun/zeroins --all
-```
-
-<br>
-
-`kubectl-obi` is experimental and requires an explicit OTLP endpoint.
-
----
-
 <!-- _class: section -->
 <!-- _paginate: false -->
 
@@ -640,28 +605,65 @@ No root access and no kernel version gate, but the binary must be rebuilt.
 
 ---
 
-<!-- _class: terminal -->
+<!-- _class: section -->
+<!-- _paginate: false -->
 
-# Try the build path yourself
+###### 04
+
+# Process start: the injector
+
+---
+
+## What the injector is
+
+A shared library loaded at process start. No source change, no rebuild.
+
+Datadog Single-Step Instrumentation and the OpenTelemetry host injector both live here. Today they ship Java, .NET, Node.js, and Python.
+
+---
+
+## `LD_PRELOAD` reaches only some Go binaries
 
 ```bash
-# Offline otelc v1.0.1 integration catalog.
-go run github.com/kakkoyun/zeroins/cmd/otelc-aspect@latest net/http
+LD_PRELOAD=./tracer.so ./python-app
+LD_PRELOAD=./tracer.so ./go-app
 
-otelc go build -o ./myapp ./...
-OTEL_SERVICE_NAME=my-service ./myapp
+go build -ldflags="-linkmode=external"
 ```
 
-<br>
+| Build | Result |
+| --- | --- |
+| Dynamically linked process | Injection can work |
+| Default internally linked Go binary | No dynamic-loader hook |
+| Static cgo or pure-Go PIE | No compatible library-injection path |
 
-Catalog lookup is read-only. Build instrumentation still changes the binary.
+---
+
+## The teaser
+
+```bash
+LD_PRELOAD=./libdd_go_hook.so \
+DD_SERVICE=my-service \
+DD_TRACE_DEBUG=1 \
+./my-go-app
+```
+
+`DD_TRACE_DEBUG=1` shows span creation and trace-id extraction on stderr.
+
+<span class="chip caution">in development</span>
+
+---
+
+## What it means
+
+No rebuild. No source change. No kernel version gate. One line.
 
 ---
 
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 04
+###### 05
 
 # Profiles complete the four signals
 
@@ -762,9 +764,9 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 05
+###### 06
 
-# Choose by constraints
+# When to reach for what
 
 ---
 
@@ -800,9 +802,9 @@ Start with the constraint you cannot change. Add the other layer when its signal
 <!-- _class: section -->
 <!-- _paginate: false -->
 
-###### 06
+###### 07
 
-# Give tools a stable contract
+# What comes next
 
 ---
 
