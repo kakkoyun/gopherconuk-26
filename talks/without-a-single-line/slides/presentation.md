@@ -1,7 +1,7 @@
 ---
 marp: true
 theme: gophercon-datadog-minimal
-# fragment-floor: 20. Five lists use `*` fragment bullets for selective
+# fragment-floor: 21. Six lists use `*` fragment bullets for selective
 # progressive reveal. Lists inside .columns are excluded on purpose. MD004 is
 # disabled, so a mixed `*`/`-` deck lints clean. Reveals animate only in
 # bespoke HTML; the PDF handout shows everything at once.
@@ -42,7 +42,7 @@ How to Instrument Go Without Changing a Single Line of Code
 
 You cannot fix what you cannot *see*.
 
-Traces, metrics, logs, profiles: the four signals that tell you what your code is doing in production.
+**Traces**, **metrics**, **logs**, **profiles**: the four signals that tell you what your code is doing in production.
 
 ---
 
@@ -52,8 +52,8 @@ Traces, metrics, logs, profiles: the four signals that tell you what your code i
 
 <br>
 
-- Added a log line. Redeployed.
-- Wrong place. Did it again.
+* Added a log line. Redeployed.
+* Wrong place. Did it again.
 
 ---
 
@@ -97,29 +97,11 @@ The fiftieth inherits gaps.
 
 ## Why we care
 
-<div class="columns3">
-<div class="center">
-
-### Build time
-
-`otelc`
-
-</div>
-<div class="center">
-
-### Process start
-
-Injector
-
-</div>
-<div class="center">
-
-### Runtime + kernel
-
-eBPF + profiling
-
-</div>
-</div>
+| Layer | What | Constraint |
+| --- | --- | --- |
+| *Build time* | `otelc` | Rebuild required |
+| *Process start* | Injector | Binary/linking restrictions |
+| *Runtime + kernel* | eBPF + profiling | Linux, privileges, kernel contracts |
 
 <br>
 
@@ -189,9 +171,9 @@ The Go team calls this access pattern a "hall of shame," not an instrumentation 
 ```mermaid
 flowchart LR
     A[source] --> B[build] --> C[link] --> D[process start] --> E[runtime] --> F[kernel]
-    B -.- otelc
-    D -.- injector
-    F -.- eBPF
+    B --> G[otelc]
+    D --> H[injector]
+    F --> I[eBPF]
 ```
 
 </div>
@@ -208,12 +190,18 @@ flowchart LR
 
 * Dynatrace OneAgent supports eligible dynamically linked Go binaries.
 * The OpenTelemetry host injector ships Java, .NET, Node.js, and Python agents. It does not inject Go.
-* The OpenTelemetry Operator has a separate, feature-gated Go eBPF sidecar.
 * Datadog is working on a Go path for Single-Step Instrumentation.
 
 <br>
 
 Runtime injection is useful, but Go's default static binary leaves less surface to attach to.
+
+---
+
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
+# Three open-source projects. *Three approaches.*
 
 ---
 
@@ -708,9 +696,7 @@ DD_TRACE_DEBUG=1 \
 
 ## What it means
 
-# No rebuild
-# No source change
-# No kernel version gate
+# No rebuild. No source change. No kernel version gate.
 
 ### *One line.*
 
@@ -830,8 +816,7 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 
 <!-- _class: punchline dark -->
 
-# Compile time sets context
-# eBPF reads *evidence*
+# Compile time sets context. eBPF reads *evidence*.
 
 ### Together, request context reaches profiles
 
@@ -940,7 +925,8 @@ Same move as the opening joke, except now the agent has the *framework*.
 
 ---
 
-<!-- _class: vcenter -->
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
 
 ## Takeaways
 
@@ -973,12 +959,23 @@ For more agent skills for instrumenting Go applications, see [github.com/ollygar
 
 ## Get involved in the SIGs
 
+<div class="columns">
+<div class="center">
+
+![width:400](../assets/meme_we_want_you.png)
+
+</div>
+<div>
+
 [github.com/open-telemetry/community](https://github.com/open-telemetry/community) has every SIG's calendar, notes, and channels.
 
 - Go Compile-Time Instrumentation (`otelc`)
 - eBPF Instrumentation (OBI)
 - Injector
 - Profiling
+
+</div>
+</div>
 
 ---
 
