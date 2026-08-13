@@ -1019,16 +1019,14 @@ Do not imply the QR opens zeroins.
 **SAY**
 
 If you want to help build this, get involved in the SIGs.
-github.com/open-telemetry/community is the index for every SIG's calendar and
-notes.
+github.com/open-telemetry/community has every SIG's calendar, notes, and
+channels.
 
 Go Compile-Time Instrumentation. eBPF Instrumentation. The Injector. Profiling.
 
-The confirmed channel is hash otel-ebpf-instrumentation.
-
 **DO**
 
-Name only the confirmed channel. Do not invent the others.
+Point to the community repo. All channels are listed there.
 
 ---
 

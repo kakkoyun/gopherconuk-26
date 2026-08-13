@@ -81,6 +81,19 @@ The fiftieth inherits gaps.
 
 ---
 
+## A short convergence timeline
+
+| Date | Milestone |
+| --- | --- |
+| Jun 2024 | Elastic's profiler joins OpenTelemetry |
+| Jan 2025 | Alibaba, Datadog, and Quesma form the Go compile-time SIG |
+| 2025 | Beyla becomes OpenTelemetry eBPF Instrumentation |
+| Jul 2026 | `otelc` v1 becomes stable |
+
+The projects did not collapse into one agent. They learned to compose.
+
+---
+
 <!-- _class: vcenter -->
 
 ## How I got here
@@ -192,13 +205,17 @@ The Go team calls this access pattern a "hall of shame," not an instrumentation 
 
 ## Choose where to intervene
 
+<div class="center">
+
 ```mermaid
 flowchart LR
     A[source] --> B[build] --> C[link] --> D[process start] --> E[runtime] --> F[kernel]
-    B -.- |otelc| B
-    D -.- |injector| D
-    F -.- |eBPF| F
+    B -.- otelc
+    D -.- injector
+    F -.- eBPF
 ```
+
+</div>
 
 | Layer | Trade-off |
 | --- | --- |
@@ -247,12 +264,16 @@ Runtime injection is useful, but Go's default static binary leaves less surface 
 
 ## How OBI works
 
+<div class="center">
+
 ```mermaid
 flowchart TD
     A[Go service] -->|uprobes + network probes| B[Linux kernel]
     B -->|events + context| C[OBI DaemonSet]
     C -->|OTLP traces + metrics| D[OpenTelemetry Collector]
 ```
+
+</div>
 
 ---
 
@@ -391,6 +412,13 @@ It leaves log shipping to your existing pipeline. It is not a log exporter.
 
 ---
 
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
+# But it still has a *cost*
+
+---
+
 ## Uprobes have real costs
 
 <div class="columns">
@@ -463,6 +491,8 @@ somehow, it works
 
 ## Three organizations converged upstream
 
+<div class="center">
+
 ```mermaid
 flowchart LR
     A[Datadog Orchestrion] --> D[OpenTelemetry Go compile-time SIG]
@@ -471,28 +501,17 @@ flowchart LR
     D --> E[otelc]
 ```
 
+</div>
+
 `otelc` is a vendor-neutral tool built by the SIG.
 
 Orchestrion remains a production Datadog distribution of the same core idea.
 
 ---
 
-## A short convergence timeline
-
-| Date | Milestone |
-| --- | --- |
-| Jun 2024 | Elastic's profiler joins OpenTelemetry |
-| Jan 2025 | Alibaba, Datadog, and Quesma form the Go compile-time SIG |
-| 2025 | Beyla becomes OpenTelemetry eBPF Instrumentation |
-| Jul 2026 | `otelc` v1 becomes stable |
-
-<br>
-
-The projects did not collapse into one agent. They learned to compose.
-
----
-
 ## `-toolexec` puts otelc before the compiler
+
+<div class="center">
 
 ```mermaid
 flowchart TD
@@ -502,6 +521,8 @@ flowchart TD
     D --> E[binary with instrumentation]
 ```
 
+</div>
+
 ---
 
 ## Production evidence
@@ -509,14 +530,14 @@ flowchart TD
 <div class="columns">
 <div class="center">
 
-<div class="big">v1</div>
+<div class="big" style="color: var(--purple);">v1</div>
 
 Stable upstream tool
 
 </div>
 <div class="center">
 
-<div class="big">20%</div>
+<div class="big" style="color: var(--purple);">20%</div>
 
 Growth in customers adopting Orchestrion-based auto-instrumentation
 
@@ -571,11 +592,18 @@ The trade-off is build ownership, not operating-system access.
 </div>
 </div>
 
-Not every Datadog integration has moved to otelc yet.
+Not every Alibaba and Datadog integration has moved to otelc yet. We will have much more.
 
 ---
 
-## Compile time can reach Go internals
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
+# And it can reach *deep*
+
+---
+
+## Compile time can reach Go internals! Dark Magic!
 
 ###### gls.orchestrion.yml
 
@@ -683,9 +711,16 @@ DD_TRACE_DEBUG=1 \
 
 ---
 
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
 ## What it means
 
-No rebuild. No source change. No kernel version gate. One line.
+# No rebuild
+# No source change
+# No kernel version gate
+
+### *One line.*
 
 ---
 
@@ -698,11 +733,14 @@ No rebuild. No source change. No kernel version gate. One line.
 
 ---
 
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
 ## Traces tell you which request was slow
 
 <br>
 
-# Profiles tell you where the CPU went
+# Profiles tell you where the *CPU* went
 
 ---
 
@@ -721,13 +759,24 @@ Originated as Elastic Universal Profiling and joined OpenTelemetry in June 2024.
 
 ---
 
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
+# But how does it read a *stripped* binary?
+
+---
+
 ## Go stacks survive stripped binaries
+
+<div class="center">
 
 ```mermaid
 flowchart TD
     A[Go binary] -->|.gopclntab| B[OpenTelemetry eBPF Profiler]
     B -->|unwind + symbolize| C[Named Go function stacks]
 ```
+
+</div>
 
 `.gopclntab` remains in fully static, stripped executables because the Go runtime needs it too.
 
@@ -751,6 +800,17 @@ flowchart TD
 | No rebuild | `CAP_BPF` + `CAP_PERFMON` or root |
 | No in-process agent | DaemonSet / Collector distribution |
 | Stripped binaries supported | CPU profiling is the confirmed core signal |
+
+<br>
+
+The eBPF profiler will add memory profiling soon. But `pprof` still has the edge: more profile types, more granular data, and no kernel privileges.
+
+---
+
+<!-- _class: punchline dark -->
+<!-- _paginate: false -->
+
+# Traces and profiles. *Apart.*
 
 ---
 
@@ -778,7 +838,8 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 
 <!-- _class: punchline dark -->
 
-# Compile time sets context.<br>eBPF reads evidence
+# Compile time sets context
+# eBPF reads *evidence*
 
 ### Together, request context reaches profiles
 
@@ -797,11 +858,11 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 
 | Constraint | Prefer |
 | --- | --- |
-| No rebuild window | OBI |
-| Non-Linux target | otelc / Orchestrion |
+| No rebuild window | OBI or injector |
+| Non-Linux target | otelc |
 | Mixed-language boundary coverage | OBI |
-| Rich Go library semantics | otelc / Orchestrion |
-| No privileged runtime agent | otelc / Orchestrion |
+| Rich Go library semantics | otelc |
+| No privileged runtime agent | otelc or injector |
 | Whole-node CPU profiles | eBPF Profiler |
 | Request-correlated profiles | Compile-time context + profiler |
 
@@ -809,16 +870,23 @@ threadlocal.schema_version: "go_pprof_labels_v1"
 
 ## A practical production combination
 
+<div class="center">
+
 ```mermaid
 flowchart TD
-    subgraph Build pipeline
-        A[otelc / Orchestrion] -->|semantic spans, metrics, logs, pprof labels|
+    subgraph Build [Build pipeline]
+        A[otelc]
     end
-    subgraph Linux cluster
-        B[OBI] -->|boundaries, mixed-language coverage|
-        C[eBPF Profiler] -->|whole-node CPU profiles|
+    subgraph Linux [Linux cluster]
+        B[OBI]
+        C[eBPF Profiler]
     end
+    A -->|semantic spans, metrics, logs, pprof labels| OUT[Your backend]
+    B -->|boundaries, mixed-language coverage| OUT
+    C -->|whole-node CPU profiles| OUT
 ```
+
+</div>
 
 Start with the constraint you cannot change. Add the other layer when its signal earns the cost.
 
@@ -868,15 +936,15 @@ Go ships no built-in USDT probes today. The proof of concept shows what a stable
 
 <br>
 
-Describe the bug in words. The agent places the probe and reads production evidence.
+Describe the bug in words. The agent places the probe and reads *production evidence*.
 
-No source edit. No restart. No redeploy.
+No source edit. No restart. No *redeploy*.
 
 <br>
 
 Bits Live Debugger does this today, in preview.
 
-Same move as the opening joke, except now the agent has the framework.
+Same move as the opening joke, except now the agent has the *framework*.
 
 ---
 
@@ -886,9 +954,9 @@ Same move as the opening joke, except now the agent has the framework.
 
 <br>
 
-Start from the constraint you cannot change.
+Start from the *constraint* you cannot change.
 
-Add a layer only when its signal pays for its operational cost.
+Add a layer only when its *signal* pays for its *operational cost*.
 
 ---
 
@@ -913,14 +981,12 @@ For more agent skills for instrumenting Go applications, see [github.com/ollygar
 
 ## Get involved in the SIGs
 
-[github.com/open-telemetry/community](https://github.com/open-telemetry/community) is the index for every SIG's calendar and notes.
+[github.com/open-telemetry/community](https://github.com/open-telemetry/community) has every SIG's calendar, notes, and channels.
 
 - Go Compile-Time Instrumentation (`otelc`)
 - eBPF Instrumentation (OBI)
 - Injector
 - Profiling
-
-The confirmed channel is **`#otel-ebpf-instrumentation`**.
 
 ---
 
