@@ -448,6 +448,15 @@ Twenty-eight minutes, public, and it goes deeper than this section can.
 
 ---
 
+<!-- _class: meme -->
+<!-- _paginate: false -->
+
+![bg contain](../assets/meme_somehow_it_works.png)
+
+somehow, it works
+
+---
+
 <!-- _class: section -->
 <!-- _paginate: false -->
 
@@ -610,6 +619,15 @@ When both sides are uninitialized BSS symbols, the linker chooses by symbol load
 > Ian Lance Taylor, [golang/go#72032](https://github.com/golang/go/issues/72032)
 
 This broke between Go 1.22 and 1.23.
+
+---
+
+<!-- _class: meme -->
+<!-- _paginate: false -->
+
+![bg contain](../assets/meme_linker_loading_order.png)
+
+the linker picks by symbol loading order
 
 ---
 
