@@ -960,10 +960,6 @@ Both decks · research · [earlier FOSDEM version](https://youtu.be/0TvrSebuDPk)
 `obi-integration` · `otelc-aspect`<br>
 `kubectl-obi` · `kubectl-profiler`
 
-### agent skills
-
-[github.com/ollygarden/opentelemetry-agent-skills](https://github.com/ollygarden/opentelemetry-agent-skills)
-
 </div>
 <div class="center">
 
